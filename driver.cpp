@@ -38,6 +38,10 @@ int main(int argc, char** argv) {
 
     chrono::steady_clock::time_point begin, end;
 
+    if (ID == 0) {
+        begin = chrono::steady_clock::now();
+    }
+
     vector<double> dynamics_state; // list of points and other information in a flattened array
     vector<vector<vector<int>>> dynamics_triangles; // at level i, each entry is a vector which contains the 3 vertices and the refinement level of the triangle
     vector<vector<bool>> dynamics_triangles_is_leaf; // at level i, if triangle j is a leaf triangle
@@ -173,6 +177,8 @@ int main(int argc, char** argv) {
     write_out_init3.close();
 
     if (ID == 0) {
+        end = chrono::steady_clock::now();
+        cout << "initialization time: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << " microseconds" << endl;
         begin = chrono::steady_clock::now();
     }
 
@@ -328,7 +334,7 @@ int main(int argc, char** argv) {
 
     if (ID == 0) {
         end = chrono::steady_clock::now();
-        cout << "time taken: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << " microseconds" << endl;
+        cout << "dynamics time: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << " microseconds" << endl;
     }
 
     for (int i = 0; i < ceil(run_information.end_time); i++) {

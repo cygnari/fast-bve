@@ -65,8 +65,8 @@ void polar_vortex(run_config& run_information, vector<double>& dynamics_state) {
         curr_pos = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
         latlon = lat_lon(curr_pos);
         lat = latlon[0];
-        vor = 2 * cos(lat) * pow(beta, 2) * (cos(theta0) * sin(lat) - sin(theta0) * cos(lat)) + sin(lat);
-        vor *= M_PI * exp(-2 * pow(beta, 2) * (1 - cos(theta0) * cos(lat) - sin(theta0 * sin(lat))));
+        vor = 2 * cos(lat) * pow(beta, 2) * sin(theta0 - lat) + sin(lat);
+        vor *= M_PI * exp(-2 * pow(beta, 2) * (1 - cos(theta0 - lat)));
         dynamics_state[run_information.info_per_point * i + 3] = vor;
     }
 }

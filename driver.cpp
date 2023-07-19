@@ -162,12 +162,15 @@ int main(int argc, char** argv) {
             write_triangles(run_information, dynamics_triangles, dynamics_triangles_is_leaf, write_out_init3, write_out4);
         } else {
             int info;
-            string name3 = run_information.out_path + "/" + output_filename + "/triangles_init.csv";
-            string name4 = run_information.out_path + "/" + output_filename + "/tri_counts.csv";
+            string name3 = run_information.out_path + "/" + output_filename + "_triangles_init.csv";
+            string name4 = run_information.out_path + "/" + output_filename + "_tri_counts.csv";
+            // string name3 = run_information.out_path + "/" + output_filename + "/triangles_init.csv";
+            // string name4 = run_information.out_path + "/" + output_filename + "/tri_counts.csv";
             info = remove(name3.c_str());
             info = remove(name4.c_str());
             for (int i = 0; i < ceil(run_information.end_time); i++) {
-                name3 = run_information.out_path + "/" + output_filename + "/triangles_" + to_string(i) + ".csv";
+                // name3 = run_information.out_path + "/" + output_filename + "/triangles_" + to_string(i) + ".csv";
+                name3 = run_information.out_path + "/" + output_filename + "_triangles_" + to_string(i) + ".csv";
                 info = remove(name3.c_str());
             }
         }

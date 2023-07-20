@@ -221,14 +221,14 @@ int main(int argc, char** argv) {
         vec_add(inter_state, dynamics_state); // x+delta_t/2*k1
         project_points(run_information, inter_state, omega);
         MPI_Barrier(MPI_COMM_WORLD);
-        if (run_information.use_fast) {
-            fast_sum_tree_point_locs.clear();
-            fast_sum_tree_tri_points.clear();
-            fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
-            fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
-            points_assign(run_information, inter_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-            tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
-        }
+        // if (run_information.use_fast) {
+        //     fast_sum_tree_point_locs.clear();
+        //     fast_sum_tree_tri_points.clear();
+        //     fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
+        //     fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
+        //     points_assign(run_information, inter_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
+        //     tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+        // }
 
         rhs_func(run_information, c_2, inter_state, dynamics_areas, omega, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time); // RK4 k_2
         sync_updates(run_information, c_2, P, ID, &win_c2);
@@ -237,14 +237,14 @@ int main(int argc, char** argv) {
         vec_add(inter_state, dynamics_state); // x+delta_t/2*k2
         project_points(run_information, inter_state, omega);
         MPI_Barrier(MPI_COMM_WORLD);
-        if (run_information.use_fast) {
-            fast_sum_tree_point_locs.clear();
-            fast_sum_tree_tri_points.clear();
-            fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
-            fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
-            points_assign(run_information, inter_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-            tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
-        }
+        // if (run_information.use_fast) {
+        //     fast_sum_tree_point_locs.clear();
+        //     fast_sum_tree_tri_points.clear();
+        //     fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
+        //     fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
+        //     points_assign(run_information, inter_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
+        //     tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+        // }
 
         rhs_func(run_information, c_3, inter_state, dynamics_areas, omega, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time); // RK4 k_3
         sync_updates(run_information, c_3, P, ID, &win_c3);
@@ -253,14 +253,14 @@ int main(int argc, char** argv) {
         vec_add(inter_state, dynamics_state); // x + delta_t * k_3
         project_points(run_information, inter_state, omega);
         MPI_Barrier(MPI_COMM_WORLD);
-        if (run_information.use_fast) {
-            fast_sum_tree_point_locs.clear();
-            fast_sum_tree_tri_points.clear();
-            fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
-            fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
-            points_assign(run_information, inter_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-            tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
-        }
+        // if (run_information.use_fast) {
+        //     fast_sum_tree_point_locs.clear();
+        //     fast_sum_tree_tri_points.clear();
+        //     fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
+        //     fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
+        //     points_assign(run_information, inter_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
+        //     tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+        // }
 
         rhs_func(run_information, c_4, inter_state, dynamics_areas, omega, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time); // RK4 k_4
         sync_updates(run_information, c_4, P, ID, &win_c4);
@@ -287,14 +287,14 @@ int main(int argc, char** argv) {
             vec_add(dynamics_state, c1234);
             project_points(run_information, dynamics_state, omega);
         }
-        if (run_information.use_fast) {
-            fast_sum_tree_point_locs.clear();
-            fast_sum_tree_tri_points.clear();
-            fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
-            fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
-            points_assign(run_information, inter_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-            tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
-        }
+        // if (run_information.use_fast) {
+        //     fast_sum_tree_point_locs.clear();
+        //     fast_sum_tree_tri_points.clear();
+        //     fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
+        //     fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
+        //     points_assign(run_information, inter_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
+        //     tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+        // }
         MPI_Barrier(MPI_COMM_WORLD);
         if (run_information.write_stream) {
             convolve_stream(run_information, stream_func, dynamics_state, dynamics_areas, omega, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time);

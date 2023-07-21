@@ -29,11 +29,10 @@ void rhs_direct_sum_vel(run_config& run_information, vector<double>& modify, vec
 
 void rhs_direct_sum_stream(run_config& run_information, vector<double>& modify, vector<double>& dynamics_state, vector<double>& dynamics_areas,
         double time, double omega) { // direct summation for all of RHS
-    vector<double> pos_change, particle_i, particle_j, contribution;
+    vector<double> pos_change, particle_i, particle_j;
     double vor;
-    int nval = 1, point_offset = 1;
+    double stream_val = 0, contribution;
     for (int i = run_information.particle_lb; i < run_information.particle_ub; i++) {
-        pos_change = {0, 0, 0};
         particle_i = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
         for (int j = 0; j < run_information.dynamics_curr_point_count; j++) {
             if (i != j) {
@@ -41,11 +40,10 @@ void rhs_direct_sum_stream(run_config& run_information, vector<double>& modify, 
                 contribution = stream_gfunc(particle_i, particle_j);
                 vor = dynamics_state[run_information.info_per_point * j + 3];
                 vor -= vor_force_func(run_information, particle_j, time, omega);
-                scalar_mult(contribution, vor * dynamics_areas[j]);
-                vec_add(pos_change, contribution);
+                stream_val += contribution * vor * dynamics_areas[j];
             }
         }
-        vector_copy(modify, pos_change, point_offset * i, nval);
+        modify[i] = stream_val;
     }
 }
 

@@ -116,10 +116,10 @@ int main(int argc, char** argv) {
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    ofstream write_out2(run_information.out_path + "/" + output_filename + "/point_counts.csv", ofstream::out | ofstream::trunc);
-    ofstream write_out4(run_information.out_path + "/" + output_filename + "/tri_counts.csv", ofstream::out | ofstream::trunc);
-    // ofstream write_out2(run_information.out_path + "/" + output_filename + "_point_counts.csv", ofstream::out | ofstream::trunc);
-    // ofstream write_out4(run_information.out_path + "/" + output_filename + "_tri_counts.csv", ofstream::out | ofstream::trunc);
+    // ofstream write_out2(run_information.out_path + "/" + output_filename + "/point_counts.csv", ofstream::out | ofstream::trunc);
+    // ofstream write_out4(run_information.out_path + "/" + output_filename + "/tri_counts.csv", ofstream::out | ofstream::trunc);
+    ofstream write_out2(run_information.out_path + "/" + output_filename + "_point_counts.csv", ofstream::out | ofstream::trunc);
+    ofstream write_out4(run_information.out_path + "/" + output_filename + "_tri_counts.csv", ofstream::out | ofstream::trunc);
 
     int writer_index;
 

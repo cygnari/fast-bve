@@ -31,6 +31,7 @@ struct run_config {
     int forcing_param1; // parameter for forcing
     double forcing_param2; // parameter for forcing
     // for SSW forcing, FRP1 is forcing wavenumber, FRP2 is forcing duration [days], default FRP1 = 1, FRP2 = 11
+    // ssw_blend , FRP2 is forcing duration [days], default FRP2 = 11
 
     int interp_degree; // interpolation degree, can go up to 4
     int interp_point_count; // number of interpolation points

@@ -12,5 +12,6 @@
 
 export TMPDIR=/glade/scratch/$USER/temp
 mkdir -p $TMPDIR
+python initialize.py
 
 mpirun -np 36 ./driver > $TMPDIR/run_out.txt

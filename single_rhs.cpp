@@ -62,10 +62,13 @@ int main(int argc, char** argv) {
     cout << "here 3" << endl;
 
     dynamics_points_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, dynamics_triangles_exists);
+    cout << "here 3 1" << endl;
     vector<double> dynamics_areas (run_information.dynamics_initial_points, 0);
+    cout << "here 3 2" << endl;
     area_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_areas); // finds areas for each point
+    cout << "here 3 3" << endl;
     vorticity_initialize(run_information, dynamics_state, dynamics_areas, omega); // initializes vorticity values for each point
-
+    cout << "here 3 4" << endl;
     if (run_information.use_fast) {
         fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
         points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);

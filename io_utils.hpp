@@ -15,6 +15,10 @@ void write_state(run_config& run_information, vector<double>& dynamics_state, ve
     file_writer2 << run_information.dynamics_curr_point_count << "\n";
 }
 
+// void write_vec(run_config& run_information, vector<double>& vec_to_write, vector<double>& dynamics_area, ofstream& file_writer, int vec_per_row) {
+//
+// }
+
 void write_triangles(run_config& run_information, vector<vector<vector<int>>>& dynamics_triangles,
             vector<vector<bool>>& dynamics_triangles_is_leaf, ofstream& file_writer3, ofstream& file_writer4) {
     for (int i = 0; i < run_information.dynamics_levels_max; i++) {

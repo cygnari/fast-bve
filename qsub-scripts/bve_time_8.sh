@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N bve_run
+#PBS -N bve_time_8
 #PBS -A UMIC0093
 #PBS -l walltime=12:00:00
 #PBS -q regular
@@ -12,6 +12,5 @@
 
 export TMPDIR=/glade/scratch/$USER/temp
 mkdir -p $TMPDIR
-python initialize.py
 
-mpirun -np 36 ./driver > $TMPDIR/run_out.txt
+mpirun -np 1 ./driver > $TMPDIR/run_out8.txt

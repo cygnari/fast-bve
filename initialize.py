@@ -34,7 +34,7 @@ for line in file:
     if (part1 == 'out_path'):
         outpath = part2.strip()
     if (part1 == 'end_time'):
-        end_time = int(part2)
+        end_time = float(part2)
     if (part1 == 'dynamics_levels_min'):
         dynamics_levels_min = int(part2)
     if (part1 == 'initial_vor_condition'):
@@ -81,6 +81,8 @@ if (vor_force != "none"):
         output_filename += str('{:.{n}f}'.format(frp2, n=precision)) + '_'
 if (use_fast):
     output_filename += "fast_" + str(fast_sum_tree_levels) + "_" + '{:.{n}f}'.format(fast_sum_theta, n=1) + "_"
+else:
+    output_filename += "direct_"
 if (use_amr):
     output_filename += "amr_" + str(amr_levels_max) + "_"
 if (use_remesh):
@@ -90,5 +92,7 @@ if (force_conservative):
 precision = max(int(math.ceil(-math.log10(end_time))), 0);
 output_filename += '{:.{n}f}'.format(end_time, n=precision)
 output_path = outpath + output_filename
-os.makedirs(output_path)
+isExist = os.path.exists(output_path)
+if (not isExist):
+    os.makedirs(output_path)
 # print(output_filename)

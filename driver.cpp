@@ -1,7 +1,6 @@
 #include <chrono>
 #include <mpi.h>
 #include <cstdio>
-// #include <filesystem>
 
 #include "general_utils.hpp"
 #include "interp_utils.hpp"
@@ -16,7 +15,6 @@
 #include "green_funcs.hpp"
 
 using namespace std;
-// namespace fs = std::filesystem;
 
 double omega = 2 * M_PI; // 2pi rotation/day
 
@@ -104,6 +102,15 @@ int main(int argc, char** argv) {
             dynamics_state[(i + 1) * run_information.info_per_point - 1] = stream_func[i];
         }
     }
+
+    if (ID  == 0) {
+        string filename = " initialize.py";
+        string command = "python";
+        command += filename;
+        system(command.c_str());
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
 
     string output_filename = create_config(run_information);
 

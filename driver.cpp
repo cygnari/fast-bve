@@ -103,8 +103,10 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (ID  == 0) {
-        string filename = " initialize.py";
+    string output_filename = create_config(run_information);
+
+    if (ID == 0) {
+        string filename = " initialize.py " + run_information.out_path + "/" + output_filename;
         string command = "python";
         command += filename;
         system(command.c_str());
@@ -112,35 +114,23 @@ int main(int argc, char** argv) {
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    string output_filename = create_config(run_information);
-
     vector<ofstream*> write_outs1 (ceil(run_information.end_time));
     vector<ofstream*> write_outs3 (ceil(run_information.end_time));
-
-    // if (ID == 0) {
-    //     auto created_new_directory = std::filesystem::create_directory(run_information.out_path + "/" + output_filename);
-    // }
 
     MPI_Barrier(MPI_COMM_WORLD);
 
     ofstream write_out2(run_information.out_path + "/" + output_filename + "/point_counts.csv", ofstream::out | ofstream::trunc);
     ofstream write_out4(run_information.out_path + "/" + output_filename + "/tri_counts.csv", ofstream::out | ofstream::trunc);
-    // ofstream write_out2(run_information.out_path + "/" + output_filename + "_point_counts.csv", ofstream::out | ofstream::trunc);
-    // ofstream write_out4(run_information.out_path + "/" + output_filename + "_tri_counts.csv", ofstream::out | ofstream::trunc);
 
     int writer_index;
 
     for (int i = 0; i < ceil(run_information.end_time); i++) {
         write_outs1[i] = new ofstream (run_information.out_path + "/" + output_filename + "/output_" + to_string(i) + ".csv", ofstream::out | ofstream::trunc);
         write_outs3[i] = new ofstream (run_information.out_path + "/" + output_filename + "/triangles_" + to_string(i) + ".csv", ofstream::out | ofstream::trunc);
-        // write_outs1[i] = new ofstream (run_information.out_path + "/" + output_filename + "_output_" + to_string(i) + ".csv", ofstream::out | ofstream::trunc);
-        // write_outs3[i] = new ofstream (run_information.out_path + "/" + output_filename + "_triangles_" + to_string(i) + ".csv", ofstream::out | ofstream::trunc);
     }
 
     ofstream write_out_init1(run_information.out_path + "/" + output_filename + "/output_init.csv", ofstream::out | ofstream::trunc); // ofstream = output file stream
     ofstream write_out_init3(run_information.out_path + "/" + output_filename + "/triangles_init.csv", ofstream::out | ofstream::trunc); // write out the triangles
-    // ofstream write_out_init1(run_information.out_path + "/" + output_filename + "_output_init.csv", ofstream::out | ofstream::trunc); // ofstream = output file stream
-    // ofstream write_out_init3(run_information.out_path + "/" + output_filename + "_triangles_init.csv", ofstream::out | ofstream::trunc); // write out the triangles
 
     MPI_Barrier(MPI_COMM_WORLD);
     if (ID == 0) {
@@ -150,13 +140,10 @@ int main(int argc, char** argv) {
             int info;
             string name1 = run_information.out_path + "/" + output_filename + "/output_init.csv";
             string name2 = run_information.out_path + "/" + output_filename + "/point_counts.csv";
-            // string name1 = run_information.out_path + "/" + output_filename + "_output_init.csv";
-            // string name2 = run_information.out_path + "/" + output_filename + "_point_counts.csv";
             info = remove(name1.c_str());
             info = remove(name2.c_str());
             for (int i = 0; i < ceil(run_information.end_time); i++) {
                 name1 = run_information.out_path + "/" + output_filename + "/output_" + to_string(i) + ".csv";
-                // name1 = run_information.out_path + "/" + output_filename + "_output_" + to_string(i) + ".csv";
                 info = remove(name1.c_str());
             }
         }
@@ -167,13 +154,10 @@ int main(int argc, char** argv) {
             int info;
             string name3 = run_information.out_path + "/" + output_filename + "_triangles_init.csv";
             string name4 = run_information.out_path + "/" + output_filename + "_tri_counts.csv";
-            // string name3 = run_information.out_path + "/" + output_filename + "/triangles_init.csv";
-            // string name4 = run_information.out_path + "/" + output_filename + "/tri_counts.csv";
             info = remove(name3.c_str());
             info = remove(name4.c_str());
             for (int i = 0; i < ceil(run_information.end_time); i++) {
                 name3 = run_information.out_path + "/" + output_filename + "/triangles_" + to_string(i) + ".csv";
-                // name3 = run_information.out_path + "/" + output_filename + "_triangles_" + to_string(i) + ".csv";
                 info = remove(name3.c_str());
             }
         }

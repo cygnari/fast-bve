@@ -27,8 +27,6 @@ int main(int argc, char** argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &P);
     MPI_Comm_rank(MPI_COMM_WORLD, &ID);
 
-    cout << "here 1" << endl;
-
     run_config run_information;
     read_run_config("namelist.txt", run_information); // reads in run configuration information
     run_information.mpi_P = P;
@@ -36,8 +34,6 @@ int main(int argc, char** argv) {
 
     double test_area;
     bool points_same;
-
-    cout << "here 2" << endl;
 
     chrono::steady_clock::time_point begin, end;
 
@@ -59,23 +55,15 @@ int main(int argc, char** argv) {
 
     vector<double> c_1 (run_information.dynamics_max_points * run_information.info_per_point, 0);
 
-    cout << "here 3" << endl;
-
     dynamics_points_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, dynamics_triangles_exists);
-    cout << "here 3 1" << endl;
     vector<double> dynamics_areas (run_information.dynamics_initial_points, 0);
-    cout << "here 3 2" << endl;
     area_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_areas); // finds areas for each point
-    cout << "here 3 3" << endl;
     vorticity_initialize(run_information, dynamics_state, dynamics_areas, omega); // initializes vorticity values for each point
-    cout << "here 3 4" << endl;
     if (run_information.use_fast) {
         fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
         points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
         tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
     }
-
-    cout << "here 4" << endl;
 
     MPI_Win_create(&c_1[0], run_information.info_per_point * run_information.dynamics_max_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_c1);
 
@@ -89,22 +77,16 @@ int main(int argc, char** argv) {
         }
     }
 
-    cout << "here 5" << endl;
+    string output_filename = create_config(run_information);
 
-    if (ID  == 0) {
-        string filename = " initialize.py";
+    if (ID == 0) {
+        string filename = " initialize.py " + run_information.out_path + "/" + output_filename;
         string command = "python";
         command += filename;
         system(command.c_str());
     }
 
-    cout << "here 6" << endl;
-
     MPI_Barrier(MPI_COMM_WORLD);
-
-    string output_filename = create_config(run_information);
-
-    // cout << output_filename << endl;
 
     ofstream write_out1(run_information.out_path + "/" + output_filename + "/rhs.csv", ofstream::out | ofstream::trunc);
     ofstream write_out2(run_information.out_path + "/" + output_filename + "/point_counts.csv", ofstream::out | ofstream::trunc);
@@ -125,10 +107,9 @@ int main(int argc, char** argv) {
     if (ID == 0) {
         end = chrono::steady_clock::now();
         cout << "dynamics time: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << " microseconds" << endl;
-        if (run_information.write_output) {
-            write_state(run_information, c_1, dynamics_areas, write_out1, write_out2);
-        }
+        write_state(run_information, c_1, dynamics_areas, write_out1, write_out2);
     }
+
     write_out1.close();
     write_out2.close();
     MPI_Win_free(&win_c1);

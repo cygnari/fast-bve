@@ -1,6 +1,4 @@
 #!/bin/bash
-export MPI_RANKS=1
-export NODES=1
 qsub bve_time_0.sh
 qsub bve_time_1.sh
 qsub bve_time_2.sh

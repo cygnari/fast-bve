@@ -11,7 +11,7 @@ struct run_config {
     bool use_fixer = false;
     bool vor_fix = false;
     bool vor_limiter = false;
-    string out_path; // ./run-output/ locally, on Cheyenne, /glade/scratch/achen/bve/
+    string out_path; // ./run-output/ locally, on Cheyenne or Derecho, /glade/scratch/achen/bve/
     int write_precision = 6; // number of decimal places, 6 for data visualization, 16 for error testing
     bool write_output = false;
     bool write_tris = false;

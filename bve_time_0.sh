@@ -10,7 +10,7 @@
 #PBS -l select=1:ncpus=36:mpiprocs=36
 #PBS -l place=group=rack
 
-export TMPDIR=/glade/scratch/$USER/temp
+export TMPDIR=/glade/derecho/scratch/$USER/temp
 mkdir -p $TMPDIR
 
 mpirun -np 1 ./driver > $TMPDIR/run_out0.txt

@@ -2,7 +2,7 @@
 #PBS -N bve_time_0
 #PBS -A UMIC0093
 #PBS -l walltime=12:00:00
-#PBS -q regular
+#PBS -q main
 #PBS -j oe
 #PBS -k eod
 #PBS -m abe

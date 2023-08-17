@@ -11,4 +11,7 @@ then compile with
 otherwise
 `mpicxx -O3 -std=c++14 driver.cpp -o driver`
 
+On Derecho,
+`mpicxx -O3 -std=c++14 -qmkl driver.cpp -o driver`
+
 Modify things in namelist.txt

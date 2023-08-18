@@ -13,4 +13,4 @@
 export TMPDIR=/glade/derecho/scratch/$USER/temp
 mkdir -p $TMPDIR
 
-mpirun -np 32 ./driver > $TMPDIR/run_out5.txt
+mpirun -np 64 ./driver > $TMPDIR/run_out5.txt

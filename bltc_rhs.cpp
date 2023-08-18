@@ -16,6 +16,14 @@
 
 #include "../BVE-BaryTree/src/interface/BaryTreeInterface.h"
 
+// extern "C" void BaryTreeInterface(int,int,double*,double*,double*,double*,double*,double*,
+//         double*,double*,double*,double*,KERNEL,int,double*,SINGULARITY,APPROXIMATION,
+//         COMPUTE_TYPE,double,int,int,int,double,double,int);
+
+extern "C" void BaryTreeInterface(int, int, double*, double*, double*, double*, double*,
+      double*, double*, double*, double*, double*, KERNEL, int, double*, SINGULARITY, APPROXIMATION,
+      COMPUTE_TYPE, double, int, int, int, double, double, int);
+
 using namespace std;
 
 double omega = 2 * M_PI; // 2pi rotation/day
@@ -55,17 +63,27 @@ int main(int argc, char** argv) {
     vector<vector<int>> fast_sum_tree_point_locs (run_information.fast_sum_tree_levels); // triangle each point is in
     vector<interaction_pair> fast_sum_tree_interactions; // c/p - c/p interactions
 
-    vector<double> c_1 (run_information.dynamics_max_points, 0);
+    vector<double> c_x (run_information.dynamics_max_points, 0);
+    vector<double> c_y (run_information.dynamics_max_points, 0);
+    vector<double> c_z (run_information.dynamics_max_points, 0);
 
     dynamics_points_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, dynamics_triangles_exists);
     vector<double> dynamics_areas (run_information.dynamics_initial_points, 0);
     area_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_areas); // finds areas for each point
     vorticity_initialize(run_information, dynamics_state, dynamics_areas, omega); // initializes vorticity values for each point
 
-    vector<double> xpoints (run_information.dynamics_max_points, 0);
-    vector<double> ypoints (run_information.dynamics_max_points, 0);
-    vector<double> zpoints (run_information.dynamics_max_points, 0);
-    vector<double> vors (run_information.dynamics_max_points, 0);
+    vector<double> xpoints;
+    vector<double> ypoints;
+    vector<double> zpoints;
+    vector<double> vors;
+    vector<double> ones (run_information.dynamics_initial_points, 1);
+
+    double kernel_params[1];
+
+    xpoints = slice(dynamics_state, 0, run_information.info_per_point, run_information.dynamics_initial_points);
+    ypoints = slice(dynamics_state, 1, run_information.info_per_point, run_information.dynamics_initial_points);
+    zpoints = slice(dynamics_state, 2, run_information.info_per_point, run_information.dynamics_initial_points);
+    vors = slice(dynamics_state, 3, run_information.info_per_point, run_information.dynamics_initial_points);
 
     string output_filename = create_config(run_information);
 
@@ -91,18 +109,20 @@ int main(int argc, char** argv) {
         begin = chrono::steady_clock::now();
     }
 
-    // rhs_func(run_information, c_1, dynamics_state, dynamics_areas, omega, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time);
-    // sync_updates(run_information, c_1, P, ID, &win_c1);
+    BaryTreeInterface(run_information.dynamics_initial_points, run_information.dynamics_initial_points,
+        &xpoints[0], &ypoints[0], &zpoints[0], &ones[0],
+        &xpoints[0], &ypoints[0], &zpoints[0], &vors[0], &dynamics_areas[0],
+        &c_x[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, 0.8, 1,
+        500, 500, 1.0, 1.0, 0);
 
     if (ID == 0) {
         end = chrono::steady_clock::now();
         cout << "dynamics time: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << " microseconds" << endl;
-        write_state(run_information, c_1, dynamics_areas, write_out1, write_out2);
+        write_state(run_information, c_x, dynamics_areas, write_out1, write_out2);
     }
 
     write_out1.close();
     write_out2.close();
-    MPI_Win_free(&win_c1);
     MPI_Finalize();
     return 0;
 }

@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
 
     run_config run_information;
     read_run_config("namelist.txt", run_information); // reads in run configuration information
+    // run_information.
     run_information.mpi_P = P;
     run_information.mpi_ID = ID;
 
@@ -54,17 +55,17 @@ int main(int argc, char** argv) {
     vector<vector<int>> fast_sum_tree_point_locs (run_information.fast_sum_tree_levels); // triangle each point is in
     vector<interaction_pair> fast_sum_tree_interactions; // c/p - c/p interactions
 
-    vector<double> c_1 (run_information.dynamics_max_points * run_information.info_per_point, 0);
+    vector<double> c_1 (run_information.dynamics_max_points, 0);
 
     dynamics_points_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, dynamics_triangles_exists);
     vector<double> dynamics_areas (run_information.dynamics_initial_points, 0);
     area_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_areas); // finds areas for each point
     vorticity_initialize(run_information, dynamics_state, dynamics_areas, omega); // initializes vorticity values for each point
 
-    vector<double> xpoints;
-    vector<double> ypoints;
-    vector<double> zpoints;
-    vector<double> vors;
+    vector<double> xpoints (run_information.dynamics_max_points, 0);
+    vector<double> ypoints (run_information.dynamics_max_points, 0);
+    vector<double> zpoints (run_information.dynamics_max_points, 0);
+    vector<double> vors (run_information.dynamics_max_points, 0);
 
     string output_filename = create_config(run_information);
 

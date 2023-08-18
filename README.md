@@ -14,4 +14,7 @@ otherwise
 On Derecho,
 `mpicxx -O3 -std=c++14 -qmkl driver.cpp -o driver`
 
+To compile with BLTC/BLTDD,
+`mpicxx -O3 -framework Accelerate -std=c++14 -L../BVE-BaryTree/Build/lib/ -lBaryTree_cpu bltc_rhs.cpp -o bltc_rhs`
+
 Modify things in namelist.txt

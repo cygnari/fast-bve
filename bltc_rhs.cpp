@@ -14,15 +14,13 @@
 #include "mpi_utils.hpp"
 #include "green_funcs.hpp"
 
-#include "../BVE-BaryTree/src/interface/BaryTreeInterface.h"
+extern "C" {
+    #include "../BVE-BaryTree/src/interface/BaryTreeInterface.h"
 
-// extern "C" void BaryTreeInterface(int,int,double*,double*,double*,double*,double*,double*,
-//         double*,double*,double*,double*,KERNEL,int,double*,SINGULARITY,APPROXIMATION,
-//         COMPUTE_TYPE,double,int,int,int,double,double,int);
-
-extern "C" void BaryTreeInterface(int, int, double*, double*, double*, double*, double*,
-      double*, double*, double*, double*, double*, KERNEL, int, double*, SINGULARITY, APPROXIMATION,
-      COMPUTE_TYPE, double, int, int, int, double, double, int);
+    void BaryTreeInterface(int, int, double*, double*, double*, double*, double*,
+        double*, double*, double*, double*, double*, KERNEL, int, double*, SINGULARITY, APPROXIMATION,
+        COMPUTE_TYPE, double, int, int, int, double, double, int);
+}
 
 using namespace std;
 

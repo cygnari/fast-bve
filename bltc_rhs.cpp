@@ -25,7 +25,6 @@ int main(int argc, char** argv) {
     MPI_Init(&argc, &argv);
     int P, ID;
     MPI_Status status;
-    // MPI_Win win_c1;
     MPI_Comm_size(MPI_COMM_WORLD, &P);
     MPI_Comm_rank(MPI_COMM_WORLD, &ID);
 
@@ -57,33 +56,15 @@ int main(int argc, char** argv) {
 
     vector<double> c_1 (run_information.dynamics_max_points * run_information.info_per_point, 0);
 
-
-
     dynamics_points_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, dynamics_triangles_exists);
     vector<double> dynamics_areas (run_information.dynamics_initial_points, 0);
     area_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_areas); // finds areas for each point
     vorticity_initialize(run_information, dynamics_state, dynamics_areas, omega); // initializes vorticity values for each point
-    // if (run_information.use_fast) {
-    //     fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
-    //     points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-    //     tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
-    // }
 
     vector<double> xpoints;
     vector<double> ypoints;
     vector<double> zpoints;
-
-    // MPI_Win_create(&c_1[0], run_information.info_per_point * run_information.dynamics_max_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_c1);
-
-    // bounds_determine(run_information, P, ID);
-    // if (P > 0) { // make sure all processes have the same number of points
-    //     points_same = test_is_same(run_information.dynamics_curr_point_count);
-    //     if (not points_same) {
-    //         if (ID == 0) {
-    //             cout << "point counts not same across processes" << endl;
-    //         }
-    //     }
-    // }
+    vector<double> vors;
 
     string output_filename = create_config(run_information);
 

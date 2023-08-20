@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     MPI_Status status;
     MPI_Comm_size(MPI_COMM_WORLD, &P);
     MPI_Comm_rank(MPI_COMM_WORLD, &ID);
-
+    MPI_Win win_cx, win_cy, win_cz;
     run_config run_information;
     read_run_config("namelist.txt", run_information); // reads in run configuration information
     // run_information.
@@ -61,26 +61,41 @@ int main(int argc, char** argv) {
     vector<vector<int>> fast_sum_tree_point_locs (run_information.fast_sum_tree_levels); // triangle each point is in
     vector<interaction_pair> fast_sum_tree_interactions; // c/p - c/p interactions
 
-    vector<double> c_x (run_information.dynamics_max_points, 0);
-    vector<double> c_y (run_information.dynamics_max_points, 0);
-    vector<double> c_z (run_information.dynamics_max_points, 0);
+    vector<double> c_x (run_information.particle_own, 0);
+    vector<double> c_y (run_information.particle_own, 0);
+    vector<double> c_z (run_information.particle_own, 0);
+    vector<double> all_cx (run_information.dynamics_initial_points, 0);
+    vector<double> all_cy (run_information.dynamics_initial_points, 0);
+    vector<double> all_cz (run_information.dynamics_initial_points, 0);
+
+    MPI_Win_create(&all_cx[0], run_information.dynamics_initial_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_cx);
+    MPI_Win_create(&all_cy[0], run_information.dynamics_initial_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_cy);
+    MPI_Win_create(&all_cz[0], run_information.dynamics_initial_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_cz);
+
+    bounds_determine(run_information, P, ID);
 
     dynamics_points_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, dynamics_triangles_exists);
     vector<double> dynamics_areas (run_information.dynamics_initial_points, 0);
     area_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_areas); // finds areas for each point
     vorticity_initialize(run_information, dynamics_state, dynamics_areas, omega); // initializes vorticity values for each point
 
-    vector<double> xpoints;
-    vector<double> ypoints;
-    vector<double> zpoints;
+    vector<double> txpoints;
+    vector<double> typoints;
+    vector<double> tzpoints;
+    vector<double> sxpoints;
+    vector<double> sypoints;
+    vector<double> szpoints;
     vector<double> vors;
-    vector<double> ones (run_information.dynamics_initial_points, 1);
+    vector<double> ones (run_information.particle_own, 1);
 
     double kernel_params[1];
 
-    xpoints = slice(dynamics_state, 0, run_information.info_per_point, run_information.dynamics_initial_points);
-    ypoints = slice(dynamics_state, 1, run_information.info_per_point, run_information.dynamics_initial_points);
-    zpoints = slice(dynamics_state, 2, run_information.info_per_point, run_information.dynamics_initial_points);
+    txpoints = slice(dynamics_state, run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
+    typoints = slice(dynamics_state, 1 + run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
+    tzpoints = slice(dynamics_state, 2 + run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
+    sxpoints = slice(dynamics_state, 0, run_information.info_per_point, run_information.dynamics_initial_points);
+    sypoints = slice(dynamics_state, 1, run_information.info_per_point, run_information.dynamics_initial_points);
+    szpoints = slice(dynamics_state, 2, run_information.info_per_point, run_information.dynamics_initial_points);
     vors = slice(dynamics_state, 3, run_information.info_per_point, run_information.dynamics_initial_points);
 
     string output_filename = create_config(run_information);
@@ -97,6 +112,8 @@ int main(int argc, char** argv) {
     ofstream write_out1(run_information.out_path + "/" + output_filename + "/rhs.csv", ofstream::out | ofstream::trunc);
     ofstream write_out2(run_information.out_path + "/" + output_filename + "/point_counts.csv", ofstream::out | ofstream::trunc);
 
+    int index;
+
     double curr_time = 0;
 
     MPI_Barrier(MPI_COMM_WORLD);
@@ -108,15 +125,40 @@ int main(int argc, char** argv) {
     }
 
     BaryTreeInterface(run_information.dynamics_initial_points, run_information.dynamics_initial_points,
-        &xpoints[0], &ypoints[0], &zpoints[0], &ones[0],
-        &xpoints[0], &ypoints[0], &zpoints[0], &vors[0], &dynamics_areas[0],
+        &txpoints[0], &typoints[0], &tzpoints[0], &ones[0],
+        &sxpoints[0], &sypoints[0], &szpoints[0], &vors[0], &dynamics_areas[0],
         &c_x[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, 0.8, 1,
         500, 500, 1.0, 1.0, 0);
+
+    BaryTreeInterface(run_information.dynamics_initial_points, run_information.dynamics_initial_points,
+        &txpoints[0], &typoints[0], &tzpoints[0], &ones[0],
+        &sxpoints[0], &sypoints[0], &szpoints[0], &vors[0], &dynamics_areas[0],
+        &c_y[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, 0.8, 1,
+        500, 500, 1.0, 1.0, 0);
+
+    BaryTreeInterface(run_information.dynamics_initial_points, run_information.dynamics_initial_points,
+        &txpoints[0], &typoints[0], &tzpoints[0], &ones[0],
+        &sxpoints[0], &sypoints[0], &szpoints[0], &vors[0], &dynamics_areas[0],
+        &c_z[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, 0.8, 1,
+        500, 500, 1.0, 1.0, 0);
+
+    for (int i = 0; i < run_information.particle_own; i++) {
+        index = i + run_information.particle_lb;
+        all_cx[index] = c_x[i];
+        all_cy[index] = c_y[i];
+        all_cz[index] = c_z[i];
+    }
+
+    sync_updates(run_information, all_cx, P, ID, &win_cx);
+    sync_updates(run_information, all_cy, P, ID, &win_cy);
+    sync_updates(run_information, all_cz, P, ID, &win_cz);
+
+    MPI_Barrier(MPI_COMM_WORLD);
 
     if (ID == 0) {
         end = chrono::steady_clock::now();
         cout << "dynamics time: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << " microseconds" << endl;
-        write_state(run_information, c_x, dynamics_areas, write_out1, write_out2);
+        // write_state(run_information, c_x, dynamics_areas, write_out1, write_out2);
     }
 
     write_out1.close();

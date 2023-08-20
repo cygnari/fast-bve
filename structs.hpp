@@ -64,6 +64,7 @@ struct run_config {
     int mpi_ID; // own MPI rank
     int particle_lb; // range of assigned particles
     int particle_ub;
+    int particle_own;
 };
 
 struct interaction_pair {

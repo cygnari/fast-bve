@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
         &txpoints[0], &typoints[0], &tzpoints[0], &ones[0],
         &sxpoints[0], &sypoints[0], &szpoints[0], &vors[0], &own_areas[0],
         &c_x[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
-        500, 500, 1.0, -1, 3);
+        500, 500, 1.0, -1, 0);
 
     BaryTreeInterface(run_information.particle_own, run_information.particle_own,
         &typoints[0], &tzpoints[0], &txpoints[0], &ones[0],

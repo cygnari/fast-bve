@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
     MPI_Win win_cx, win_cy, win_cz;
     run_config run_information;
     read_run_config("namelist.txt", run_information); // reads in run configuration information
+    run_information.bltc = true;
     // run_information.
     run_information.mpi_P = P;
     run_information.mpi_ID = ID;
@@ -68,6 +69,8 @@ int main(int argc, char** argv) {
     vector<double> all_cy (run_information.dynamics_initial_points, 0);
     vector<double> all_cz (run_information.dynamics_initial_points, 0);
 
+    vector<double> c_1 (run_information.dynamics_max_points * run_information.info_per_point, 0);
+
     MPI_Win_create(&all_cx[0], run_information.dynamics_initial_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_cx);
     MPI_Win_create(&all_cy[0], run_information.dynamics_initial_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_cy);
     MPI_Win_create(&all_cz[0], run_information.dynamics_initial_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_cz);
@@ -87,16 +90,18 @@ int main(int argc, char** argv) {
     vector<double> szpoints;
     vector<double> vors;
     vector<double> ones (run_information.particle_own, 1);
+    vector<double> own_areas;
 
     double kernel_params[1];
 
     txpoints = slice(dynamics_state, run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
     typoints = slice(dynamics_state, 1 + run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
     tzpoints = slice(dynamics_state, 2 + run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
-    sxpoints = slice(dynamics_state, 0, run_information.info_per_point, run_information.dynamics_initial_points);
-    sypoints = slice(dynamics_state, 1, run_information.info_per_point, run_information.dynamics_initial_points);
-    szpoints = slice(dynamics_state, 2, run_information.info_per_point, run_information.dynamics_initial_points);
-    vors = slice(dynamics_state, 3, run_information.info_per_point, run_information.dynamics_initial_points);
+    sxpoints = slice(dynamics_state, run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
+    sypoints = slice(dynamics_state, 1 + run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
+    szpoints = slice(dynamics_state, 2 + run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
+    vors = slice(dynamics_state, 3 + run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
+    own_areas = slice(dynamics_areas, run_information.particle_lb, 1, run_information.particle_own);
 
     string output_filename = create_config(run_information);
 
@@ -124,22 +129,22 @@ int main(int argc, char** argv) {
         begin = chrono::steady_clock::now();
     }
 
-    BaryTreeInterface(run_information.dynamics_initial_points, run_information.dynamics_initial_points,
+    BaryTreeInterface(run_information.particle_own, run_information.particle_own,
         &txpoints[0], &typoints[0], &tzpoints[0], &ones[0],
-        &sxpoints[0], &sypoints[0], &szpoints[0], &vors[0], &dynamics_areas[0],
-        &c_x[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, 0.8, 1,
+        &sxpoints[0], &sypoints[0], &szpoints[0], &vors[0], &own_areas[0],
+        &c_x[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
+        500, 500, 1.0, 1.0, 3);
+
+    BaryTreeInterface(run_information.particle_own, run_information.particle_own,
+        &typoints[0], &tzpoints[0], &txpoints[0], &ones[0],
+        &sypoints[0], &szpoints[0], &sxpoints[0], &vors[0], &own_areas[0],
+        &c_y[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
         500, 500, 1.0, 1.0, 0);
 
-    BaryTreeInterface(run_information.dynamics_initial_points, run_information.dynamics_initial_points,
-        &txpoints[0], &typoints[0], &tzpoints[0], &ones[0],
-        &sxpoints[0], &sypoints[0], &szpoints[0], &vors[0], &dynamics_areas[0],
-        &c_y[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, 0.8, 1,
-        500, 500, 1.0, 1.0, 0);
-
-    BaryTreeInterface(run_information.dynamics_initial_points, run_information.dynamics_initial_points,
-        &txpoints[0], &typoints[0], &tzpoints[0], &ones[0],
-        &sxpoints[0], &sypoints[0], &szpoints[0], &vors[0], &dynamics_areas[0],
-        &c_z[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, 0.8, 1,
+    BaryTreeInterface(run_information.particle_own, run_information.particle_own,
+        &tzpoints[0], &txpoints[0], &typoints[0], &ones[0],
+        &szpoints[0], &sxpoints[0], &sypoints[0], &vors[0], &own_areas[0],
+        &c_z[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
         500, 500, 1.0, 1.0, 0);
 
     for (int i = 0; i < run_information.particle_own; i++) {

@@ -28,7 +28,7 @@ void bounds_determine(run_config& run_information, int P, int ID) {
     }
     run_information.particle_lb = lb[ID];
     run_information.particle_ub = ub[ID];
-    run_information.particle_own = ub[ID] - lb[ID];
+    run_information.particle_own = particles[ID];
 }
 
 bool test_is_same(int x) { // test if all processes have the same value for a variable

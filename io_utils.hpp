@@ -59,6 +59,8 @@ string create_config(run_config& run_information) {
     }
     if (run_information.use_fast) {
         output_filename += "fast_" + to_string(run_information.fast_sum_tree_levels) + "_" + to_string(run_information.fast_sum_theta).substr(0, 3);
+    } else if (run_information.bltc) {
+        output_filename += "bltc_" + to_string(run_information.fast_sum_theta).substr(0, 3) + "_" + to_string(run_information.interp_degree);
     } else output_filename += "direct";
     if (run_information.use_amr) output_filename += "_amr_" + to_string(run_information.amr_levels);
     if (run_information.use_remesh) output_filename += "_remesh";

@@ -62,6 +62,8 @@ int main(int argc, char** argv) {
     vector<vector<int>> fast_sum_tree_point_locs (run_information.fast_sum_tree_levels); // triangle each point is in
     vector<interaction_pair> fast_sum_tree_interactions; // c/p - c/p interactions
 
+    bounds_determine(run_information, P, ID);
+
     vector<double> c_x (run_information.particle_own, 0);
     vector<double> c_y (run_information.particle_own, 0);
     vector<double> c_z (run_information.particle_own, 0);
@@ -74,8 +76,6 @@ int main(int argc, char** argv) {
     MPI_Win_create(&all_cx[0], run_information.dynamics_initial_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_cx);
     MPI_Win_create(&all_cy[0], run_information.dynamics_initial_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_cy);
     MPI_Win_create(&all_cz[0], run_information.dynamics_initial_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_cz);
-
-    bounds_determine(run_information, P, ID);
 
     dynamics_points_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, dynamics_triangles_exists);
     vector<double> dynamics_areas (run_information.dynamics_initial_points, 0);

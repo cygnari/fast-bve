@@ -164,7 +164,13 @@ int main(int argc, char** argv) {
     if (ID == 0) {
         end = chrono::steady_clock::now();
         cout << "dynamics time: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << " microseconds" << endl;
-        // write_state(run_information, c_x, dynamics_areas, write_out1, write_out2);
+
+        for (int i = 0; i < run_information.dynamics_initial_points; i++) {
+            c_1[i * run_information.info_per_point] = all_cx[i];
+            c_1[1 + i * run_information.info_per_point] = all_cy[i];
+            c_1[2 + i * run_information.info_per_point] = all_cx[i];
+        }
+        write_state(run_information, c_1, dynamics_areas, write_out1, write_out2);
     }
 
     write_out1.close();

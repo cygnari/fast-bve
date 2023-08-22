@@ -92,7 +92,8 @@ int main(int argc, char** argv) {
     vector<double> ones (run_information.particle_own, 1);
     vector<double> own_areas;
 
-    double kernel_params[1];
+    int numParams = 1;
+    double kernel_params[1] = {0.5};
 
     txpoints = slice(dynamics_state, run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
     typoints = slice(dynamics_state, 1 + run_information.info_per_point * run_information.particle_lb, run_information.info_per_point, run_information.particle_own);
@@ -132,19 +133,19 @@ int main(int argc, char** argv) {
     BaryTreeInterface(run_information.particle_own, run_information.particle_own,
         &txpoints[0], &typoints[0], &tzpoints[0], &ones[0],
         &sxpoints[0], &sypoints[0], &szpoints[0], &vors[0], &own_areas[0],
-        &c_x[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
+        &c_x[0], YUKAWA, 1, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
         500, 500, 1.0, -1, 1);
 
     BaryTreeInterface(run_information.particle_own, run_information.particle_own,
         &typoints[0], &tzpoints[0], &txpoints[0], &ones[0],
         &sypoints[0], &szpoints[0], &sxpoints[0], &vors[0], &own_areas[0],
-        &c_y[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
+        &c_y[0], YUKAWA, 1, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
         500, 500, 1.0, -1, 1);
 
     BaryTreeInterface(run_information.particle_own, run_information.particle_own,
         &tzpoints[0], &txpoints[0], &typoints[0], &ones[0],
         &szpoints[0], &sxpoints[0], &sypoints[0], &vors[0], &own_areas[0],
-        &c_z[0], USER, 0, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
+        &c_z[0], YUKAWA, 1, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
         500, 500, 1.0, -1, 1);
 
     for (int i = 0; i < run_information.particle_own; i++) {

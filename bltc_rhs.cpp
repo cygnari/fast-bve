@@ -133,19 +133,19 @@ int main(int argc, char** argv) {
     BaryTreeInterface(run_information.particle_own, run_information.particle_own,
         &txpoints[0], &typoints[0], &tzpoints[0], &ones[0],
         &sxpoints[0], &sypoints[0], &szpoints[0], &vors[0], &own_areas[0],
-        &c_x[0], COULOMB, 1, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
+        &c_x[0], COULOMB, 1, kernel_params, SUBTRACTION, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
         500, 500, 1.0, -1, 3);
 
     BaryTreeInterface(run_information.particle_own, run_information.particle_own,
         &typoints[0], &tzpoints[0], &txpoints[0], &ones[0],
         &sypoints[0], &szpoints[0], &sxpoints[0], &vors[0], &own_areas[0],
-        &c_y[0], COULOMB, 1, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
+        &c_y[0], COULOMB, 1, kernel_params, SUBTRACTION, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
         500, 500, 1.0, -1, -1);
 
     BaryTreeInterface(run_information.particle_own, run_information.particle_own,
         &tzpoints[0], &txpoints[0], &typoints[0], &ones[0],
         &szpoints[0], &sxpoints[0], &sypoints[0], &vors[0], &own_areas[0],
-        &c_z[0], COULOMB, 1, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
+        &c_z[0], COULOMB, 1, kernel_params, SUBTRACTION, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
         500, 500, 1.0, -1, -1);
 
     for (int i = 0; i < run_information.particle_own; i++) {

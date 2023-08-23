@@ -106,8 +106,6 @@ int main(int argc, char** argv) {
 
     string output_filename = create_config(run_information);
 
-    cout << output_filename << endl;
-
     if (ID == 0) {
         string filename = " initialize.py " + run_information.out_path + "/" + output_filename;
         string command = "python";
@@ -136,7 +134,7 @@ int main(int argc, char** argv) {
         &txpoints[0], &typoints[0], &tzpoints[0], &ones[0],
         &sxpoints[0], &sypoints[0], &szpoints[0], &vors[0], &own_areas[0],
         &c_x[0], USER, 1, kernel_params, SKIPPING, LAGRANGE, PARTICLE_CLUSTER, run_information.fast_sum_theta, run_information.interp_degree,
-        500, 500, 1.0, -1, -1);
+        500, 500, 1.0, -1, 3);
 
     BaryTreeInterface(run_information.particle_own, run_information.particle_own,
         &typoints[0], &tzpoints[0], &txpoints[0], &ones[0],
@@ -170,7 +168,7 @@ int main(int argc, char** argv) {
         for (int i = 0; i < run_information.dynamics_initial_points; i++) {
             c_1[i * run_information.info_per_point] = all_cx[i];
             c_1[1 + i * run_information.info_per_point] = all_cy[i];
-            c_1[2 + i * run_information.info_per_point] = all_cx[i];
+            c_1[2 + i * run_information.info_per_point] = all_cz[i];
         }
         write_state(run_information, c_1, dynamics_areas, write_out1, write_out2);
     }

@@ -106,6 +106,8 @@ int main(int argc, char** argv) {
 
     string output_filename = create_config(run_information);
 
+    cout << output_filename << endl;
+
     if (ID == 0) {
         string filename = " initialize.py " + run_information.out_path + "/" + output_filename;
         string command = "python";

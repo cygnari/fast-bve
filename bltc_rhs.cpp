@@ -124,9 +124,9 @@ int main(int argc, char** argv) {
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    for (int i = 0; i < run_information.particle_own; i++) {
-        vors[i] *= own_areas[i];
-    }
+    // for (int i = 0; i < run_information.particle_own; i++) {
+    //     vors[i] *= own_areas[i];
+    // }
 
     if (ID == 0) {
         end = chrono::steady_clock::now();

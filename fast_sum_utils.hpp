@@ -36,6 +36,38 @@ void point_assign(run_config& run_information, vector<double>& point, vector<vec
     }
 }
 
+void new_point_assign(run_config& run_information, vector<double>& point, vector<vector<double>>& fast_sum_icos_verts,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<int>& fast_sum_tree_point_locs, int point_id) {
+    // finds which triangle each point is in
+    int iv1, iv2, iv3, lb, ub, index;
+    vector<double> v1, v2, v3;
+    for (int i = 0; i < run_information.fast_sum_tree_levels; i++) {
+        // cout << "i " << i << endl;
+        if (i > 0) {
+            index = (i - 1) * run_information.dynamics_max_points + point_id;
+            lb = 4 * fast_sum_tree_point_locs[index];
+            ub = lb + 4;
+        } else {
+            lb = 0;
+            ub = 20;
+        }
+        for (int j = lb; j < ub; j++) {
+            // cout << "j " << j << endl;
+            iv1 = fast_sum_icos_tri_verts[i][j][0];
+            iv2 = fast_sum_icos_tri_verts[i][j][1];
+            iv3 = fast_sum_icos_tri_verts[i][j][2];
+            v1 = fast_sum_icos_verts[iv1];
+            v2 = fast_sum_icos_verts[iv2];
+            v3 = fast_sum_icos_verts[iv3];
+            if (check_in_tri(v1, v2, v3, point)) {
+                // cout << "point: " << point_id <<
+                index = i * run_information.dynamics_max_points + point_id;
+                fast_sum_tree_point_locs[index] = j;
+            }
+        }
+    }
+}
+
 void points_assign(run_config& run_information, vector<double>& dynamics_state, vector<vector<double>>& fast_sum_icos_verts,
         vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<vector<int>>>& fast_sum_tree_tri_points,
         vector<vector<int>>& fast_sum_tree_point_locs) {
@@ -48,6 +80,37 @@ void points_assign(run_config& run_information, vector<double>& dynamics_state, 
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
         point = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
         point_assign(run_information, point, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs, i);
+    }
+}
+
+void points_find_tris(run_config& run_information, vector<double>& dynamics_state, vector<vector<double>>& fast_sum_icos_verts,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<int>& fast_sum_tree_point_locs) {
+    // finds which triangle each point is in
+    vector<double> point;
+    cout << run_information.particle_ub - run_information.particle_lb << endl;
+    for (int i = run_information.particle_lb; i < run_information.particle_ub; i++) {
+
+        point = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
+        // cout << i << endl;
+        new_point_assign(run_information, point, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_point_locs, i);
+    }
+}
+
+void points_assign_tris(run_config& run_information, vector<double>& dynamics_state, vector<vector<double>>& fast_sum_icos_verts,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<vector<int>>>& fast_sum_tree_tri_points,
+        vector<int>& fast_sum_tree_point_locs) {
+    // assigns each triangle the points it contains
+    int start, tri_index;
+    for (int i = 0; i < run_information.fast_sum_tree_levels; i++) {
+        // cout << "i " << i << endl;
+        fast_sum_tree_tri_points[i] = vector<vector<int>> (20 * pow(4, i));
+        start = i * run_information.dynamics_max_points;
+        for (int j = 0; j < run_information.dynamics_curr_point_count; j++) {
+            // cout << "j: " << j << endl;
+            tri_index = fast_sum_tree_point_locs[start + j];
+            // cout << "ti: " << tri_index << endl;
+            fast_sum_tree_tri_points[i][tri_index].push_back(j);
+        }
     }
 }
 

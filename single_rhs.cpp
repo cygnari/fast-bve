@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     MPI_Init(&argc, &argv);
     int P, ID;
     MPI_Status status;
-    MPI_Win win_c1;
+    MPI_Win win_c1, win_tree_points;
     MPI_Comm_size(MPI_COMM_WORLD, &P);
     MPI_Comm_rank(MPI_COMM_WORLD, &ID);
 
@@ -50,7 +50,8 @@ int main(int argc, char** argv) {
     vector<vector<vector<double>>> fast_sum_icos_tri_info; // information about fast sum icos triangles
     vector<vector<vector<int>>> fast_sum_icos_tri_verts; // triangles for fast sum icosahedron
     vector<vector<vector<int>>> fast_sum_tree_tri_points (run_information.fast_sum_tree_levels); // points inside each triangle
-    vector<vector<int>> fast_sum_tree_point_locs (run_information.fast_sum_tree_levels); // triangle each point is in
+    // vector<vector<int>> fast_sum_tree_point_locs (run_information.fast_sum_tree_levels); // triangle each point is in
+    vector<int> fast_sum_tree_point_locs(run_information.fast_sum_tree_levels * run_information.dynamics_max_points, 0);
     vector<interaction_pair> fast_sum_tree_interactions; // c/p - c/p interactions
 
     vector<double> c_1 (run_information.dynamics_max_points * run_information.info_per_point, 0);
@@ -59,13 +60,9 @@ int main(int argc, char** argv) {
     vector<double> dynamics_areas (run_information.dynamics_initial_points, 0);
     area_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_areas); // finds areas for each point
     vorticity_initialize(run_information, dynamics_state, dynamics_areas, omega); // initializes vorticity values for each point
-    if (run_information.use_fast) {
-        fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
-        points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-        tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
-    }
 
     MPI_Win_create(&c_1[0], run_information.info_per_point * run_information.dynamics_max_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_c1);
+    MPI_Win_create(&fast_sum_tree_point_locs[0], run_information.fast_sum_tree_levels * run_information.dynamics_max_points * sizeof(int), sizeof(int), MPI_INFO_NULL, MPI_COMM_WORLD, &win_tree_points);
 
     bounds_determine(run_information, P, ID);
     if (P > 0) { // make sure all processes have the same number of points
@@ -75,6 +72,14 @@ int main(int argc, char** argv) {
                 cout << "point counts not same across processes" << endl;
             }
         }
+    }
+
+    if (run_information.use_fast) {
+        fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
+        points_find_tris(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_point_locs);
+        sync_updates_int(run_information, fast_sum_tree_point_locs, P, ID, &win_tree_points);
+        points_assign_tris(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
+        tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
     }
 
     string output_filename = create_config(run_information);

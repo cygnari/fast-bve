@@ -54,4 +54,19 @@ void sync_updates(run_config& run_information, vector<double>& vals, int P, int 
     MPI_Barrier(MPI_COMM_WORLD);
 }
 
+void sync_updates_int(run_config& run_information, vector<int>& vals, int P, int ID, MPI_Win *win) {
+    // add all the vals from all the processes together, then distribute
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Win_fence(0, *win);
+    if (ID != 0) {
+        MPI_Accumulate(&vals[0], vals.size(), MPI_INT, 0, 0, vals.size(), MPI_INT, MPI_SUM, *win);
+    }
+    MPI_Win_fence(0, *win);
+    if (ID != 0) {
+        MPI_Get(&vals[0], vals.size(), MPI_INT, 0, 0, vals.size(), MPI_INT, *win);
+    }
+    MPI_Win_fence(0, *win);
+    MPI_Barrier(MPI_COMM_WORLD);
+}
+
 #endif

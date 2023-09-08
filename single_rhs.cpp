@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
     double test_area;
     bool points_same;
 
-    chrono::steady_clock::time_point begin, end;
+    chrono::steady_clock::time_point begin, end, t1, t2;
 
     if (ID == 0) {
         begin = chrono::steady_clock::now();
@@ -74,12 +74,45 @@ int main(int argc, char** argv) {
         }
     }
 
+    // if (run_information.use_fast) {
+    //     fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
+    //     points_find_tris(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_point_locs);
+    //     sync_updates_int(run_information, fast_sum_tree_point_locs, P, ID, &win_tree_points);
+    //     points_assign_tris(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
+    //     tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+    // }
+    // if (ID == 0) {
+    //     t1 = chrono::steady_clock::now();
+    // }
     if (run_information.use_fast) {
         fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
+        // points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
+        if (ID == 0) {
+            t1 = chrono::steady_clock::now();
+        }
         points_find_tris(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_point_locs);
+        if (ID == 0) {
+            t2 = chrono::steady_clock::now();
+            cout << "point find tris setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
+            t1 = chrono::steady_clock::now();
+        }
         sync_updates_int(run_information, fast_sum_tree_point_locs, P, ID, &win_tree_points);
+        if (ID == 0) {
+            t2 = chrono::steady_clock::now();
+            cout << "sync time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
+            t1 = chrono::steady_clock::now();
+        }
         points_assign_tris(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
+        if (ID == 0) {
+            t2 = chrono::steady_clock::now();
+            cout << "point assign tris setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
+            t1 = chrono::steady_clock::now();
+        }
         tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+    }
+    if (ID == 0) {
+        t2 = chrono::steady_clock::now();
+        cout << "tree traverse setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
     }
 
     string output_filename = create_config(run_information);

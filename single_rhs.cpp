@@ -52,8 +52,8 @@ int main(int argc, char** argv) {
     vector<vector<vector<double>>> fast_sum_icos_tri_info; // information about fast sum icos triangles
     vector<vector<vector<int>>> fast_sum_icos_tri_verts; // triangles for fast sum icosahedron
     vector<vector<vector<int>>> fast_sum_tree_tri_points (run_information.fast_sum_tree_levels); // points inside each triangle
-    // vector<vector<int>> fast_sum_tree_point_locs (run_information.fast_sum_tree_levels); // triangle each point is in
-    vector<int> fast_sum_tree_point_locs(run_information.fast_sum_tree_levels * run_information.dynamics_max_points, 0);
+    vector<vector<int>> fast_sum_tree_point_locs (run_information.fast_sum_tree_levels); // triangle each point is in
+    // vector<int> fast_sum_tree_point_locs(run_information.fast_sum_tree_levels * run_information.dynamics_max_points, 0);
     vector<interaction_pair> fast_sum_tree_interactions; // c/p - c/p interactions
 
     vector<double> c_1 (run_information.dynamics_max_points * run_information.info_per_point, 0);
@@ -76,6 +76,12 @@ int main(int argc, char** argv) {
         }
     }
 
+    if (run_information.use_fast) {
+        fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
+        points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
+        tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+    }
+
     // if (run_information.use_fast) {
     //     fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
     //     points_find_tris(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_point_locs);
@@ -86,36 +92,36 @@ int main(int argc, char** argv) {
     // if (ID == 0) {
     //     t1 = chrono::steady_clock::now();
     // }
-    if (run_information.use_fast) {
-        fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
-        // points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-        if (ID == 0) {
-            t1 = chrono::steady_clock::now();
-        }
-        points_find_tris(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_point_locs);
-        if (ID == 0) {
-            t2 = chrono::steady_clock::now();
-            cout << "point find tris setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
-            t1 = chrono::steady_clock::now();
-        }
-        sync_updates_int(run_information, fast_sum_tree_point_locs, P, ID, &win_tree_points);
-        if (ID == 0) {
-            t2 = chrono::steady_clock::now();
-            cout << "sync time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
-            t1 = chrono::steady_clock::now();
-        }
-        points_assign_tris(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-        if (ID == 0) {
-            t2 = chrono::steady_clock::now();
-            cout << "point assign tris setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
-            t1 = chrono::steady_clock::now();
-        }
-        tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
-    }
-    if (ID == 0) {
-        t2 = chrono::steady_clock::now();
-        cout << "tree traverse setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
-    }
+    // if (run_information.use_fast) {
+    //     fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
+    //     // points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
+    //     if (ID == 0) {
+    //         t1 = chrono::steady_clock::now();
+    //     }
+    //     points_find_tris(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_point_locs);
+    //     if (ID == 0) {
+    //         t2 = chrono::steady_clock::now();
+    //         cout << "point find tris setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
+    //         t1 = chrono::steady_clock::now();
+    //     }
+    //     sync_updates_int(run_information, fast_sum_tree_point_locs, P, ID, &win_tree_points);
+    //     if (ID == 0) {
+    //         t2 = chrono::steady_clock::now();
+    //         cout << "sync time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
+    //         t1 = chrono::steady_clock::now();
+    //     }
+    //     points_assign_tris(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
+    //     if (ID == 0) {
+    //         t2 = chrono::steady_clock::now();
+    //         cout << "point assign tris setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
+    //         t1 = chrono::steady_clock::now();
+    //     }
+    //     tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+    // }
+    // if (ID == 0) {
+    //     t2 = chrono::steady_clock::now();
+    //     cout << "tree traverse setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
+    // }
 
     string output_filename = create_config(run_information);
 

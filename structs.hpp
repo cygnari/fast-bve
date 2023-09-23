@@ -1,5 +1,7 @@
-#ifndef struct_H
-#define struct_H
+#ifndef H_STRUCTS_H
+#define H_STRUCTS_H
+
+#include <string>
 
 using namespace std;
 

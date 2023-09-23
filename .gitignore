@@ -16,3 +16,5 @@
 */run-output/
 *.ipynb
 !namelist.txt
+*.o
+!makefile

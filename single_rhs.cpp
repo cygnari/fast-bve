@@ -1,6 +1,7 @@
 #include <chrono>
 #include <mpi.h>
 #include <cstdio>
+#include <iostream>
 
 #include "general_utils.hpp"
 #include "interp_utils.hpp"
@@ -13,6 +14,7 @@
 #include "amr.hpp"
 #include "mpi_utils.hpp"
 #include "green_funcs.hpp"
+#include "fast_sum_utils.hpp"
 
 using namespace std;
 

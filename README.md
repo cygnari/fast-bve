@@ -14,4 +14,4 @@ To compile with BLTC/BLTDD,
 and on Derecho
 `mpicxx -O0 -std=c++14 -qmkl -L../BVE-BaryTree/build/lib/ -Wl,-rpath=../BVE-BaryTree/build/lib/ -lBaryTree_cpu bltc_rhs.cpp -o bltc_rhs`
 
-Modify things in namelist.txt
+Modify things in bin/namelist.txt

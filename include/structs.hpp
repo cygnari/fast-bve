@@ -14,7 +14,7 @@ struct run_config {
     bool vor_fix = false;
     bool vor_limiter = false;
     bool bltc = false;
-    string out_path; // ./run-output/ locally, on Derecho, /glade/derecho/scratch/achen/bve/
+    string out_path; // ../run-output/ locally, on Derecho, /glade/derecho/scratch/achen/bve/
     int write_precision = 6; // number of decimal places, 6 for data visualization, 16 for error testing
     bool write_output = false;
     bool write_tris = false;

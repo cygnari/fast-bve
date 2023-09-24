@@ -104,6 +104,4 @@ void enforce_conservation(run_config& run_information, vector<double>& dynamics_
     for (int i = 0; i < run_information.tracer_count; i++) {
         reconstruct_safely(run_information, dynamics_state, dynamics_areas, qmins[i + 1], qmaxs[i + 1], target_mass[i + 1], i);
     }
-
-    // vorticity_fix(run_information, dynamics_state, dynamics_areas, qmins[0], qmaxs[0], omega);
 }

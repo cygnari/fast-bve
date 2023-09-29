@@ -14,8 +14,8 @@ OBJS      := $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 LIBO      := $(filter-out $(OBJ_DIR)/driver.o,$(filter-out $(OBJ_DIR)/single_rhs.o,$(OBJS)))
 
 # get lapack linker flags
-UNAME     := $(shell uname -n)
-ifeq ($(UNAME),cygnari-mbp.local)
+UNAME     := $(shell uname -n -o -s)
+ifeq ($(findstring Darwin,$(UNAME)),Darwin)
   CXXFLAGS := $(CXXFLAGS) -framework Accelerate
 endif
 ifeq ($(findstring derecho,$(UNAME)),derecho)
@@ -23,12 +23,10 @@ ifeq ($(findstring derecho,$(UNAME)),derecho)
 endif
 
 all: directories $(BIN_DIR)/driver $(BIN_DIR)/single_rhs $(BIN_DIR)/mylib.so
-#
 
 $(BIN_DIR)/driver: $(filter-out $(OBJ_DIR)/single_rhs.o,$(OBJS))
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-#
 $(BIN_DIR)/single_rhs: $(filter-out $(OBJ_DIR)/driver.o,$(OBJS))
 	$(CXX) $(CXXFLAGS) $^ -o $@
 

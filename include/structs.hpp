@@ -14,6 +14,7 @@ struct run_config {
     bool vor_fix = false;
     bool vor_limiter = false;
     bool bltc = false;
+    bool same_source_targets = true;
     string out_path; // ../run-output/ locally, on Derecho, /glade/derecho/scratch/achen/bve/
     int write_precision = 6; // number of decimal places, 6 for data visualization, 16 for error testing
     bool write_output = false;
@@ -62,6 +63,7 @@ struct run_config {
     int dynamics_curr_point_count; // current number of points
     int dynamics_curr_tri_count; // current number of triangles
     int tracer_count; // number of tracers
+    int target_points; // number of convolution target points
 
     // mpi info
     int mpi_P; // total MPI ranks
@@ -69,6 +71,9 @@ struct run_config {
     int particle_lb; // range of assigned particles
     int particle_ub;
     int particle_own;
+    int target_lb;
+    int target_ub;
+    int target_own;
 };
 
 struct interaction_pair {

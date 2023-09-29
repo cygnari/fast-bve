@@ -17,6 +17,7 @@ void bounds_determine(run_config& run_information, int P, int ID) {
     for (int i = 0; i < P; i++) {
         total += particles[i];
     }
+
     assertm(total == run_information.dynamics_curr_point_count, "Particle count not correct");
 
     ub[0] = particles[0];
@@ -27,6 +28,28 @@ void bounds_determine(run_config& run_information, int P, int ID) {
     run_information.particle_lb = lb[ID];
     run_information.particle_ub = ub[ID];
     run_information.particle_own = particles[ID];
+
+    vector<double> targets (P, int(run_information.target_points / P));
+    total = P * int(run_information.target_points / P);
+    gap = run_information.target_points - total;
+    for (int i = 1; i < gap + 1; i++) {
+        targets[i] += 1;
+    }
+    total = 0;
+    for (int i = 0; i < P; i++) {
+        total += targets[i];
+    }
+
+    assertm(total == run_information.target_points, "Target count not correct");
+
+    ub[0] = targets[0];
+    for (int i = 1; i < P; i++) {
+        lb[i] = ub[i-1];
+        ub[i] = lb[i] + targets[i];
+    }
+    run_information.target_lb = lb[ID];
+    run_information.target_ub = ub[ID];
+    run_information.target_own = targets[ID];
 }
 
 bool test_is_same(int x) { // test if all processes have the same value for a variable

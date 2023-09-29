@@ -5,62 +5,62 @@
 #include "green_funcs.hpp"
 #include "direct_sum_utils.hpp"
 
-void rhs_fast_sum_vel(run_config& run_information, vector<double>& modify, vector<double>& curr_state, vector<double>& area,
-        vector<interaction_pair>& interactions, vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        vector<vector<double>>& fast_sum_icos_verts, double time, double omega) {
+void rhs_fast_sum_vel(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& curr_state, vector<double>& area,
+        vector<interaction_pair>& interactions, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<double>>& fast_sum_icos_verts, double time, double omega) {
     for (int i = 0; i < interactions.size(); i++) {
         if (i % run_information.mpi_P == run_information.mpi_ID) { // evenly split up interactions
-            if (interactions[i].type == "pp") pp_vel(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, time, omega);
-            else if (interactions[i].type == "cp") cp_vel(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
-            // else if (interactions[i].type == "pc") pc_vel(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
-            else if (interactions[i].type == "pc") pp_vel(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, time, omega);
-            // else if (interactions[i].type == "cc") cc_vel(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
-            else if (interactions[i].type == "cc") cp_vel(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
+            if (interactions[i].type == "pp") pp_vel(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, time, omega);
+            else if (interactions[i].type == "cp") cp_vel(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
+            // else if (interactions[i].type == "pc") pc_vel(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
+            else if (interactions[i].type == "pc") pp_vel(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, time, omega);
+            // else if (interactions[i].type == "cc") cc_vel(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
+            else if (interactions[i].type == "cc") cp_vel(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
         }
     }
 }
 
-void rhs_fast_sum_stream(run_config& run_information, vector<double>& modify, vector<double>& curr_state, vector<double>& area,
-        vector<interaction_pair>& interactions, vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        vector<vector<double>>& fast_sum_icos_verts, double time, double omega) {
+void rhs_fast_sum_stream(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& curr_state, vector<double>& area,
+        vector<interaction_pair>& interactions, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<double>>& fast_sum_icos_verts, double time, double omega) {
     for (int i = 0; i < interactions.size(); i++) {
         if (i % run_information.mpi_P == run_information.mpi_ID) { // evenly split up interactions
-            if (interactions[i].type == "pp") pp_stream(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, time, omega);
-            else if (interactions[i].type == "cp") cp_stream(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
-            // else if (interactions[i].type == "pc") pc_stream(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
-            else if (interactions[i].type == "pc") pp_stream(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, time, omega);
-            // else if (interactions[i].type == "cc") cc_stream(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
-            else if (interactions[i].type == "cc") cp_stream(run_information, modify, curr_state, area, interactions[i], fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
+            if (interactions[i].type == "pp") pp_stream(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, time, omega);
+            else if (interactions[i].type == "cp") cp_stream(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
+            // else if (interactions[i].type == "pc") pc_stream(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
+            else if (interactions[i].type == "pc") pp_stream(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, time, omega);
+            // else if (interactions[i].type == "cc") cc_stream(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
+            else if (interactions[i].type == "cc") cp_stream(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
         }
     }
 }
 
-void convolve_vel(run_config& run_information, vector<double>& modify, vector<double>& dynamics_state, vector<double>& dynamics_areas,
-        double omega, vector<interaction_pair>& interactions, vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        vector<vector<double>>& fast_sum_icos_verts, double time) {
+void convolve_vel(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& dynamics_state, vector<double>& dynamics_areas,
+        double omega, vector<interaction_pair>& interactions, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<double>>& fast_sum_icos_verts, double time) {
     fill(modify.begin(), modify.end(), 0);
     if (run_information.use_fast) {
-        rhs_fast_sum_vel(run_information, modify, dynamics_state, dynamics_areas, interactions, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
+        rhs_fast_sum_vel(run_information, modify, targets, dynamics_state, dynamics_areas, interactions, fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
     } else {
-        rhs_direct_sum_vel(run_information, modify, dynamics_state, dynamics_areas, time, omega);
+        rhs_direct_sum_vel(run_information, modify, targets, dynamics_state, dynamics_areas, time, omega);
     }
 }
 
-void convolve_stream(run_config& run_information, vector<double>& modify, vector<double>& dynamics_state, vector<double>& dynamics_areas,
-        double omega, vector<interaction_pair>& interactions, vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        vector<vector<double>>& fast_sum_icos_verts, double time) {
+void convolve_stream(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& dynamics_state, vector<double>& dynamics_areas,
+        double omega, vector<interaction_pair>& interactions, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<double>>& fast_sum_icos_verts, double time) {
     fill(modify.begin(), modify.end(), 0);
     if (run_information.use_fast) {
-        rhs_fast_sum_stream(run_information, modify, dynamics_state, dynamics_areas, interactions, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
+        rhs_fast_sum_stream(run_information, modify, targets, dynamics_state, dynamics_areas, interactions, fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
     } else {
-        rhs_direct_sum_stream(run_information, modify, dynamics_state, dynamics_areas, time, omega);
+        rhs_direct_sum_stream(run_information, modify, targets, dynamics_state, dynamics_areas, time, omega);
     }
 }
 
-void rhs_func(run_config& run_information, vector<double>& modify, vector<double>& dynamics_state, vector<double>& dynamics_areas,
-        double omega, vector<interaction_pair>& interactions, vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        vector<vector<double>>& fast_sum_icos_verts, double time) {
-    convolve_vel(run_information, modify, dynamics_state, dynamics_areas, omega, interactions, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, time);
+void rhs_func(run_config& run_information, vector<double>& modify, vector<double>& target_points, vector<double>& dynamics_state, vector<double>& dynamics_areas,
+        double omega, vector<interaction_pair>& interactions, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<double>>& fast_sum_icos_verts, double time) {
+    convolve_vel(run_information, modify, target_points, dynamics_state, dynamics_areas, omega, interactions, fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time);
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) modify[run_information.info_per_point * i + 3] = -2 * omega * modify[run_information.info_per_point * i + 2];
 }
 

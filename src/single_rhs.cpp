@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
     if (run_information.use_fast) {
         fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
         points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-        tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+        tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
     }
 
     // if (run_information.use_fast) {
@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
         begin = chrono::steady_clock::now();
     }
 
-    rhs_func(run_information, c_1, dynamics_state, dynamics_areas, omega, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time);
+    rhs_func(run_information, c_1, dynamics_state, dynamics_state, dynamics_areas, omega, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time);
     sync_updates(run_information, c_1, P, ID, &win_c1);
 
     if (ID == 0) {

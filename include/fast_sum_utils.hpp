@@ -24,37 +24,39 @@ void points_assign_tris(run_config& run_information, vector<double>& dynamics_st
         vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<vector<int>>>& fast_sum_tree_tri_points,
         vector<int>& fast_sum_tree_point_locs);
 
-void tree_traverse(run_config& run_information, vector<vector<vector<int>>>& fast_sum_tree_tri_points,
+void tree_traverse(run_config& run_information, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
         vector<vector<vector<double>>>& fast_sum_icos_tri_info, vector<interaction_pair>& tree_interactions);
 
-void pp_vel(run_config& run_information, vector<double>& modify, vector<double>& curr_state, vector<double>& area,
-        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points, double time, double omega);
+void pp_vel(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& curr_state, vector<double>& area,
+        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        double time, double omega);
 
-void pc_vel(run_config& run_information, vector<double>& modify, vector<double>& curr_state, vector<double>& area,
-        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
+void pc_vel(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& curr_state, vector<double>& area,
+        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
 
-void cp_vel(run_config& run_information, vector<double>& modify, vector<double>& curr_state, vector<double>& area,
-        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
+void cp_vel(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& curr_state, vector<double>& area,
+        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
 
-void cc_vel(run_config& run_information, vector<double>& modify, vector<double>& curr_state, vector<double>& area,
-        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
+void cc_vel(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& curr_state, vector<double>& area,
+        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
 
-void pp_stream(run_config& run_information, vector<double>& modify, vector<double>& curr_state, vector<double>& area,
-        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points, double time, double omega);
+void pp_stream(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& curr_state, vector<double>& area,
+        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        double time, double omega);
 
-void pc_stream(run_config& run_information, vector<double>& modify, vector<double>& curr_state, vector<double>& area,
-        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
+void pc_stream(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& curr_state, vector<double>& area,
+        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
 
-void cp_stream(run_config& run_information, vector<double>& modify, vector<double>& curr_state, vector<double>& area,
-        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
+void cp_stream(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& curr_state, vector<double>& area,
+        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
 
-void cc_stream(run_config& run_information, vector<double>& modify, vector<double>& curr_state, vector<double>& area,
-        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
+void cc_stream(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& curr_state, vector<double>& area,
+        interaction_pair& interact, vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
+        vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<double>>& fast_sum_icos_verts, double time, double omega);
 
 #endif

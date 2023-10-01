@@ -29,6 +29,10 @@ int main(int argc, char** argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &P);
     MPI_Comm_rank(MPI_COMM_WORLD, &ID);
 
+    MPI_Datatype dt_interaction;
+    MPI_Type_contiguous(7, MPI_INT, &dt_interaction);
+    MPI_Type_commit(&dt_interaction);
+
     run_config run_information;
     read_run_config("namelist.txt", run_information); // reads in run configuration information
     run_information.mpi_P = P;
@@ -90,10 +94,28 @@ int main(int argc, char** argv) {
         fixer_init(run_information, dynamics_state, dynamics_areas, qmins, qmaxs, target_mass, omega);
     }
 
+    // if (ID == 0) {
+    //     t1 = chrono::steady_clock::now();
+    // }
+
     if (run_information.use_fast) {
         fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
+        // if (ID == 0) {
+        //     t2 = chrono::steady_clock::now();
+        //     cout << "icos setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
+        //     t1 = chrono::steady_clock::now();
+        // }
         points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-        tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+        // if (ID == 0) {
+        //     t2 = chrono::steady_clock::now();
+        //     cout << "point assign setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
+        //     t1 = chrono::steady_clock::now();
+        // }
+        tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions, dt_interaction);
+        // if (ID == 0) {
+        //     t2 = chrono::steady_clock::now();
+        //     cout << "tree traverse setup time: " << chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << " microseconds" << endl;
+        // }
     }
 
     MPI_Win_create(&c_1[0], run_information.info_per_point * run_information.dynamics_max_points * sizeof(double), sizeof(double), MPI_INFO_NULL, MPI_COMM_WORLD, &win_c1);
@@ -197,7 +219,7 @@ int main(int argc, char** argv) {
                 fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
                 fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
                 points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-                tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+                tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions, dt_interaction);
             }
         }
 
@@ -271,7 +293,7 @@ int main(int argc, char** argv) {
                 fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
                 fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
                 points_assign(run_information, inter_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-                tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+                tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions, dt_interaction);
             }
             convolve_stream(run_information, stream_func, dynamics_state, dynamics_state, dynamics_areas, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time, omega);
             sync_updates(run_information, stream_func, P, ID, &win_stream);

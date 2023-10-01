@@ -5,9 +5,9 @@
 
 void bounds_determine(run_config& run_information, const int P, const int ID) {
     // find range of particles for each process
-    vector<double> particles (P, int(run_information.dynamics_curr_point_count / P));
-    vector<double> lb (P, 0);
-    vector<double> ub (P, 0);
+    vector<int> particles (P, int(run_information.dynamics_curr_point_count / P));
+    vector<int> lb (P, 0);
+    vector<int> ub (P, 0);
     int total = P * int(run_information.dynamics_curr_point_count / P);
     int gap = run_information.dynamics_curr_point_count - total;
     for (int i = 1; i < gap + 1; i++) {
@@ -29,7 +29,7 @@ void bounds_determine(run_config& run_information, const int P, const int ID) {
     run_information.particle_ub = ub[ID];
     run_information.particle_own = particles[ID];
 
-    vector<double> targets (P, int(run_information.target_points / P));
+    vector<int> targets (P, int(run_information.target_points / P));
     total = P * int(run_information.target_points / P);
     gap = run_information.target_points - total;
     for (int i = 1; i < gap + 1; i++) {
@@ -88,4 +88,5 @@ void sync_updates_int(const run_config& run_information, vector<int>& vals, cons
     }
     MPI_Win_fence(0, *win);
     MPI_Barrier(MPI_COMM_WORLD);
+    
 }

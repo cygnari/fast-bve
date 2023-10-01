@@ -2,6 +2,7 @@
 #define H_MPI_UTILS_H
 
 #include "structs.hpp"
+#include <mpi.h>
 #include <vector>
 
 using namespace std;

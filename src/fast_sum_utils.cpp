@@ -3,7 +3,11 @@
 #include "green_funcs.hpp"
 #include "interp_utils.hpp"
 #include "vorticity_functions.hpp"
+#include "mpi_utils.hpp"
 #include <iostream>
+#include <cassert>
+#include <mpi.h>
+#define assertm(exp, msg) assert(((void)msg, exp))
 
 extern "C" { // lapack
     extern int dgesv_(int*,int*,double*,int*,int*,double*,int*,int*);
@@ -122,7 +126,7 @@ void points_assign(const run_config& run_information, const vector<double>& dyna
 
 void tree_traverse(const run_config& run_information, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
         const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, const vector<vector<vector<double>>>& fast_sum_icos_tri_info,
-        vector<interaction_pair>& tree_interactions) {
+        vector<interaction_pair>& tree_interactions, MPI_Datatype dt_interaction) {
     // determines {C,P}-{C,P} interactions
     int curr_source, curr_target, lev_target, lev_source;
     int particle_count_target, particle_count_source;
@@ -131,8 +135,63 @@ void tree_traverse(const run_config& run_information, const vector<vector<vector
     vector<vector<int>> tri_interactions;
     vector<int> curr_interact (4, 0);
 
-    for (int i = 0; i < 20; i++) { // queue of triangle pairs to interact
-        for (int j = 0; j < 20; j++) {
+    vector<interaction_pair> own_interactions;
+
+    int out_lb, out_ub, in_lb, in_ub;
+    int P = run_information.mpi_P;
+    int ID = run_information.mpi_ID;
+
+    if (P <= 20) { // less than 20 threads, parallelize only targets
+        in_lb = 0;
+        in_ub = 20;
+        vector<int> out_counts (P, int(20 / P));
+        vector<int> lb (P, 0);
+        vector<int> ub (P, 0);
+        int total = P * int(20 / P);
+        int gap = 20 - total;
+        for (int i = 1; i < gap + 1; i++) {
+            out_counts[i] += 1;
+        }
+        total = 0;
+        for (int i = 0; i < P; i++) {
+            total += out_counts[i];
+        }
+        assertm(total == 20, "Outer triangle loop count not correct");
+        ub[0] = out_counts[0];
+        for (int i = 1; i < P; i++) {
+            lb[i] = ub[i-1];
+            ub[i] = lb[i] + out_counts[i];
+        }
+        out_lb = lb[ID];
+        out_ub = ub[ID];
+    } else { // more than 20 threads, parallelize both
+        out_lb = ID % 20;
+        out_ub = out_lb + 1;
+        int same_outer = 1 + (P % 20);
+        vector<int> in_counts (same_outer, int(20 / same_outer));
+        vector<int> lb (same_outer, 0);
+        vector<int> ub (same_outer, 0);
+        int total = same_outer * int(20 / same_outer);
+        int gap = 20 - total;
+        for (int i = 1; i < gap + 1; i++) {
+            in_counts[i] += 1;
+        }
+        total = 0;
+        for (int i = 0; i < P; i++) {
+            total += in_counts[i];
+        }
+        assertm(total == 20, "Inner triangle loop count not correct");
+        ub[0] = in_counts[0];
+        for (int i = 1; i < P; i++) {
+            lb[i] = ub[i-1];
+            ub[i] = lb[i] + in_counts[i];
+        }
+        in_lb = lb[ID % 20];
+        in_ub = ub[ID % 20];
+    }
+
+    for (int i = out_lb; i < out_ub; i++) { // queue of triangle pairs to interact
+        for (int j = in_lb; j < in_ub; j++) {
             tri_interactions.push_back({i, j, 0, 0});
         }
     }
@@ -162,14 +221,14 @@ void tree_traverse(const run_config& run_information, const vector<vector<vector
             if (particle_count_source > run_information.fast_sum_cluster_thresh) {
                 new_interact.type += 2;
             }
-            tree_interactions.push_back(new_interact);
+            own_interactions.push_back(new_interact);
         } else {
             if ((particle_count_target < run_information.fast_sum_cluster_thresh) and (particle_count_source < run_information.fast_sum_cluster_thresh)) { // both have few particles, pp
                 interaction_pair new_interact = {lev_target, lev_source, curr_target, curr_source, particle_count_target, particle_count_source, 0};
-                tree_interactions.push_back(new_interact);
+                own_interactions.push_back(new_interact);
             } else if ((lev_target == run_information.fast_sum_tree_levels - 1) and (lev_source == run_information.fast_sum_tree_levels - 1)) { // both are leaves, pp
                 interaction_pair new_interact = {lev_target, lev_source, curr_target, curr_source, particle_count_target, particle_count_source, 0};
-                tree_interactions.push_back(new_interact);
+                own_interactions.push_back(new_interact);
             } else if (lev_target == run_information.fast_sum_tree_levels - 1) { // target is leaf, tree traverse source
                 tri_interactions.push_back(vector<int> {curr_target, 4 * curr_source, lev_target, lev_source + 1});
                 tri_interactions.push_back(vector<int> {curr_target, 4 * curr_source + 1, lev_target, lev_source + 1});
@@ -194,6 +253,25 @@ void tree_traverse(const run_config& run_information, const vector<vector<vector
                 }
             }
         }
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+    int size = static_cast<int>(own_interactions.size());
+    vector<int> array_sizes_buff (P, 0);
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Allgather(&size, 1, MPI_INT, &array_sizes_buff[0], 1, MPI_INT, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+    vector<int> offsets (P, 0);
+    for (int i = 1; i < P; i++) {
+        offsets[i] = offsets[i-1] + array_sizes_buff[i-1];
+    }
+    int total = offsets[P-1] + array_sizes_buff[P-1];
+    tree_interactions.resize(total);
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Allgatherv(&own_interactions[0], static_cast<int>(own_interactions.size()), dt_interaction, &tree_interactions[0], &array_sizes_buff[0], &offsets[0], dt_interaction, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+    // cout << "interactions: " << tree_interactions.size() << endl;
+    if (not test_is_same(tree_interactions.size())) {
+        cout << "Tree Traverse Error" << endl;
     }
 }
 

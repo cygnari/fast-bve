@@ -3,6 +3,7 @@
 
 #include "structs.hpp"
 #include <vector>
+#include <mpi.h>
 
 using namespace std;
 
@@ -26,7 +27,7 @@ void points_assign(const run_config& run_information, const vector<double>& dyna
 
 void tree_traverse(const run_config& run_information, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
         const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, const vector<vector<vector<double>>>& fast_sum_icos_tri_info,
-        vector<interaction_pair>& tree_interactions);
+        vector<interaction_pair>& tree_interactions, MPI_Datatype dt_interaction);
 
 void pp_vel(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
         const vector<double>& area, const interaction_pair& interact, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,

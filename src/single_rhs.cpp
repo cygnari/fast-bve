@@ -29,6 +29,10 @@ int main(int argc, char** argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &P);
     MPI_Comm_rank(MPI_COMM_WORLD, &ID);
 
+    MPI_Datatype dt_interaction;
+    MPI_Type_contiguous(7, MPI_INT, &dt_interaction);
+    MPI_Type_commit(&dt_interaction);
+
     run_config run_information;
     read_run_config("namelist.txt", run_information); // reads in run configuration information
     run_information.mpi_P = P;
@@ -79,7 +83,7 @@ int main(int argc, char** argv) {
     if (run_information.use_fast) {
         fast_sum_icos_init(run_information, fast_sum_icos_verts, fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
         points_assign(run_information, dynamics_state, fast_sum_icos_verts, fast_sum_icos_tri_verts, fast_sum_tree_tri_points, fast_sum_tree_point_locs);
-        tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions);
+        tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions, dt_interaction);
     }
 
     // if (run_information.use_fast) {

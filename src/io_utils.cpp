@@ -2,7 +2,7 @@
 #include <sstream>
 #include "structs.hpp"
 
-void write_state(run_config& run_information, vector<double>& dynamics_state, vector<double>& dynamics_area, ofstream& file_writer1, ofstream& file_writer2) {
+void write_state(const run_config& run_information, const vector<double>& dynamics_state, const vector<double>& dynamics_area, ofstream& file_writer1, ofstream& file_writer2) {
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) { // write out initial state
         for (int j = 0; j < run_information.info_per_point; j++) {
             file_writer1 << setprecision(run_information.write_precision) << dynamics_state[run_information.info_per_point * i + j] << ",";
@@ -16,8 +16,8 @@ void write_state(run_config& run_information, vector<double>& dynamics_state, ve
 //
 // }
 
-void write_triangles(run_config& run_information, vector<vector<vector<int>>>& dynamics_triangles,
-            vector<vector<bool>>& dynamics_triangles_is_leaf, ofstream& file_writer3, ofstream& file_writer4) {
+void write_triangles(const run_config& run_information, const vector<vector<vector<int>>>& dynamics_triangles,
+            const vector<vector<bool>>& dynamics_triangles_is_leaf, ofstream& file_writer3, ofstream& file_writer4) {
     for (int i = 0; i < run_information.dynamics_levels_max; i++) {
         for (int j = 0; j < 20 * pow(4, i); j++) {
             if (dynamics_triangles_is_leaf[i][j]) {
@@ -31,7 +31,7 @@ void write_triangles(run_config& run_information, vector<vector<vector<int>>>& d
     file_writer4 << run_information.dynamics_curr_tri_count << "\n";
 }
 
-string create_config(run_config& run_information) {
+string create_config(const run_config& run_information) {
     stringstream ss1, ss2, ss3;
     int precision;
     string output_filename = to_string(run_information.dynamics_initial_points) + "_" + run_information.initial_vor_condition + "_";

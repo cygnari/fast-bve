@@ -1,5 +1,5 @@
 CXX       := mpicxx
-CXXFLAGS  := -std=c++14 -O3 -Iinclude
+CXXFLAGS  := -std=c++14 -Ofast -Iinclude
 
 SRC_DIR   := src
 INC_DIR   := include

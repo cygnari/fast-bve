@@ -3,8 +3,8 @@
 #include "green_funcs.hpp"
 #include "vorticity_functions.hpp"
 
-void rhs_direct_sum_vel(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& dynamics_state, vector<double>& dynamics_areas,
-        double time, double omega) { // direct summation for all of RHS
+void rhs_direct_sum_vel(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& dynamics_state,
+        const vector<double>& dynamics_areas, const double time, const double omega) { // direct summation for all of RHS
     vector<double> pos_change, particle_source, particle_target, contribution;
     double vor;
     int nval = 3, point_offset = run_information.info_per_point;
@@ -25,8 +25,8 @@ void rhs_direct_sum_vel(run_config& run_information, vector<double>& modify, vec
     }
 }
 
-void rhs_direct_sum_stream(run_config& run_information, vector<double>& modify, vector<double>& targets, vector<double>& dynamics_state, vector<double>& dynamics_areas,
-        double time, double omega) { // direct summation for all of RHS
+void rhs_direct_sum_stream(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& dynamics_state,
+        const vector<double>& dynamics_areas, const double time, const double omega) { // direct summation for all of RHS
     vector<double> pos_change, particle_i, particle_j;
     double vor;
     double stream_val = 0, contribution;

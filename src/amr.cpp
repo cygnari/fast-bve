@@ -3,10 +3,10 @@
 #include "interp_utils.hpp"
 #include "init_utils.hpp"
 
-void amr(run_config& run_information, vector<double>& new_dynamics_state, vector<double>& old_dynamics_state,
-        vector<vector<vector<int>>>& new_dynamics_triangles, vector<vector<vector<int>>>& old_dynamics_triangles,
-        vector<vector<bool>>& new_dynamics_triangles_is_leaf, vector<vector<bool>>& old_dynamics_triangles_is_leaf,
-        vector<double>& dynamics_areas, double omega) {
+void amr(run_config& run_information, vector<double>& new_dynamics_state, const vector<double>& old_dynamics_state,
+        vector<vector<vector<int>>>& new_dynamics_triangles, const vector<vector<vector<int>>>& old_dynamics_triangles,
+        vector<vector<bool>>& new_dynamics_triangles_is_leaf, const vector<vector<bool>>& old_dynamics_triangles_is_leaf,
+        vector<double>& dynamics_areas, const double omega) {
 
     int iv, iv1, iv2, iv3, iv12, iv23, iv31, iv1n, iv2n, iv3n, iv4n, iv5n, iv6n, tri_level, tri_index, super_tri_index;
     vector<double> v, v1, v2, v3, v12, v23, v31, v11, v22, v33;
@@ -158,7 +158,7 @@ void amr(run_config& run_information, vector<double>& new_dynamics_state, vector
 }
 
 void amr_wrapper(run_config& run_information, vector<double>& dynamics_state, vector<vector<vector<int>>>& dynamics_triangles,
-        vector<vector<bool>>& dynamics_triangles_is_leaf, vector<double>& dynamics_areas, double omega) {
+        vector<vector<bool>>& dynamics_triangles_is_leaf, vector<double>& dynamics_areas, const double omega) {
     // wraps amr routine
     vector<double> new_dynamics_state;
     vector<vector<vector<int>>> new_dynamics_triangles;

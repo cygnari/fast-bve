@@ -4,8 +4,8 @@
 using namespace std;
 #include <vector>
 
-vector<double> bve_gfunc(vector<double>& x, vector<double>& y);
+vector<double> bve_gfunc(const vector<double>& x, const vector<double>& y);
 
-double stream_gfunc(vector<double>& x, vector<double>& y);
+double stream_gfunc(const vector<double>& x, const vector<double>& y);
 
 #endif

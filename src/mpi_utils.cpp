@@ -3,7 +3,7 @@
 #include <mpi.h>
 #define assertm(exp, msg) assert(((void)msg, exp))
 
-void bounds_determine(run_config& run_information, int P, int ID) {
+void bounds_determine(run_config& run_information, const int P, const int ID) {
     // find range of particles for each process
     vector<double> particles (P, int(run_information.dynamics_curr_point_count / P));
     vector<double> lb (P, 0);
@@ -52,7 +52,7 @@ void bounds_determine(run_config& run_information, int P, int ID) {
     run_information.target_own = targets[ID];
 }
 
-bool test_is_same(int x) { // test if all processes have the same value for a variable
+bool test_is_same(const int x) { // test if all processes have the same value for a variable
     int p[2];
     p[0] = -x;
     p[1] = x;
@@ -60,7 +60,7 @@ bool test_is_same(int x) { // test if all processes have the same value for a va
     return (p[0] == -p[1]);
 }
 
-void sync_updates(run_config& run_information, vector<double>& vals, int P, int ID, MPI_Win *win) {
+void sync_updates(const run_config& run_information, vector<double>& vals, const int P, const int ID, const MPI_Win *win) {
     // add all the vals from all the processes together, then distribute
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Win_fence(0, *win);
@@ -75,7 +75,7 @@ void sync_updates(run_config& run_information, vector<double>& vals, int P, int 
     MPI_Barrier(MPI_COMM_WORLD);
 }
 
-void sync_updates_int(run_config& run_information, vector<int>& vals, int P, int ID, MPI_Win *win) {
+void sync_updates_int(const run_config& run_information, vector<int>& vals, const int P, const int ID, const MPI_Win *win) {
     // add all the vals from all the processes together, then distribute
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Win_fence(0, *win);

@@ -16,7 +16,7 @@ extern "C" { // lapack
 
 using namespace std;
 
-int count_nans(vector<double>& x) {
+int count_nans(const vector<double>& x) {
     int count = 0;
     for (int i = 0; i < x.size(); i++) {
         if (isnan(x[i])) count +=1;
@@ -24,38 +24,38 @@ int count_nans(vector<double>& x) {
     return count;
 }
 
-double dot_prod(vector<double>& x, vector<double>& y) { // dot product of vectors x and y
+double dot_prod(const vector<double>& x, const vector<double>& y) { // dot product of vectors x and y
     double sum = 0;
     assert (x.size() == y.size());
     for (int i = 0; i < x.size(); i++) sum += x[i] * y[i];
     return sum;
 }
 
-double vec_norm(vector<double>& x) { // L2 norm of vector x
+double vec_norm(const vector<double>& x) { // L2 norm of vector x
     return sqrt(dot_prod(x, x));
 }
 
-void scalar_mult(vector<double>& x, double scalar) { // multiplies x by scalar in place, modifies x
+void scalar_mult(vector<double>& x, const double scalar) { // multiplies x by scalar in place, modifies x
     for (int i = 0; i < x.size(); i++) x[i] *= scalar;
 }
 
-void vec_add(vector<double>& x, vector<double>& y) { // adds y to x in place, modifies x
+void vec_add(vector<double>& x, const vector<double>& y) { // adds y to x in place, modifies x
     assert(x.size() >= y.size());
     for (int i = 0; i < x.size(); i++) x[i] += y[i];
 }
 
-void vec_minus(vector<double>& x, vector<double>& y) { // subtracts y from x in place, modifies x
+void vec_minus(vector<double>& x, const vector<double>& y) { // subtracts y from x in place, modifies x
     assert(x.size() >= y.size());
     for (int i = 0; i < x.size(); i++) x[i] -= y[i];
 }
 
-void scalar_mult2d(vector<vector<double>>& x, double scalar) {
+void scalar_mult2d(vector<vector<double>>& x, const double scalar) {
     for (int i = 0; i < x.size(); i++) {
         for (int j = 0; j < x[i].size(); j++) x[i][j] *= scalar;
     }
 }
 
-void vec_add2d(vector<vector<double>>& x, vector<vector<double>>& y) {
+void vec_add2d(vector<vector<double>>& x, const vector<vector<double>>& y) {
     assert(x.size() == y.size());
     for (int i = 0; i < x.size(); i++) {
         assert(x[i].size() == y[i].size());
@@ -63,7 +63,7 @@ void vec_add2d(vector<vector<double>>& x, vector<vector<double>>& y) {
     }
 }
 
-void vec_minus2d(vector<vector<double>>& x, vector<vector<double>>& y) {
+void vec_minus2d(vector<vector<double>>& x, const vector<vector<double>>& y) {
     assert(x.size() == y.size());
     for (int i = 0; i < x.size(); i++) {
         assert(x[i].size() == y[i].size());
@@ -71,7 +71,7 @@ void vec_minus2d(vector<vector<double>>& x, vector<vector<double>>& y) {
     }
 }
 
-void matvecmult(vector<vector<double>>& Amat, vector<double>& xvec) {
+void matvecmult(const vector<vector<double>>& Amat, vector<double>& xvec) {
     assert(Amat[0].size() == xvec.size());
     vector<double> y = xvec;
     for (int i = 0; i < Amat.size(); i++) {
@@ -79,24 +79,24 @@ void matvecmult(vector<vector<double>>& Amat, vector<double>& xvec) {
     }
 }
 
-vector<double> slice(vector<double>& x, int start, int stride, int length) {
+vector<double> slice(const vector<double>& x, const int start, const int stride, const int length) {
     // returns a slice of length from x, starting at start, every stride elements
     vector<double> out(length);
     for (int i = 0; i < length; i++) out[i] = x[start + i * stride];
     return out;
 }
 
-void vector_copy(vector<double>& x, vector<double>& y, int start, int length) {
+void vector_copy(vector<double>& x, const vector<double>& y, const int start, const int length) {
     // copies elements from y into x
     for (int i = 0; i < length; i++) x[start + i] = y[i];
 }
 
-void vector_copy2(vector<double>& x, vector<double> y, int start, int length) {
+void vector_copy2(vector<double>& x, const vector<double> y, const int start, const int length) {
     // copies elements from y into x
     for (int i = 0; i < length; i++) x[start + i] = y[i];
 }
 
-vector<double> cross_product(vector<double>& x, vector<double>& y) { // cross product of x and y
+vector<double> cross_product(const vector<double>& x, const vector<double>& y) { // cross product of x and y
     assert (x.size() >= 3);
     assert (y.size() >= 3);
     vector<double> vals(3);
@@ -106,7 +106,7 @@ vector<double> cross_product(vector<double>& x, vector<double>& y) { // cross pr
     return vals;
 }
 
-vector<double> cart_to_sphere(vector<double>& p1) { // turns cartesian coordinates to spherical coordinates
+vector<double> cart_to_sphere(const vector<double>& p1) { // turns cartesian coordinates to spherical coordinates
     assert (p1.size() == 3);
     vector<double> sphere(3);
     double x = p1[0], y = p1[1], z = p1[2];
@@ -116,7 +116,7 @@ vector<double> cart_to_sphere(vector<double>& p1) { // turns cartesian coordinat
     return sphere;
 }
 
-vector<double> sphere_to_cart(double radius, double colat, double lon) { // turns spherical coordinates to cartesian coordinates
+vector<double> sphere_to_cart(const double radius, const double colat, const double lon) { // turns spherical coordinates to cartesian coordinates
     vector<double> cart(3);
     cart[0] = radius * sin(colat) * cos(lon);
     cart[1] = radius * sin(colat) * sin(lon);
@@ -124,12 +124,12 @@ vector<double> sphere_to_cart(double radius, double colat, double lon) { // turn
     return cart;
 }
 
-void project_to_sphere(vector<double>& p1, double radius) { // projects a point to the surface of a sphere of radius, modifies p1
+void project_to_sphere(vector<double>& p1, const double radius) { // projects a point to the surface of a sphere of radius, modifies p1
     double norm = vec_norm(p1);
     for (int i = 0; i < p1.size(); i++) p1[i] *= radius / norm;
 }
 
-vector<double> project_to_sphere_2(vector<double> p1, double radius) {
+vector<double> project_to_sphere_2(const vector<double> p1, const double radius) {
     // projects a point to the surface of a sphere of radius, returns the new coordinates
     double norm = vec_norm(p1);
     vector<double> newcords(p1.size());
@@ -137,18 +137,18 @@ vector<double> project_to_sphere_2(vector<double> p1, double radius) {
     return newcords;
 }
 
-double great_circ_dist(vector<double>& p1, vector<double>& p2, double radius) {
+double great_circ_dist(const vector<double>& p1, const vector<double>& p2, const double radius) {
     // finds great circle distance between two points
     double s = dot_prod(p1, p2) / (vec_norm(p1) * vec_norm(p2));
     double theta = acos(min(max(s, -1.0), 1.0));
     return theta * radius;
 }
 
-double great_circ_dist_sph(double lat1, double lat2, double lon1, double lon2, double radius) {
+double great_circ_dist_sph(const double lat1, const double lat2, const double lon1, const double lon2, const double radius) {
     return radius * acos(min(1.0, max(-1.0, sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1))));
 }
 
-double sphere_tri_area(vector<double>& p1, vector<double>& p2, vector<double>& p3, double radius) {
+double sphere_tri_area(const vector<double>& p1, const vector<double>& p2, const vector<double>& p3, const double radius) {
     // finds the area of a spherical triangle
     assert (p1.size() == p2.size());
     assert (p1.size() == p3.size());
@@ -169,7 +169,7 @@ double sphere_tri_area(vector<double>& p1, vector<double>& p2, vector<double>& p
     return area;
 }
 
-vector<double> lat_lon(vector<double>& p1) { // finds latitude and longitude of cartesian point
+vector<double> lat_lon(const vector<double>& p1) { // finds latitude and longitude of cartesian point
     assert (p1.size() >= 3);
     vector<double> latlon(2);
     double x = p1[0], y = p1[1], z = p1[2];
@@ -178,7 +178,7 @@ vector<double> lat_lon(vector<double>& p1) { // finds latitude and longitude of 
     return latlon;
 }
 
-vector<double> barycoords(vector<double>& p1, vector<double>& p2, vector<double>& p3, vector<double>& p) {
+vector<double> barycoords(const vector<double>& p1, const vector<double>& p2, const vector<double>& p3, const vector<double>& p) {
     // finds triangle barycentric coordinates of point p
     assert (p1.size() == 3);
     assert (p2.size() == 3);
@@ -198,7 +198,7 @@ vector<double> barycoords(vector<double>& p1, vector<double>& p2, vector<double>
     return coords;
 }
 
-vector<double> normalized_barycoords(vector<double>& p1, vector<double>& p2, vector<double>& p3, vector<double>& p) {
+vector<double> normalized_barycoords(const vector<double>& p1, const vector<double>& p2, const vector<double>& p3, const vector<double>& p) {
     // returns normalized barycentric coordinates so b1 + b2 + b3 = 1
     vector<double> coords;
     coords = barycoords(p1, p2, p3, p);
@@ -206,23 +206,23 @@ vector<double> normalized_barycoords(vector<double>& p1, vector<double>& p2, vec
     return coords;
 }
 
-bool check_in_tri(vector<double>& p1, vector<double>& p2, vector<double>& p3, vector<double>& p) { // checks if point p is in triangle
+bool check_in_tri(const vector<double>& p1, const vector<double>& p2, const vector<double>& p3, const vector<double>& p) { // checks if point p is in triangle
     vector<double> bary_coord = barycoords(p1, p2, p3, p);
     if ((bary_coord[0] >= 0) and (bary_coord[1] >= 0) and (bary_coord[2] >= 0)) return true;
     else return false;
 }
 
-bool check_in_tri_thresh(vector<double>& p1, vector<double>& p2, vector<double>& p3, vector<double>& p, double threshold) { // checks if point p is in triangle
+bool check_in_tri_thresh(const vector<double>& p1, const vector<double>& p2, const vector<double>& p3, const vector<double>& p, const double threshold) { // checks if point p is in triangle
     vector<double> bary_coord = barycoords(p1, p2, p3, p);
     if ((bary_coord[0] >= -threshold) and (bary_coord[1] >= -threshold) and (bary_coord[2] >= -threshold)) return true;
     else return false;
 }
 
-double circum_poly(double a, double b, double c) { // polynomial for circumcenter
+double circum_poly(const double a, const double b, const double c) { // polynomial for circumcenter
     return a * a + b * b - c * c;
 }
 
-vector<double> tri_sides(vector<double>& p1, vector<double>& p2, vector<double>& p3) {// finds side lengths of triangle
+vector<double> tri_sides(const vector<double>& p1, const vector<double>& p2, const vector<double>& p3) {// finds side lengths of triangle
     vector<double> sides(3);
     vector<double> p23 = p2;
     vector<double> p31 = p3;
@@ -236,7 +236,7 @@ vector<double> tri_sides(vector<double>& p1, vector<double>& p2, vector<double>&
     return sides;
 }
 
-vector<double> circum_center(vector<double>& p1, vector<double>& p2, vector<double>& p3, double radius) {
+vector<double> circum_center(const vector<double>& p1, const vector<double>& p2, const vector<double>& p3, const double radius) {
     // finds triangle circumcenter x y z coords
     vector<double> tri_cent(3);
     vector<double> trisides = tri_sides(p1, p2, p3);
@@ -252,7 +252,7 @@ vector<double> circum_center(vector<double>& p1, vector<double>& p2, vector<doub
     return tri_cent;
 }
 
-double tri_radius(vector<double>& p1, vector<double>& p2, vector<double>& p3, vector<double>& center) { // finds triangle circumradius
+double tri_radius(const vector<double>& p1, const vector<double>& p2, const vector<double>& p3, const vector<double>& center) { // finds triangle circumradius
     vector<double> p1c = p1;
     vector<double> p2c = p2;
     vector<double> p3c = p3;
@@ -265,7 +265,7 @@ double tri_radius(vector<double>& p1, vector<double>& p2, vector<double>& p3, ve
     return max(max(radius1, radius2), radius3);
 }
 
-void replace(vector<int>& vals, int find, int replacement) { // replace find in vals with replacement
+void replace(vector<int>& vals, const int find, const int replacement) { // replace find in vals with replacement
     for (int i = 0; i < vals.size(); i++) {
         if (vals[i] == find) {
             vals[i] = replacement;
@@ -274,7 +274,7 @@ void replace(vector<int>& vals, int find, int replacement) { // replace find in 
     }
 }
 
-int check_point_exist(vector<vector<int>>& parent_points, int point_count, int iv1, int iv2) {
+int check_point_exist(const vector<vector<int>>& parent_points, const int point_count, const int iv1, const int iv2) {
     // cout << parent_points.size() << " " << point_count << endl;
     for (int i = 0; i < point_count; i++) {
         if ((parent_points[i][0] == iv1) and (parent_points[i][1] == iv2)) return i;
@@ -282,7 +282,7 @@ int check_point_exist(vector<vector<int>>& parent_points, int point_count, int i
     return -1;
 }
 
-int check_point_exist2(vector<double>& state, vector<double>& target_point, int point_count, double tol, int info_per_point) {
+int check_point_exist2(const vector<double>& state, const vector<double>& target_point, const int point_count, const double tol, const int info_per_point) {
     for (int i = 0; i < point_count; i++) {
         if ((abs(state[i * info_per_point] - target_point[0]) < tol) and (abs(state[i * info_per_point + 1] - target_point[1]) < tol) and (abs(state[i * info_per_point + 2] - target_point[2]) < tol)) {
             return i;
@@ -291,15 +291,15 @@ int check_point_exist2(vector<double>& state, vector<double>& target_point, int 
     return -1;
 }
 
-int check_in_vec(vector<vector<double>>& x, vector<double>& y) { // checks if length 3 vector y is in vector of vectors x
+int check_in_vec(const vector<vector<double>>& x, const vector<double>& y) { // checks if length 3 vector y is in vector of vectors x
     for (int i = 0; i < x.size(); i++) {
         if ((x[i][0] == y[0]) and (x[i][1] == y[1]) and (x[i][2] == y[2])) return i; // index where y is in x
     }
     return -1; // -1 if y not in x
 }
 
-tuple<int, int> find_leaf_tri(vector<double>& target_point, vector<double>& dynamics_state, vector<vector<vector<int>>>& dynamics_triangles,
-        vector<vector<bool>>& dynamics_triangles_is_leaf, int info_per_point, int max_level) {
+tuple<int, int> find_leaf_tri(const vector<double>& target_point, const vector<double>& dynamics_state, const vector<vector<vector<int>>>& dynamics_triangles,
+        const vector<vector<bool>>& dynamics_triangles_is_leaf, const int info_per_point, const int max_level) {
     bool found_leaf_tri = false, found_curr_level;
     double epsilon = pow(10, -10);
     int curr_level = -1;

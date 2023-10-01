@@ -114,7 +114,7 @@ void dynamics_points_initialize(run_config& run_information, vector<double>& dyn
     }
 }
 
-void area_initialize(run_config& run_information, vector<double>& dynamics_state, vector<vector<vector<int>>>& dynamics_triangles, vector<double>& dynamics_areas) {
+void area_initialize(const run_config& run_information, const vector<double>& dynamics_state, const vector<vector<vector<int>>>& dynamics_triangles, vector<double>& dynamics_areas) {
     // initialize areas, node patch area for each point
     int iv1, iv2, iv3;
     vector<double> v1, v2, v3;
@@ -134,7 +134,7 @@ void area_initialize(run_config& run_information, vector<double>& dynamics_state
     }
 }
 
-void vorticity_initialize(run_config& run_information, vector<double>& dynamics_state, vector<double>& dynamics_areas, double omega) {
+void vorticity_initialize(const run_config& run_information, vector<double>& dynamics_state, const vector<double>& dynamics_areas, const double omega) {
     // initializes the initial vorticity
     if (run_information.initial_vor_condition == "rh") {
         rossby_haurwitz(run_information, dynamics_state, omega);
@@ -156,7 +156,7 @@ void vorticity_initialize(run_config& run_information, vector<double>& dynamics_
     }
 }
 
-void tracer_initialize(run_config& run_information, vector<double>& dynamics_state) {
+void tracer_initialize(const run_config& run_information, vector<double>& dynamics_state) {
     // initializes the tracer
     vector<double> curr_pos, latlon;
     double lat, lon, hmax=1, hi, r1, r2, r = run_information.radius / 2, b = 0.1, c = 0.8;
@@ -188,7 +188,7 @@ void tracer_initialize(run_config& run_information, vector<double>& dynamics_sta
     }
 }
 
-void fixer_init(run_config& run_information, vector<double>& dynamics_state, vector<double>& dynamics_areas, vector<double>& qmins, vector<double>& qmaxs, vector<double>& target_mass, double omega) {
+void fixer_init(const run_config& run_information, const vector<double>& dynamics_state, const vector<double>& dynamics_areas, vector<double>& qmins, vector<double>& qmaxs, vector<double>& target_mass, const double omega) {
     double abs_vor;
     qmins.resize(run_information.tracer_count + 1, INT_MAX); // vorticity + tracers
     qmaxs.resize(run_information.tracer_count + 1, INT_MIN); // voriticty + tracers
@@ -207,7 +207,7 @@ void fixer_init(run_config& run_information, vector<double>& dynamics_state, vec
     }
 }
 
-void fast_sum_icos_init(run_config& run_information, vector<vector<double>>& fast_sum_icos_verts, vector<vector<vector<double>>>& fast_sum_icos_tri_info, vector<vector<vector<int>>>& fast_sum_icos_tri_verts) {
+void fast_sum_icos_init(const run_config& run_information, vector<vector<double>>& fast_sum_icos_verts, vector<vector<vector<double>>>& fast_sum_icos_tri_info, vector<vector<vector<int>>>& fast_sum_icos_tri_verts) {
     double phi = (1 + sqrt(5)) / 2;
     vector<double> center, v1, v2, v3, v12, v23, v31;
     int iv1, iv2, iv3, iv12, iv23, iv13;

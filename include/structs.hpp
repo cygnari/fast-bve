@@ -83,7 +83,8 @@ struct interaction_pair {
     int curr_source;
     int count_target; // number of particles in target/source
     int count_source;
-    string type; // pp, pc, cp, or cc
+    int type; // pp, pc, cp, or cc
+    // 0 for pp, 1, for pc, 2 for cp, 3 for cc
 };
 
 #endif

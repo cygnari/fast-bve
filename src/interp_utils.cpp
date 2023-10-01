@@ -8,7 +8,7 @@ extern "C" { // lapack
     extern int dgetrs_(char*,int*,int*,double*,int*,int*,double*,int*,int*);
 }
 
-void fekete_init(vector<vector<double>>& points, int degree) {
+void fekete_init(vector<vector<double>>& points, const int degree) {
     double delta_x = 1.0 / degree;
     int index;
     double a, b, c;
@@ -28,7 +28,7 @@ void fekete_init(vector<vector<double>>& points, int degree) {
     }
 }
 
-void interp_mat_init(vector<double>& mat, vector<vector<double>>& points, int degree, int point_count) { // sets up matrix to interpolate with fekete points
+void interp_mat_init(vector<double>& mat, const vector<vector<double>>& points, const int degree, const int point_count) { // sets up matrix to interpolate with fekete points
     int index, place;
     double a, b;
     for (int i = 0; i < degree + 1; i++) {
@@ -44,7 +44,7 @@ void interp_mat_init(vector<double>& mat, vector<vector<double>>& points, int de
     }
 }
 
-double interp_eval(vector<double>& alphas, double s, double t, int degree) { // evaluate interpolation polynomial with coefficients alpha and barycentric point (s, t)
+double interp_eval(const vector<double>& alphas, const double s, const double t, const int degree) { // evaluate interpolation polynomial with coefficients alpha and barycentric point (s, t)
     double accum = 0;
     int index;
     for (int i = 0; i < degree + 1; i++) {
@@ -56,7 +56,8 @@ double interp_eval(vector<double>& alphas, double s, double t, int degree) { // 
     return accum;
 }
 
-vector<double> bilinear_interp(run_config& run_information, vector<double>& target_point, int iv1, int iv2, int iv3, vector<double>& dynamics_state) {
+vector<double> bilinear_interp(const run_config& run_information, const vector<double>& target_point,
+        const int iv1, const int iv2, const int iv3, const vector<double>& dynamics_state) {
     vector<double> v1, v2, v3, bary_cords, out;
 
     v1 = slice(dynamics_state, run_information.info_per_point * iv1, 1, 3);
@@ -75,8 +76,8 @@ vector<double> bilinear_interp(run_config& run_information, vector<double>& targ
     return out;
 }
 
-vector<double> biquadratic_interp(run_config& run_information, vector<double>& target_point, int iv1, int iv2, int iv3, int iv4,
-        int iv5, int iv6, vector<double>& dynamics_state) {
+vector<double> biquadratic_interp(const run_config& run_information, const vector<double>& target_point, const int iv1, const int iv2,
+        const int iv3, const int iv4, const int iv5, const int iv6, const vector<double>& dynamics_state) {
 
     vector<double> v1, v2, v3, v4, v5, v6, curr_alphas, bary_cords;
     vector<vector<double>> points(6, vector<double> (3, 0));
@@ -139,8 +140,8 @@ vector<double> biquadratic_interp(run_config& run_information, vector<double>& t
     return output_values;
 }
 
-void remesh_points(run_config& run_information, vector<double>& target_points, vector<double>& dynamics_state,
-        vector<vector<vector<int>>>& dynamics_triangles, vector<vector<bool>>& dynamics_triangles_is_leaf, int point_count, double omega) {
+void remesh_points(const run_config& run_information, vector<double>& target_points, const vector<double>& dynamics_state,
+        const vector<vector<vector<int>>>& dynamics_triangles, const vector<vector<bool>>& dynamics_triangles_is_leaf, const int point_count, const double omega) {
     // remesh points back to regular point distribution
     vector<double> curr_target;
     int iv1, iv2, iv3, iv4, iv5, iv6, curr_level, tri_loc, super_tri_loc; // , lb, ub;

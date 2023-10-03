@@ -3,16 +3,14 @@
 #include "structs.hpp"
 #include <iostream>
 
-using namespace std;
-
-void read_run_config(const string file_name, run_config& run_information) {
+void read_run_config(const std::string file_name, run_config& run_information) {
     // reads run information of file_name
-    ifstream config_file(file_name);
-    string line, word1, word2;
+    std::ifstream config_file(file_name);
+    std::string line, word1, word2;
 
     while (true) {
         getline(config_file, line);
-        stringstream str1(line);
+        std::stringstream str1(line);
         getline(str1, word1, '=');
         getline(str1, word2);
         if (word1 == "use_amr") {

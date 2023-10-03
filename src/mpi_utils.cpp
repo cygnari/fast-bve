@@ -5,9 +5,9 @@
 
 void bounds_determine(run_config& run_information, const int P, const int ID) {
     // find range of particles for each process
-    vector<int> particles (P, int(run_information.dynamics_curr_point_count / P));
-    vector<int> lb (P, 0);
-    vector<int> ub (P, 0);
+    std::vector<int> particles (P, int(run_information.dynamics_curr_point_count / P));
+    std::vector<int> lb (P, 0);
+    std::vector<int> ub (P, 0);
     int total = P * int(run_information.dynamics_curr_point_count / P);
     int gap = run_information.dynamics_curr_point_count - total;
     for (int i = 1; i < gap + 1; i++) {
@@ -29,7 +29,7 @@ void bounds_determine(run_config& run_information, const int P, const int ID) {
     run_information.particle_ub = ub[ID];
     run_information.particle_own = particles[ID];
 
-    vector<int> targets (P, int(run_information.target_points / P));
+    std::vector<int> targets (P, int(run_information.target_points / P));
     total = P * int(run_information.target_points / P);
     gap = run_information.target_points - total;
     for (int i = 1; i < gap + 1; i++) {
@@ -60,7 +60,7 @@ bool test_is_same(const int x) { // test if all processes have the same value fo
     return (p[0] == -p[1]);
 }
 
-template <typename T> void sync_updates(const run_config& run_information, vector<T>& vals, const int P, const int ID, const MPI_Win *win, MPI_Datatype type) {
+template <typename T> void sync_updates(const run_config& run_information, std::vector<T>& vals, const int P, const int ID, const MPI_Win *win, MPI_Datatype type) {
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Win_fence(0, *win);
     if (ID != 0) {

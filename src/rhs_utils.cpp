@@ -5,10 +5,10 @@
 #include "green_funcs.hpp"
 #include "direct_sum_utils.hpp"
 
-void rhs_fast_sum_vel(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const vector<interaction_pair>& interactions, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        const vector<vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
+void rhs_fast_sum_vel(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const std::vector<interaction_pair>& interactions, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     for (int i = 0; i < interactions.size(); i++) {
         if (i % run_information.mpi_P == run_information.mpi_ID) { // evenly split up interactions
             if (interactions[i].type == 0) pp_vel(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, time, omega);
@@ -21,10 +21,10 @@ void rhs_fast_sum_vel(const run_config& run_information, vector<double>& modify,
     }
 }
 
-void rhs_fast_sum_stream(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const vector<interaction_pair>& interactions, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        const vector<vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
+void rhs_fast_sum_stream(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const std::vector<interaction_pair>& interactions, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     for (int i = 0; i < interactions.size(); i++) {
         if (i % run_information.mpi_P == run_information.mpi_ID) { // evenly split up interactions
             if (interactions[i].type == 0) pp_stream(run_information, modify, targets, curr_state, area, interactions[i], fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, time, omega);
@@ -37,10 +37,10 @@ void rhs_fast_sum_stream(const run_config& run_information, vector<double>& modi
     }
 }
 
-void convolve_vel(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const vector<interaction_pair>& interactions, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        const vector<vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
+void convolve_vel(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const std::vector<interaction_pair>& interactions, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     fill(modify.begin(), modify.end(), 0);
     if (run_information.use_fast) {
         rhs_fast_sum_vel(run_information, modify, targets, curr_state, area, interactions, fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
@@ -49,10 +49,10 @@ void convolve_vel(const run_config& run_information, vector<double>& modify, con
     }
 }
 
-void convolve_stream(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const vector<interaction_pair>& interactions, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        const vector<vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
+void convolve_stream(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const std::vector<interaction_pair>& interactions, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     fill(modify.begin(), modify.end(), 0);
     if (run_information.use_fast) {
         rhs_fast_sum_stream(run_information, modify, targets, curr_state, area, interactions, fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
@@ -61,16 +61,16 @@ void convolve_stream(const run_config& run_information, vector<double>& modify, 
     }
 }
 
-void rhs_func(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const vector<interaction_pair>& interactions, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        const vector<vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
+void rhs_func(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const std::vector<interaction_pair>& interactions, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     convolve_vel(run_information, modify, targets, curr_state, area, interactions, fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source, fast_sum_icos_tri_verts, fast_sum_icos_verts, time, omega);
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) modify[run_information.info_per_point * i + 3] = -2 * omega * modify[run_information.info_per_point * i + 2];
 }
 
-void project_points(const run_config& run_information, vector<double>& dynamics_state, const double omega) {
-    vector<double> projected;
+void project_points(const run_config& run_information, std::vector<double>& dynamics_state, const double omega) {
+    std::vector<double> projected;
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
         projected = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
         project_to_sphere(projected, run_information.radius);

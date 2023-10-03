@@ -3,20 +3,18 @@
 #include <cstdio>
 #include <iostream>
 
-#include "general_utils.hpp"
-#include "interp_utils.hpp"
-#include "init_utils.hpp"
-#include "structs.hpp"
-#include "input_utils.hpp"
-#include "io_utils.hpp"
-#include "rhs_utils.hpp"
-#include "conservation_fixer.hpp"
-#include "amr.hpp"
-#include "mpi_utils.hpp"
-#include "green_funcs.hpp"
-#include "fast_sum_utils.hpp"
-
-using namespace std;
+#include "../src/general_utils.hpp"
+#include "../src/interp_utils.hpp"
+#include "../src/init_utils.hpp"
+#include "../src/structs.hpp"
+#include "../src/input_utils.hpp"
+#include "../src/io_utils.hpp"
+#include "../src/rhs_utils.hpp"
+#include "../src/conservation_fixer.hpp"
+#include "../src/amr.hpp"
+#include "../src/mpi_utils.hpp"
+#include "../src/green_funcs.hpp"
+#include "../src/fast_sum_utils.hpp"
 
 double omega = 2 * M_PI; // 2pi rotation/day
 
@@ -41,42 +39,42 @@ int main(int argc, char** argv) {
     double test_area;
     bool points_same;
 
-    chrono::steady_clock::time_point begin, end;
-    chrono::steady_clock::time_point t1, t2;
+    std::chrono::steady_clock::time_point begin, end;
+    std::chrono::steady_clock::time_point t1, t2;
 
     if (ID == 0) {
-        begin = chrono::steady_clock::now();
+        begin = std::chrono::steady_clock::now();
     }
 
-    vector<double> dynamics_state; // list of points and other information in a flattened array
-    vector<vector<vector<int>>> dynamics_triangles; // at level i, each entry is a vector which contains the 3 vertices and the refinement level of the triangle
-    vector<vector<bool>> dynamics_triangles_is_leaf; // at level i, if triangle j is a leaf triangle
-    vector<vector<bool>> dynamics_triangles_exists; // at level i, if triangle j exists
+    std::vector<double> dynamics_state; // list of points and other information in a flattened array
+    std::vector<std::vector<std::vector<int>>> dynamics_triangles; // at level i, each entry is a vector which contains the 3 vertices and the refinement level of the triangle
+    std::vector<std::vector<bool>> dynamics_triangles_is_leaf; // at level i, if triangle j is a leaf triangle
+    std::vector<std::vector<bool>> dynamics_triangles_exists; // at level i, if triangle j exists
     // vector<double> target_points;
 
-    vector<vector<double>> fast_sum_icos_verts; // vertices for the fast sum icosahedron
-    vector<vector<vector<double>>> fast_sum_icos_tri_info; // information about fast sum icos triangles
-    vector<vector<vector<int>>> fast_sum_icos_tri_verts; // triangles for fast sum icosahedron
-    vector<vector<vector<int>>> fast_sum_tree_tri_points (run_information.fast_sum_tree_levels); // points inside each triangle
-    vector<vector<int>> fast_sum_tree_point_locs (run_information.fast_sum_tree_levels); // triangle each point is in
+    std::vector<std::vector<double>> fast_sum_icos_verts; // vertices for the fast sum icosahedron
+    std::vector<std::vector<std::vector<double>>> fast_sum_icos_tri_info; // information about fast sum icos triangles
+    std::vector<std::vector<std::vector<int>>> fast_sum_icos_tri_verts; // triangles for fast sum icosahedron
+    std::vector<std::vector<std::vector<int>>> fast_sum_tree_tri_points (run_information.fast_sum_tree_levels); // points inside each triangle
+    std::vector<std::vector<int>> fast_sum_tree_point_locs (run_information.fast_sum_tree_levels); // triangle each point is in
     // vector<vector<vector<int>>> fast_sum_tree_tri_points_target (run_information.fast_sum_tree_levels); // points inside each triangle
     // vector<vector<int>> fast_sum_tree_point_locs_target (run_information.fast_sum_tree_levels); // triangle each point is in
-    vector<interaction_pair> fast_sum_tree_interactions; // c/p - c/p interactions
+    std::vector<interaction_pair> fast_sum_tree_interactions; // c/p - c/p interactions
 
-    vector<double> qmins; // min value for absolute vorticity + each tracer
-    vector<double> qmaxs; // max values for absolute vorticity + each tracer
-    vector<double> target_mass; // initial surface integral of each tracer
+    std::vector<double> qmins; // min value for absolute vorticity + each tracer
+    std::vector<double> qmaxs; // max values for absolute vorticity + each tracer
+    std::vector<double> target_mass; // initial surface integral of each tracer
 
-    vector<double> c_1 (run_information.dynamics_max_points * run_information.info_per_point, 0);
-    vector<double> c_2 (run_information.dynamics_max_points * run_information.info_per_point, 0);
-    vector<double> c_3 (run_information.dynamics_max_points * run_information.info_per_point, 0);
-    vector<double> c_4 (run_information.dynamics_max_points * run_information.info_per_point, 0);
-    vector<double> c1234 (run_information.dynamics_max_points * run_information.info_per_point, 0);
-    vector<double> inter_state (run_information.dynamics_max_points * run_information.info_per_point, 0);
-    vector<double> stream_func (run_information.dynamics_max_points, 0);
+    std::vector<double> c_1 (run_information.dynamics_max_points * run_information.info_per_point, 0);
+    std::vector<double> c_2 (run_information.dynamics_max_points * run_information.info_per_point, 0);
+    std::vector<double> c_3 (run_information.dynamics_max_points * run_information.info_per_point, 0);
+    std::vector<double> c_4 (run_information.dynamics_max_points * run_information.info_per_point, 0);
+    std::vector<double> c1234 (run_information.dynamics_max_points * run_information.info_per_point, 0);
+    std::vector<double> inter_state (run_information.dynamics_max_points * run_information.info_per_point, 0);
+    std::vector<double> stream_func (run_information.dynamics_max_points, 0);
     dynamics_points_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, dynamics_triangles_exists);
     // target_points = dynamics_state;
-    vector<double> dynamics_areas (run_information.dynamics_initial_points, 0);
+    std::vector<double> dynamics_areas (run_information.dynamics_initial_points, 0);
     area_initialize(run_information, dynamics_state, dynamics_triangles, dynamics_areas); // finds areas for each point
     vorticity_initialize(run_information, dynamics_state, dynamics_areas, omega); // initializes vorticity values for each point
     tracer_initialize(run_information, dynamics_state); // initializes tracer values for each point
@@ -86,7 +84,7 @@ int main(int argc, char** argv) {
         points_same = test_is_same(run_information.dynamics_curr_point_count);
         if (not points_same) {
             if (ID == 0) {
-                cout << "point counts not same across processes" << endl;
+                std::cout << "point counts not same across processes" << std::endl;
             }
         }
     }
@@ -134,34 +132,34 @@ int main(int argc, char** argv) {
         }
     }
 
-    string output_filename = create_config(run_information);
+    std::string output_filename = create_config(run_information);
 
     if (ID == 0) {
-        string filename = " initialize.py " + run_information.out_path + "/" + output_filename;
-        string command = "python";
+        std::string filename = " initialize.py " + run_information.out_path + "/" + output_filename;
+        std::string command = "python";
         command += filename;
         system(command.c_str());
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    vector<ofstream*> write_outs1 (ceil(run_information.end_time));
-    vector<ofstream*> write_outs3 (ceil(run_information.end_time));
+    std::vector<std::ofstream*> write_outs1 (ceil(run_information.end_time));
+    std::vector<std::ofstream*> write_outs3 (ceil(run_information.end_time));
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    ofstream write_out2(run_information.out_path + "/" + output_filename + "/point_counts.csv", ofstream::out | ofstream::trunc);
-    ofstream write_out4(run_information.out_path + "/" + output_filename + "/tri_counts.csv", ofstream::out | ofstream::trunc);
+    std::ofstream write_out2(run_information.out_path + "/" + output_filename + "/point_counts.csv", std::ofstream::out | std::ofstream::trunc);
+    std::ofstream write_out4(run_information.out_path + "/" + output_filename + "/tri_counts.csv", std::ofstream::out | std::ofstream::trunc);
 
     int writer_index;
 
     for (int i = 0; i < ceil(run_information.end_time); i++) {
-        write_outs1[i] = new ofstream (run_information.out_path + "/" + output_filename + "/output_" + to_string(i) + ".csv", ofstream::out | ofstream::trunc);
-        write_outs3[i] = new ofstream (run_information.out_path + "/" + output_filename + "/triangles_" + to_string(i) + ".csv", ofstream::out | ofstream::trunc);
+        write_outs1[i] = new std::ofstream (run_information.out_path + "/" + output_filename + "/output_" + std::to_string(i) + ".csv", std::ofstream::out | std::ofstream::trunc);
+        write_outs3[i] = new std::ofstream (run_information.out_path + "/" + output_filename + "/triangles_" + std::to_string(i) + ".csv", std::ofstream::out | std::ofstream::trunc);
     }
 
-    ofstream write_out_init1(run_information.out_path + "/" + output_filename + "/output_init.csv", ofstream::out | ofstream::trunc); // ofstream = output file stream
-    ofstream write_out_init3(run_information.out_path + "/" + output_filename + "/triangles_init.csv", ofstream::out | ofstream::trunc); // write out the triangles
+    std::ofstream write_out_init1(run_information.out_path + "/" + output_filename + "/output_init.csv", std::ofstream::out | std::ofstream::trunc); // ofstream = output file stream
+    std::ofstream write_out_init3(run_information.out_path + "/" + output_filename + "/triangles_init.csv", std::ofstream::out | std::ofstream::trunc); // write out the triangles
 
     MPI_Barrier(MPI_COMM_WORLD);
     if (ID == 0) {
@@ -169,12 +167,12 @@ int main(int argc, char** argv) {
             write_state(run_information, dynamics_state, dynamics_areas, write_out_init1, write_out2);
         } else {
             int info;
-            string name1 = run_information.out_path + "/" + output_filename + "/output_init.csv";
-            string name2 = run_information.out_path + "/" + output_filename + "/point_counts.csv";
+            std::string name1 = run_information.out_path + "/" + output_filename + "/output_init.csv";
+            std::string name2 = run_information.out_path + "/" + output_filename + "/point_counts.csv";
             info = remove(name1.c_str());
             info = remove(name2.c_str());
             for (int i = 0; i < ceil(run_information.end_time); i++) {
-                name1 = run_information.out_path + "/" + output_filename + "/output_" + to_string(i) + ".csv";
+                name1 = run_information.out_path + "/" + output_filename + "/output_" + std::to_string(i) + ".csv";
                 info = remove(name1.c_str());
             }
         }
@@ -183,12 +181,12 @@ int main(int argc, char** argv) {
             write_triangles(run_information, dynamics_triangles, dynamics_triangles_is_leaf, write_out_init3, write_out4);
         } else {
             int info;
-            string name3 = run_information.out_path + "/" + output_filename + "_triangles_init.csv";
-            string name4 = run_information.out_path + "/" + output_filename + "_tri_counts.csv";
+            std::string name3 = run_information.out_path + "/" + output_filename + "_triangles_init.csv";
+            std::string name4 = run_information.out_path + "/" + output_filename + "_tri_counts.csv";
             info = remove(name3.c_str());
             info = remove(name4.c_str());
             for (int i = 0; i < ceil(run_information.end_time); i++) {
-                name3 = run_information.out_path + "/" + output_filename + "/triangles_" + to_string(i) + ".csv";
+                name3 = run_information.out_path + "/" + output_filename + "/triangles_" + std::to_string(i) + ".csv";
                 info = remove(name3.c_str());
             }
         }
@@ -198,9 +196,9 @@ int main(int argc, char** argv) {
     write_out_init3.close();
 
     if (ID == 0) {
-        end = chrono::steady_clock::now();
-        cout << "initialization time: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << " microseconds" << endl;
-        begin = chrono::steady_clock::now();
+        end = std::chrono::steady_clock::now();
+        std::cout << "initialization time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << " microseconds" << std::endl;
+        begin = std::chrono::steady_clock::now();
     }
 
     double curr_time;
@@ -210,7 +208,7 @@ int main(int argc, char** argv) {
             amr_wrapper(run_information, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, dynamics_areas, omega);
             test_area = 0;
             for (int i = 0; i < dynamics_areas.size(); i++) test_area += dynamics_areas[i];
-            if (abs(test_area - 4 * M_PI) > pow(10, -8)) cout << "thread: " << ID << " wrong area: " << setprecision(15) << test_area << endl;
+            if (abs(test_area - 4 * M_PI) > pow(10, -8)) std::cout << "thread: " << ID << " wrong area: " << std::setprecision(15) << test_area << std::endl;
             project_points(run_information, dynamics_state, omega);
             inter_state.resize(run_information.dynamics_curr_point_count * run_information.info_per_point);
             bounds_determine(run_information, P, ID);
@@ -230,7 +228,7 @@ int main(int argc, char** argv) {
             points_same = test_is_same(run_information.dynamics_curr_point_count);
             if (not points_same) {
                 if (ID == 0) {
-                    cout << "point counts not same across processes" << endl;
+                    std::cout << "point counts not same across processes" << std::endl;
                 }
             }
         }
@@ -278,7 +276,7 @@ int main(int argc, char** argv) {
         MPI_Barrier(MPI_COMM_WORLD);
 
         if (count_nans(c1234) > 0) {
-            cout << "process: " << ID << " has nans" << endl;
+            std::cout << "process: " << ID << " has nans" << std::endl;
         }
 
         if (run_information.use_remesh) {
@@ -326,18 +324,18 @@ int main(int argc, char** argv) {
             write_triangles(run_information, dynamics_triangles, dynamics_triangles_is_leaf, *write_outs3[writer_index], write_out4);
         }
         if ((count_nans(dynamics_state) > 0) and (ID == 0)) {
-            cout << "nans present!" << endl;
+            std::cout << "nans present!" << std::endl;
         }
         if (ID == 0) {
-            cout << "points: " << run_information.dynamics_curr_point_count << endl;
-            cout << "time: " << t << endl;
+            std::cout << "points: " << run_information.dynamics_curr_point_count << std::endl;
+            std::cout << "time: " << t << std::endl;
         }
         MPI_Barrier(MPI_COMM_WORLD);
     }
 
     if (ID == 0) {
-        end = chrono::steady_clock::now();
-        cout << "dynamics time: " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << " microseconds" << endl;
+        end = std::chrono::steady_clock::now();
+        std::cout << "dynamics time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << " microseconds" << std::endl;
     }
 
     for (int i = 0; i < ceil(run_information.end_time); i++) {

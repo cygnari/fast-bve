@@ -2,38 +2,38 @@
 #include "structs.hpp"
 #include "vorticity_functions.hpp"
 
-void dynamics_points_initialize(run_config& run_information, vector<double>& dynamics_state,
-        vector<vector<vector<int>>>& dynamics_triangles, vector<vector<bool>>& dynamics_triangles_is_leaf,
-        vector<vector<bool>>& dynamics_triangles_exists) {
+void dynamics_points_initialize(run_config& run_information, std::vector<double>& dynamics_state,
+        std::vector<std::vector<std::vector<int>>>& dynamics_triangles, std::vector<std::vector<bool>>& dynamics_triangles_is_leaf,
+        std::vector<std::vector<bool>>& dynamics_triangles_exists) {
     // creates all the dynamics points and corresponding triangles
     double phi = (1 + sqrt(5)) / 2;
     int iv1, iv2, iv3, iv12, iv23, iv31;
-    vector<double> v1, v2, v3, v12, v23, v31;
-    vector<vector<int>> dynamics_points_parents;
+    std::vector<double> v1, v2, v3, v12, v23, v31;
+    std::vector<std::vector<int>> dynamics_points_parents;
 
     dynamics_state.clear();
     dynamics_triangles.clear();
     dynamics_triangles_is_leaf.clear();
     dynamics_state.resize(run_information.dynamics_max_points * run_information.info_per_point, 0);
     dynamics_triangles.resize(run_information.dynamics_levels_max);
-    dynamics_triangles[0] = vector<vector<int>> (20, vector<int> (4, 0));
-    dynamics_points_parents.resize(run_information.dynamics_initial_points, vector<int> (2, -1));
+    dynamics_triangles[0] = std::vector<std::vector<int>> (20, std::vector<int> (4, 0));
+    dynamics_points_parents.resize(run_information.dynamics_initial_points, std::vector<int> (2, -1));
     dynamics_triangles_is_leaf.resize(run_information.dynamics_levels_max);
 
     run_information.dynamics_curr_point_count = 12;
     run_information.dynamics_curr_tri_count = 20;
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {0, 1, phi}, run_information.radius), 0, 3);
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {0, -1, phi}, run_information.radius), run_information.info_per_point, 3);
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {0, 1, -phi}, run_information.radius), 2 * run_information.info_per_point, 3);
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {0, -1, -phi}, run_information.radius), 3 * run_information.info_per_point, 3);
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {1, phi, 0}, run_information.radius), 4 * run_information.info_per_point, 3);
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {1, -phi, 0}, run_information.radius), 5 * run_information.info_per_point, 3);
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {-1, phi, 0}, run_information.radius), 6 * run_information.info_per_point, 3);
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {-1, -phi, 0}, run_information.radius), 7 * run_information.info_per_point, 3);
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {phi, 0, 1}, run_information.radius), 8 * run_information.info_per_point, 3);
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {phi, 0, -1}, run_information.radius), 9 * run_information.info_per_point, 3);
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {-phi, 0, 1}, run_information.radius), 10 * run_information.info_per_point, 3);
-    vector_copy2(dynamics_state, project_to_sphere_2(vector<double> {-phi, 0, -1}, run_information.radius), 11 * run_information.info_per_point, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {0, 1, phi}, run_information.radius), 0, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {0, -1, phi}, run_information.radius), run_information.info_per_point, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {0, 1, -phi}, run_information.radius), 2 * run_information.info_per_point, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {0, -1, -phi}, run_information.radius), 3 * run_information.info_per_point, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {1, phi, 0}, run_information.radius), 4 * run_information.info_per_point, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {1, -phi, 0}, run_information.radius), 5 * run_information.info_per_point, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {-1, phi, 0}, run_information.radius), 6 * run_information.info_per_point, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {-1, -phi, 0}, run_information.radius), 7 * run_information.info_per_point, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {phi, 0, 1}, run_information.radius), 8 * run_information.info_per_point, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {phi, 0, -1}, run_information.radius), 9 * run_information.info_per_point, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {-phi, 0, 1}, run_information.radius), 10 * run_information.info_per_point, 3);
+    vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double> {-phi, 0, -1}, run_information.radius), 11 * run_information.info_per_point, 3);
 
     dynamics_triangles[0][0].insert(dynamics_triangles[0][0].begin(), {0, 1, 8, 0}); // 0, 1, 2 are indices of the three vertices
     dynamics_triangles[0][1].insert(dynamics_triangles[0][1].begin(), {0, 10, 1, 0}); // 20 starting faces
@@ -57,7 +57,7 @@ void dynamics_points_initialize(run_config& run_information, vector<double>& dyn
     dynamics_triangles[0][19].insert(dynamics_triangles[0][19].begin(), {7, 10, 11, 0});
 
     for (int i = 0; i < run_information.dynamics_levels_min - 1; i++) {
-        dynamics_triangles[i+1] = vector<vector<int>> (20 * pow(4, i+1), vector<int> (4, 0));
+        dynamics_triangles[i+1] = std::vector<std::vector<int>> (20 * pow(4, i+1), std::vector<int> (4, 0));
         for (int j = 0; j < 20 * pow(4, i); j++) {
             iv1 = dynamics_triangles[i][j][0];
             iv2 = dynamics_triangles[i][j][1];
@@ -77,25 +77,25 @@ void dynamics_points_initialize(run_config& run_information, vector<double>& dyn
             project_to_sphere(v12, run_information.radius);
             project_to_sphere(v23, run_information.radius);
             project_to_sphere(v31, run_information.radius);
-            iv12 = check_point_exist(dynamics_points_parents, run_information.dynamics_curr_point_count, min(iv1, iv2), max(iv1, iv2));
-            iv23 = check_point_exist(dynamics_points_parents, run_information.dynamics_curr_point_count, min(iv2, iv3), max(iv2, iv3));
-            iv31 = check_point_exist(dynamics_points_parents, run_information.dynamics_curr_point_count, min(iv3, iv1), max(iv3, iv1));
+            iv12 = check_point_exist(dynamics_points_parents, run_information.dynamics_curr_point_count, std::min(iv1, iv2), std::max(iv1, iv2));
+            iv23 = check_point_exist(dynamics_points_parents, run_information.dynamics_curr_point_count, std::min(iv2, iv3), std::max(iv2, iv3));
+            iv31 = check_point_exist(dynamics_points_parents, run_information.dynamics_curr_point_count, std::min(iv3, iv1), std::max(iv3, iv1));
             if (iv12 == -1) {
                 iv12 = run_information.dynamics_curr_point_count;
                 run_information.dynamics_curr_point_count += 1;
-                dynamics_points_parents[iv12] = {min(iv1, iv2), max(iv1, iv2)};
+                dynamics_points_parents[iv12] = {std::min(iv1, iv2), std::max(iv1, iv2)};
                 vector_copy2(dynamics_state, v12, iv12 * run_information.info_per_point, 3);
             }
             if (iv23 == -1) {
                 iv23 = run_information.dynamics_curr_point_count;
                 run_information.dynamics_curr_point_count += 1;
-                dynamics_points_parents[iv23] = {min(iv2, iv3), max(iv2, iv3)};
+                dynamics_points_parents[iv23] = {std::min(iv2, iv3), std::max(iv2, iv3)};
                 vector_copy2(dynamics_state, v23, iv23 * run_information.info_per_point, 3);
             }
             if (iv31 == -1) {
                 iv31 = run_information.dynamics_curr_point_count;
                 run_information.dynamics_curr_point_count += 1;
-                dynamics_points_parents[iv31] = {min(iv3, iv1), max(iv3, iv1)};
+                dynamics_points_parents[iv31] = {std::min(iv3, iv1), std::max(iv3, iv1)};
                 vector_copy2(dynamics_state, v31, iv31 * run_information.info_per_point, 3);
             }
             dynamics_triangles[i+1][4*j].insert(dynamics_triangles[i+1][4*j].begin(), {iv1, iv12, iv31, i + 1});
@@ -114,10 +114,10 @@ void dynamics_points_initialize(run_config& run_information, vector<double>& dyn
     }
 }
 
-void area_initialize(const run_config& run_information, const vector<double>& dynamics_state, const vector<vector<vector<int>>>& dynamics_triangles, vector<double>& dynamics_areas) {
+void area_initialize(const run_config& run_information, const std::vector<double>& dynamics_state, const std::vector<std::vector<std::vector<int>>>& dynamics_triangles, std::vector<double>& dynamics_areas) {
     // initialize areas, node patch area for each point
     int iv1, iv2, iv3;
-    vector<double> v1, v2, v3;
+    std::vector<double> v1, v2, v3;
     double tri_area;
     dynamics_areas.resize(run_information.dynamics_initial_points, 0);
     for (int i = 0; i < run_information.dynamics_initial_triangles; i++) {
@@ -134,7 +134,7 @@ void area_initialize(const run_config& run_information, const vector<double>& dy
     }
 }
 
-void vorticity_initialize(const run_config& run_information, vector<double>& dynamics_state, const vector<double>& dynamics_areas, const double omega) {
+void vorticity_initialize(const run_config& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const double omega) {
     // initializes the initial vorticity
     if (run_information.initial_vor_condition == "rh") {
         rossby_haurwitz(run_information, dynamics_state, omega);
@@ -156,9 +156,9 @@ void vorticity_initialize(const run_config& run_information, vector<double>& dyn
     }
 }
 
-void tracer_initialize(const run_config& run_information, vector<double>& dynamics_state) {
+void tracer_initialize(const run_config& run_information, std::vector<double>& dynamics_state) {
     // initializes the tracer
-    vector<double> curr_pos, latlon;
+    std::vector<double> curr_pos, latlon;
     double lat, lon, hmax=1, hi, r1, r2, r = run_information.radius / 2, b = 0.1, c = 0.8;
     double lonc1 = M_PI / 2, lonc2 = 3 * M_PI / 2, latc1 = 0, latc2 = 0;
     double poly_a = -0.8, poly_b = 0.9, cos_b;
@@ -188,43 +188,43 @@ void tracer_initialize(const run_config& run_information, vector<double>& dynami
     }
 }
 
-void fixer_init(const run_config& run_information, const vector<double>& dynamics_state, const vector<double>& dynamics_areas, vector<double>& qmins, vector<double>& qmaxs, vector<double>& target_mass, const double omega) {
+void fixer_init(const run_config& run_information, const std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, std::vector<double>& qmins, std::vector<double>& qmaxs, std::vector<double>& target_mass, const double omega) {
     double abs_vor;
     qmins.resize(run_information.tracer_count + 1, INT_MAX); // vorticity + tracers
     qmaxs.resize(run_information.tracer_count + 1, INT_MIN); // voriticty + tracers
     target_mass.resize(run_information.tracer_count + 1, 0);
     for (int i = 0; i < run_information.tracer_count; i++) {
         for (int j = 0; j < run_information.dynamics_initial_points; j++) {
-            qmins[i + 1] = min(dynamics_state[run_information.info_per_point * j + i + 4], qmins[i + 1]);
-            qmaxs[i + 1] = max(dynamics_state[run_information.info_per_point * j + i + 4], qmaxs[i + 1]);
+            qmins[i + 1] = std::min(dynamics_state[run_information.info_per_point * j + i + 4], qmins[i + 1]);
+            qmaxs[i + 1] = std::max(dynamics_state[run_information.info_per_point * j + i + 4], qmaxs[i + 1]);
             target_mass[i + 1] += dynamics_areas[j] * dynamics_state[run_information.info_per_point * j + i + 4];
         }
     }
     for (int i = 0; i < run_information.dynamics_initial_points; i++) {
         abs_vor = dynamics_state[run_information.info_per_point * i + 3] + 2 * omega * dynamics_state[run_information.info_per_point * i + 2];
-        qmins[0] = min(abs_vor, qmins[0]); // min and max of absolute vorticity
-        qmaxs[0] = max(abs_vor, qmaxs[0]); // total vorticity is 0
+        qmins[0] = std::min(abs_vor, qmins[0]); // min and max of absolute vorticity
+        qmaxs[0] = std::max(abs_vor, qmaxs[0]); // total vorticity is 0
     }
 }
 
-void fast_sum_icos_init(const run_config& run_information, vector<vector<double>>& fast_sum_icos_verts, vector<vector<vector<double>>>& fast_sum_icos_tri_info, vector<vector<vector<int>>>& fast_sum_icos_tri_verts) {
+void fast_sum_icos_init(const run_config& run_information, std::vector<std::vector<double>>& fast_sum_icos_verts, std::vector<std::vector<std::vector<double>>>& fast_sum_icos_tri_info, std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts) {
     double phi = (1 + sqrt(5)) / 2;
-    vector<double> center, v1, v2, v3, v12, v23, v31;
+    std::vector<double> center, v1, v2, v3, v12, v23, v31;
     int iv1, iv2, iv3, iv12, iv23, iv13;
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {0, 1, phi}, run_information.radius)); // 12 starting points
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {0, -1, phi}, run_information.radius));
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {0, 1, -phi}, run_information.radius));
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {0, -1, -phi}, run_information.radius));
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {1, phi, 0}, run_information.radius));
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {1, -phi, 0}, run_information.radius));
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {-1, phi, 0}, run_information.radius));
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {-1, -phi, 0}, run_information.radius));
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {phi, 0, 1}, run_information.radius));
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {phi, 0, -1}, run_information.radius));
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {-phi, 0, 1}, run_information.radius));
-    fast_sum_icos_verts.push_back(project_to_sphere_2(vector<double> {-phi, 0, -1}, run_information.radius));
-    fast_sum_icos_tri_verts.push_back(vector<vector<int>> (20, vector<int> (0)));
-    fast_sum_icos_tri_info.push_back(vector<vector<double>> (20, vector<double> (0)));
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {0, 1, phi}, run_information.radius)); // 12 starting points
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {0, -1, phi}, run_information.radius));
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {0, 1, -phi}, run_information.radius));
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {0, -1, -phi}, run_information.radius));
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {1, phi, 0}, run_information.radius));
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {1, -phi, 0}, run_information.radius));
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {-1, phi, 0}, run_information.radius));
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {-1, -phi, 0}, run_information.radius));
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {phi, 0, 1}, run_information.radius));
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {phi, 0, -1}, run_information.radius));
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {-phi, 0, 1}, run_information.radius));
+    fast_sum_icos_verts.push_back(project_to_sphere_2(std::vector<double> {-phi, 0, -1}, run_information.radius));
+    fast_sum_icos_tri_verts.push_back(std::vector<std::vector<int>> (20, std::vector<int> (0)));
+    fast_sum_icos_tri_info.push_back(std::vector<std::vector<double>> (20, std::vector<double> (0)));
     fast_sum_icos_tri_verts[0][0].insert(fast_sum_icos_tri_verts[0][0].end(), {1, 2, 9}); // 0, 1, 2 are indices of the three vertices
     fast_sum_icos_tri_verts[0][1].insert(fast_sum_icos_tri_verts[0][1].end(), {1, 2, 11}); // 20 starting faces
     fast_sum_icos_tri_verts[0][2].insert(fast_sum_icos_tri_verts[0][2].end(), {1, 5, 7});
@@ -252,7 +252,7 @@ void fast_sum_icos_init(const run_config& run_information, vector<vector<double>
         double beta = run_information.fast_sum_rotate_beta; // y rot
         double gamm = run_information.fast_sum_rotate_gamm; // z rot
 
-        vector<vector<double>> rot_mat (3, vector<double> (3, 0));
+        std::vector<std::vector<double>> rot_mat (3, std::vector<double> (3, 0));
 
         rot_mat[0][0] = cos(beta) * cos(gamm);
         rot_mat[0][1] = sin(alph) * sin(beta) * cos(gamm) - cos(alph) * sin(gamm);
@@ -283,8 +283,8 @@ void fast_sum_icos_init(const run_config& run_information, vector<vector<double>
         fast_sum_icos_tri_info[0][i].push_back(tri_radius(v1, v2, v3, center)); // index 3 is the triangle radius
     }
     for (int i = 0; i < run_information.fast_sum_tree_levels; i++) { // iterative refinement
-        fast_sum_icos_tri_info.push_back(vector<vector<double>> (20 * pow(4, i + 1), vector<double> (0)));
-        fast_sum_icos_tri_verts.push_back(vector<vector<int>> (20 * pow(4, i + 1), vector<int> (0)));
+        fast_sum_icos_tri_info.push_back(std::vector<std::vector<double>> (20 * pow(4, i + 1), std::vector<double> (0)));
+        fast_sum_icos_tri_verts.push_back(std::vector<std::vector<int>> (20 * pow(4, i + 1), std::vector<int> (0)));
         for (int j = 0; j < 20 * pow(4, i); j++) {
             iv1 = fast_sum_icos_tri_verts[i][j][0];
             iv2 = fast_sum_icos_tri_verts[i][j][1];

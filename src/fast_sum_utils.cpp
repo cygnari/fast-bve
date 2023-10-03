@@ -15,12 +15,12 @@ extern "C" { // lapack
     extern int dgetrs_(char*,int*,int*,double*,int*,int*,double*,int*,int*);
 }
 
-void point_assign(const run_config& run_information, const vector<double>& point, const vector<vector<double>>& fast_sum_icos_verts,
-        const vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<vector<int>>>& fast_sum_tree_tri_points,
-        vector<vector<int>>& fast_sum_tree_point_locs, const int point_id) {
+void point_assign(const run_config& run_information, const std::vector<double>& point, const std::vector<std::vector<double>>& fast_sum_icos_verts,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts, std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points,
+        std::vector<std::vector<int>>& fast_sum_tree_point_locs, const int point_id) {
     // find which fast sum triangles each point is in
     int iv1, iv2, iv3, lb, ub;
-    vector<double> v1, v2, v3;
+    std::vector<double> v1, v2, v3;
 
     for (int i = 0; i < run_information.fast_sum_tree_levels; i++) {
         if (i > 0) {
@@ -78,14 +78,14 @@ void point_assign(const run_config& run_information, const vector<double>& point
 //     }
 // }
 
-void points_assign(const run_config& run_information, const vector<double>& dynamics_state, const vector<vector<double>>& fast_sum_icos_verts,
-        const vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<vector<vector<int>>>& fast_sum_tree_tri_points,
-        vector<vector<int>>& fast_sum_tree_point_locs) {
+void points_assign(const run_config& run_information, const std::vector<double>& dynamics_state, const std::vector<std::vector<double>>& fast_sum_icos_verts,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts, std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points,
+        std::vector<std::vector<int>>& fast_sum_tree_point_locs) {
     // assigns each point to triangles in the fast sum tree structure
-    vector<double> point;
+    std::vector<double> point;
     for (int i = 0; i < run_information.fast_sum_tree_levels; i++) {
-        fast_sum_tree_tri_points[i] = vector<vector<int>> (20 * pow(4, i));
-        fast_sum_tree_point_locs[i] = vector<int> (run_information.dynamics_curr_point_count, 0);
+        fast_sum_tree_tri_points[i] = std::vector<std::vector<int>> (20 * pow(4, i));
+        fast_sum_tree_point_locs[i] = std::vector<int> (run_information.dynamics_curr_point_count, 0);
     }
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
         point = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
@@ -124,18 +124,18 @@ void points_assign(const run_config& run_information, const vector<double>& dyna
 //     }
 // }
 
-void tree_traverse(const run_config& run_information, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target, const vector<vector<vector<double>>>& fast_sum_icos_tri_info,
-        vector<interaction_pair>& tree_interactions, MPI_Datatype dt_interaction) {
+void tree_traverse(const run_config& run_information, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target, const std::vector<std::vector<std::vector<double>>>& fast_sum_icos_tri_info,
+        std::vector<interaction_pair>& tree_interactions, MPI_Datatype dt_interaction) {
     // determines {C,P}-{C,P} interactions
     int curr_source, curr_target, lev_target, lev_source;
     int particle_count_target, particle_count_source;
-    vector<double> center_target, center_source;
+    std::vector<double> center_target, center_source;
     double separation, distance;
-    vector<vector<int>> tri_interactions;
-    vector<int> curr_interact (4, 0);
+    std::vector<std::vector<int>> tri_interactions;
+    std::vector<int> curr_interact (4, 0);
 
-    vector<interaction_pair> own_interactions;
+    std::vector<interaction_pair> own_interactions;
 
     int out_lb, out_ub, in_lb, in_ub;
     int P = run_information.mpi_P;
@@ -144,9 +144,9 @@ void tree_traverse(const run_config& run_information, const vector<vector<vector
     if (P <= 20) { // less than 20 threads, parallelize only targets
         in_lb = 0;
         in_ub = 20;
-        vector<int> out_counts (P, int(20 / P));
-        vector<int> lb (P, 0);
-        vector<int> ub (P, 0);
+        std::vector<int> out_counts (P, int(20 / P));
+        std::vector<int> lb (P, 0);
+        std::vector<int> ub (P, 0);
         int total = P * int(20 / P);
         int gap = 20 - total;
         for (int i = 1; i < gap + 1; i++) {
@@ -168,9 +168,9 @@ void tree_traverse(const run_config& run_information, const vector<vector<vector
         out_lb = ID % 20;
         out_ub = out_lb + 1;
         int same_outer = 1 + (P % 20);
-        vector<int> in_counts (same_outer, int(20 / same_outer));
-        vector<int> lb (same_outer, 0);
-        vector<int> ub (same_outer, 0);
+        std::vector<int> in_counts (same_outer, int(20 / same_outer));
+        std::vector<int> lb (same_outer, 0);
+        std::vector<int> ub (same_outer, 0);
         int total = same_outer * int(20 / same_outer);
         int gap = 20 - total;
         for (int i = 1; i < gap + 1; i++) {
@@ -230,37 +230,37 @@ void tree_traverse(const run_config& run_information, const vector<vector<vector
                 interaction_pair new_interact = {lev_target, lev_source, curr_target, curr_source, particle_count_target, particle_count_source, 0};
                 own_interactions.push_back(new_interact);
             } else if (lev_target == run_information.fast_sum_tree_levels - 1) { // target is leaf, tree traverse source
-                tri_interactions.push_back(vector<int> {curr_target, 4 * curr_source, lev_target, lev_source + 1});
-                tri_interactions.push_back(vector<int> {curr_target, 4 * curr_source + 1, lev_target, lev_source + 1});
-                tri_interactions.push_back(vector<int> {curr_target, 4 * curr_source + 2, lev_target, lev_source + 1});
-                tri_interactions.push_back(vector<int> {curr_target, 4 * curr_source + 3, lev_target, lev_source + 1});
+                tri_interactions.push_back(std::vector<int> {curr_target, 4 * curr_source, lev_target, lev_source + 1});
+                tri_interactions.push_back(std::vector<int> {curr_target, 4 * curr_source + 1, lev_target, lev_source + 1});
+                tri_interactions.push_back(std::vector<int> {curr_target, 4 * curr_source + 2, lev_target, lev_source + 1});
+                tri_interactions.push_back(std::vector<int> {curr_target, 4 * curr_source + 3, lev_target, lev_source + 1});
             } else if (lev_source == run_information.fast_sum_tree_levels - 1) { // source is leaf, tree traverse target
-                tri_interactions.push_back(vector<int> {4 * curr_target, curr_source, lev_target + 1, lev_source});
-                tri_interactions.push_back(vector<int> {4 * curr_target + 1, curr_source, lev_target + 1, lev_source});
-                tri_interactions.push_back(vector<int> {4 * curr_target + 2, curr_source, lev_target + 1, lev_source});
-                tri_interactions.push_back(vector<int> {4 * curr_target + 3, curr_source, lev_target + 1, lev_source});
+                tri_interactions.push_back(std::vector<int> {4 * curr_target, curr_source, lev_target + 1, lev_source});
+                tri_interactions.push_back(std::vector<int> {4 * curr_target + 1, curr_source, lev_target + 1, lev_source});
+                tri_interactions.push_back(std::vector<int> {4 * curr_target + 2, curr_source, lev_target + 1, lev_source});
+                tri_interactions.push_back(std::vector<int> {4 * curr_target + 3, curr_source, lev_target + 1, lev_source});
             } else { // neither is leaf
                 if (particle_count_target >= particle_count_source) { // target has more points, refine target
-                    tri_interactions.push_back(vector<int> {4 * curr_target, curr_source, lev_target + 1, lev_source});
-                    tri_interactions.push_back(vector<int> {4 * curr_target + 1, curr_source, lev_target + 1, lev_source});
-                    tri_interactions.push_back(vector<int> {4 * curr_target + 2, curr_source, lev_target + 1, lev_source});
-                    tri_interactions.push_back(vector<int> {4 * curr_target + 3, curr_source, lev_target + 1, lev_source});
+                    tri_interactions.push_back(std::vector<int> {4 * curr_target, curr_source, lev_target + 1, lev_source});
+                    tri_interactions.push_back(std::vector<int> {4 * curr_target + 1, curr_source, lev_target + 1, lev_source});
+                    tri_interactions.push_back(std::vector<int> {4 * curr_target + 2, curr_source, lev_target + 1, lev_source});
+                    tri_interactions.push_back(std::vector<int> {4 * curr_target + 3, curr_source, lev_target + 1, lev_source});
                 } else { // source has more points, refine source
-                    tri_interactions.push_back(vector<int> {curr_target, 4 * curr_source, lev_target, lev_source + 1});
-                    tri_interactions.push_back(vector<int> {curr_target, 4 * curr_source + 1, lev_target, lev_source + 1});
-                    tri_interactions.push_back(vector<int> {curr_target, 4 * curr_source + 2, lev_target, lev_source + 1});
-                    tri_interactions.push_back(vector<int> {curr_target, 4 * curr_source + 3, lev_target, lev_source + 1});
+                    tri_interactions.push_back(std::vector<int> {curr_target, 4 * curr_source, lev_target, lev_source + 1});
+                    tri_interactions.push_back(std::vector<int> {curr_target, 4 * curr_source + 1, lev_target, lev_source + 1});
+                    tri_interactions.push_back(std::vector<int> {curr_target, 4 * curr_source + 2, lev_target, lev_source + 1});
+                    tri_interactions.push_back(std::vector<int> {curr_target, 4 * curr_source + 3, lev_target, lev_source + 1});
                 }
             }
         }
     }
     MPI_Barrier(MPI_COMM_WORLD);
     int size = static_cast<int>(own_interactions.size());
-    vector<int> array_sizes_buff (P, 0);
+    std::vector<int> array_sizes_buff (P, 0);
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Allgather(&size, 1, MPI_INT, &array_sizes_buff[0], 1, MPI_INT, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
-    vector<int> offsets (P, 0);
+    std::vector<int> offsets (P, 0);
     for (int i = 1; i < P; i++) {
         offsets[i] = offsets[i-1] + array_sizes_buff[i-1];
     }
@@ -271,20 +271,20 @@ void tree_traverse(const run_config& run_information, const vector<vector<vector
     MPI_Barrier(MPI_COMM_WORLD);
     // cout << "interactions: " << tree_interactions.size() << endl;
     if (not test_is_same(tree_interactions.size())) {
-        cout << "Tree Traverse Error" << endl;
+        std::cout << "Tree Traverse Error" << std::endl;
     }
 }
 
-void pp_vel(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const interaction_pair& interact, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const double time, const double omega) {
+void pp_vel(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const double time, const double omega) {
     // particle particle interaction
     int target_i, source_j;
-    vector<double> particle_i, particle_j, contribution;
+    std::vector<double> particle_i, particle_j, contribution;
     double vor;
     for (int i = 0; i < interact.count_target; i++) {
         target_i = fast_sum_tree_tri_points_target[interact.lev_target][interact.curr_target][i];
-        vector<double> pos_change (3, 0);
+        std::vector<double> pos_change (3, 0);
         particle_i = slice(targets, run_information.info_per_point * target_i, 1, 3);
         for (int j = 0; j < interact.count_source; j++) {
             source_j = fast_sum_tree_tri_points_source[interact.lev_source][interact.curr_source][j];
@@ -303,21 +303,21 @@ void pp_vel(const run_config& run_information, vector<double>& modify, const vec
     }
 }
 
-void pc_vel(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const interaction_pair& interact, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        const vector<vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
-    vector<double> v1s, v2s, v3s, target_particle, placeholder1, placeholder2, placeholder3, bary_cord, source_particle;
-    vector<double> func_vals (3 * run_information.interp_point_count, 0), func_val (3, 0);
-    vector<double> alphas_x (run_information.interp_point_count, 0), alphas_y (run_information.interp_point_count, 0), alphas_z (run_information.interp_point_count, 0);
+void pc_vel(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
+    std::vector<double> v1s, v2s, v3s, target_particle, placeholder1, placeholder2, placeholder3, bary_cord, source_particle;
+    std::vector<double> func_vals (3 * run_information.interp_point_count, 0), func_val (3, 0);
+    std::vector<double> alphas_x (run_information.interp_point_count, 0), alphas_y (run_information.interp_point_count, 0), alphas_z (run_information.interp_point_count, 0);
     int iv1s, iv2s, iv3s, point_index;
     double vor;
     double us, vs;
     char trans = 'N';
     int nrhs = 3, dim = run_information.interp_point_count, info;
-    vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
-    vector<int> ipiv (run_information.interp_point_count, 0);
-    vector<vector<double>> interp_points (run_information.interp_point_count, vector<double> (3, 0));
+    std::vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
+    std::vector<int> ipiv (run_information.interp_point_count, 0);
+    std::vector<std::vector<double>> interp_points (run_information.interp_point_count, std::vector<double> (3, 0));
     fekete_init(interp_points, run_information.interp_degree);
     interp_mat_init(interp_matrix, interp_points, run_information.interp_degree, run_information.interp_point_count);
     dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
@@ -347,7 +347,7 @@ void pc_vel(const run_config& run_information, vector<double>& modify, const vec
 
         dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &*func_vals.begin(), &dim, &info);
         if (info > 0) {
-            cout << info << endl;
+            std::cout << info << std::endl;
         }
 
         for (int j = 0; j < run_information.interp_point_count; j++) {
@@ -368,26 +368,26 @@ void pc_vel(const run_config& run_information, vector<double>& modify, const vec
     }
 }
 
-void cp_vel(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const interaction_pair& interact, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        const vector<vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
+void cp_vel(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     int iv1, iv2, iv3, point_index;
-    vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, source_particle, target_particle, bary_cord;
+    std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, source_particle, target_particle, bary_cord;
     double u, v, vor;
-    vector<vector<double>> curr_points (run_information.interp_point_count, vector<double> (3, 0));
-    vector<double> interptargets (3 * run_information.interp_point_count, 0), func_val (3, 0);
+    std::vector<std::vector<double>> curr_points (run_information.interp_point_count, std::vector<double> (3, 0));
+    std::vector<double> interptargets (3 * run_information.interp_point_count, 0), func_val (3, 0);
     char trans = 'N';
     int nrhs = 3, dim = run_information.interp_point_count, info;
-    vector<double> alphas_x (run_information.interp_point_count, 0), alphas_y (run_information.interp_point_count, 0), alphas_z (run_information.interp_point_count, 0);
-    vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
-    vector<int> ipiv (run_information.interp_point_count, 0);
-    vector<vector<double>> interp_points (run_information.interp_point_count, vector<double> (3, 0));
+    std::vector<double> alphas_x (run_information.interp_point_count, 0), alphas_y (run_information.interp_point_count, 0), alphas_z (run_information.interp_point_count, 0);
+    std::vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
+    std::vector<int> ipiv (run_information.interp_point_count, 0);
+    std::vector<std::vector<double>> interp_points (run_information.interp_point_count, std::vector<double> (3, 0));
     fekete_init(interp_points, run_information.interp_degree);
     interp_mat_init(interp_matrix, interp_points, run_information.interp_degree, run_information.interp_point_count);
     dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
     if (info > 0) {
-        cout << info << endl;
+        std::cout << info << std::endl;
     }
     iv1 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][0];
     iv2 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][1];
@@ -424,7 +424,7 @@ void cp_vel(const run_config& run_information, vector<double>& modify, const vec
 
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &*interptargets.begin(), &dim, &info);
     if (info > 0) {
-        cout << info << endl;
+        std::cout << info << std::endl;
     }
 
     for (int i = 0; i < run_information.interp_point_count; i++) {
@@ -443,21 +443,21 @@ void cp_vel(const run_config& run_information, vector<double>& modify, const vec
     }
 }
 
-void cc_vel(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const interaction_pair& interact, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        const vector<vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
+void cc_vel(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     int iv1, iv2, iv3, iv1s, iv2s, iv3s, point_index;
-    vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, v1s, v2s, v3s, func_vals (3 * run_information.interp_point_count, 0), func_val (3, 0), alphas_x (run_information.interp_point_count, 0), alphas_y (run_information.interp_point_count, 0), alphas_z (run_information.interp_point_count, 0);
+    std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, v1s, v2s, v3s, func_vals (3 * run_information.interp_point_count, 0), func_val (3, 0), alphas_x (run_information.interp_point_count, 0), alphas_y (run_information.interp_point_count, 0), alphas_z (run_information.interp_point_count, 0);
     double u, v, us, vs, vor;
-    vector<vector<double>> curr_points (run_information.interp_point_count, vector<double> (3, 0));
+    std::vector<std::vector<double>> curr_points (run_information.interp_point_count, std::vector<double> (3, 0));
     int nrhs = 3, dim = run_information.interp_point_count, info;
     char trans = 'N';
-    vector<double> bary_cord, target_particle, source_particle;
-    vector<double> interptargets (3 * run_information.interp_point_count, 0);
-    vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
-    vector<int> ipiv (run_information.interp_point_count, 0);
-    vector<vector<double>> interp_points (run_information.interp_point_count, vector<double> (3, 0));
+    std::vector<double> bary_cord, target_particle, source_particle;
+    std::vector<double> interptargets (3 * run_information.interp_point_count, 0);
+    std::vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
+    std::vector<int> ipiv (run_information.interp_point_count, 0);
+    std::vector<std::vector<double>> interp_points (run_information.interp_point_count, std::vector<double> (3, 0));
     fekete_init(interp_points, run_information.interp_degree);
     interp_mat_init(interp_matrix, interp_points, run_information.interp_degree, run_information.interp_point_count);
     dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
@@ -506,7 +506,7 @@ void cc_vel(const run_config& run_information, vector<double>& modify, const vec
 
         dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &*func_vals.begin(), &dim, &info);
         if (info > 0) {
-            cout << info << endl;
+            std::cout << info << std::endl;
         }
 
         for (int j = 0; j < run_information.interp_point_count; j++) {
@@ -530,7 +530,7 @@ void cc_vel(const run_config& run_information, vector<double>& modify, const vec
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &*interptargets.begin(), &dim, &info);
 
     if (info > 0) {
-        cout << info << endl;
+        std::cout << info << std::endl;
     }
 
     for (int i = 0; i < run_information.interp_point_count; i++) {
@@ -549,12 +549,12 @@ void cc_vel(const run_config& run_information, vector<double>& modify, const vec
     }
 }
 
-void pp_stream(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const interaction_pair& interact, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const double time, const double omega) {
+void pp_stream(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const double time, const double omega) {
     // particle particle interaction
     int target_i, source_j;
-    vector<double> particle_i, particle_j;
+    std::vector<double> particle_i, particle_j;
     double vor, stream = 0, contribution;
     for (int i = 0; i < interact.count_target; i++) {
         target_i = fast_sum_tree_tri_points_target[interact.lev_target][interact.curr_target][i];
@@ -573,20 +573,20 @@ void pp_stream(const run_config& run_information, vector<double>& modify, const 
     }
 }
 
-void pc_stream(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const interaction_pair& interact, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        const vector<vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
-    vector<double> v1s, v2s, v3s, target_particle, placeholder1, placeholder2, placeholder3, bary_cord, source_particle;
-    vector<double> func_vals (run_information.interp_point_count, 0);
+void pc_stream(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
+    std::vector<double> v1s, v2s, v3s, target_particle, placeholder1, placeholder2, placeholder3, bary_cord, source_particle;
+    std::vector<double> func_vals (run_information.interp_point_count, 0);
     int iv1s, iv2s, iv3s, point_index;
     double vor, stream, contribution;
     double us, vs;
     char trans = 'N';
     int nrhs = 1, dim = run_information.interp_point_count, info;
-    vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
-    vector<int> ipiv (run_information.interp_point_count, 0);
-    vector<vector<double>> interp_points (run_information.interp_point_count, vector<double> (3, 0));
+    std::vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
+    std::vector<int> ipiv (run_information.interp_point_count, 0);
+    std::vector<std::vector<double>> interp_points (run_information.interp_point_count, std::vector<double> (3, 0));
     fekete_init(interp_points, run_information.interp_degree);
     interp_mat_init(interp_matrix, interp_points, run_information.interp_degree, run_information.interp_point_count);
     dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
@@ -616,7 +616,7 @@ void pc_stream(const run_config& run_information, vector<double>& modify, const 
 
         dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &*func_vals.begin(), &dim, &info);
         if (info > 0) {
-            cout << info << endl;
+            std::cout << info << std::endl;
         }
 
         for (int j = 0; j < interact.count_source; j++) {
@@ -630,25 +630,25 @@ void pc_stream(const run_config& run_information, vector<double>& modify, const 
     }
 }
 
-void cp_stream(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const interaction_pair& interact, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        const vector<vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
+void cp_stream(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     int iv1, iv2, iv3, point_index;
-    vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, source_particle, target_particle, bary_cord;
+    std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, source_particle, target_particle, bary_cord;
     double u, v, vor, contribution;
-    vector<vector<double>> curr_points (run_information.interp_point_count, vector<double> (3, 0));
-    vector<double> interptargets (run_information.interp_point_count, 0);
+    std::vector<std::vector<double>> curr_points (run_information.interp_point_count, std::vector<double> (3, 0));
+    std::vector<double> interptargets (run_information.interp_point_count, 0);
     char trans = 'N';
     int nrhs = 1, dim = run_information.interp_point_count, info;
-    vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
-    vector<int> ipiv (run_information.interp_point_count, 0);
-    vector<vector<double>> interp_points (run_information.interp_point_count, vector<double> (3, 0));
+    std::vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
+    std::vector<int> ipiv (run_information.interp_point_count, 0);
+    std::vector<std::vector<double>> interp_points (run_information.interp_point_count, std::vector<double> (3, 0));
     fekete_init(interp_points, run_information.interp_degree);
     interp_mat_init(interp_matrix, interp_points, run_information.interp_degree, run_information.interp_point_count);
     dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
     if (info > 0) {
-        cout << info << endl;
+        std::cout << info << std::endl;
     }
     iv1 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][0];
     iv2 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][1];
@@ -683,7 +683,7 @@ void cp_stream(const run_config& run_information, vector<double>& modify, const 
 
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &*interptargets.begin(), &dim, &info);
     if (info > 0) {
-        cout << info << endl;
+        std::cout << info << std::endl;
     }
 
     for (int i = 0; i < interact.count_target; i++) {
@@ -694,21 +694,21 @@ void cp_stream(const run_config& run_information, vector<double>& modify, const 
     }
 }
 
-void cc_stream(const run_config& run_information, vector<double>& modify, const vector<double>& targets, const vector<double>& curr_state,
-        const vector<double>& area, const interaction_pair& interact, const vector<vector<vector<int>>>& fast_sum_tree_tri_points_target,
-        const vector<vector<vector<int>>>& fast_sum_tree_tri_points_source, const vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-        const vector<vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
+void cc_stream(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
+        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     int iv1, iv2, iv3, iv1s, iv2s, iv3s, point_index;
-    vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, v1s, v2s, v3s, func_vals (run_information.interp_point_count, 0);
+    std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, v1s, v2s, v3s, func_vals (run_information.interp_point_count, 0);
     double u, v, us, vs, vor, contribution;
-    vector<vector<double>> curr_points (run_information.interp_point_count, vector<double> (3, 0));
+    std::vector<std::vector<double>> curr_points (run_information.interp_point_count, std::vector<double> (3, 0));
     int nrhs = 1, dim = run_information.interp_point_count, info;
     char trans = 'N';
-    vector<double> bary_cord, target_particle, source_particle;
-    vector<double> interptargets (run_information.interp_point_count, 0);
-    vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
-    vector<int> ipiv (run_information.interp_point_count, 0);
-    vector<vector<double>> interp_points (run_information.interp_point_count, vector<double> (3, 0));
+    std::vector<double> bary_cord, target_particle, source_particle;
+    std::vector<double> interptargets (run_information.interp_point_count, 0);
+    std::vector<double> interp_matrix (run_information.interp_point_count * run_information.interp_point_count, 0);
+    std::vector<int> ipiv (run_information.interp_point_count, 0);
+    std::vector<std::vector<double>> interp_points (run_information.interp_point_count, std::vector<double> (3, 0));
     fekete_init(interp_points, run_information.interp_degree);
     interp_mat_init(interp_matrix, interp_points, run_information.interp_degree, run_information.interp_point_count);
     dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
@@ -758,7 +758,7 @@ void cc_stream(const run_config& run_information, vector<double>& modify, const 
 
         dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &*func_vals.begin(), &dim, &info);
         if (info > 0) {
-            cout << info << endl;
+            std::cout << info << std::endl;
         }
 
         for (int j = 0; j < interact.count_source; j++) { // interpolate green's function into interior of source triangle
@@ -773,7 +773,7 @@ void cc_stream(const run_config& run_information, vector<double>& modify, const 
 
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &*interptargets.begin(), &dim, &info);
     if (info > 0) {
-        cout << info << endl;
+        std::cout << info << std::endl;
     }
 
     for (int i = 0; i < interact.count_target; i++) { // interpolate interaction into target triangle

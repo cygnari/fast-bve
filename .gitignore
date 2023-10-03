@@ -19,3 +19,4 @@
 *.o
 !makefile
 *.so
+!*CMakeLists.txt

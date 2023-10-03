@@ -1,8 +1,8 @@
 #include "general_utils.hpp"
 #include "structs.hpp"
 
-void rossby_haurwitz(const run_config& run_information, vector<double>& dynamics_state, const double omega) {
-    vector<double> curr_pos, latlon;
+void rossby_haurwitz(const run_config& run_information, std::vector<double>& dynamics_state, const double omega) {
+    std::vector<double> curr_pos, latlon;
     double lat, lon;
     int deg = run_information.init_cond_param1;
     double w = (run_information.init_cond_param2 * (1 + deg) * (2 + deg) + 2 * omega) / (deg * (3 + deg));
@@ -15,8 +15,8 @@ void rossby_haurwitz(const run_config& run_information, vector<double>& dynamics
     }
 }
 
-void gauss_vortex(const run_config& run_information, vector<double>& dynamics_state) {
-    vector<double> curr_pos, latlon, p1;
+void gauss_vortex(const run_config& run_information, std::vector<double>& dynamics_state) {
+    std::vector<double> curr_pos, latlon, p1;
     double lat, dist;
     double center_lat = run_information.init_cond_param2 * M_PI;
     double center_lon = 0.0;
@@ -31,8 +31,8 @@ void gauss_vortex(const run_config& run_information, vector<double>& dynamics_st
     }
 }
 
-void rankine_vortex(const run_config& run_information, vector<double>& dynamics_state) {
-    vector<double> curr_pos, latlon, p1;
+void rankine_vortex(const run_config& run_information, std::vector<double>& dynamics_state) {
+    std::vector<double> curr_pos, latlon, p1;
     double lat, dist, val;
     double center_lat = run_information.init_cond_param2 * M_PI;
     double center_lon = 0.0;
@@ -54,8 +54,8 @@ void rankine_vortex(const run_config& run_information, vector<double>& dynamics_
     }
 }
 
-void polar_vortex(const run_config& run_information, vector<double>& dynamics_state) {
-    vector<double> curr_pos, latlon;
+void polar_vortex(const run_config& run_information, std::vector<double>& dynamics_state) {
+    std::vector<double> curr_pos, latlon;
     double theta0 = 15.0 * M_PI / 32.0, beta = 1.5;
     double lat, vor;
     for (int i = 0; i < run_information.dynamics_initial_points; i++) {
@@ -68,8 +68,8 @@ void polar_vortex(const run_config& run_information, vector<double>& dynamics_st
     }
 }
 
-double ssw_force(const vector<double>& curr_pos, const double time, const double omega, const int wavenumber, const double time_dur) {
-    vector<double> latlon;
+double ssw_force(const std::vector<double>& curr_pos, const double time, const double omega, const int wavenumber, const double time_dur) {
+    std::vector<double> latlon;
     double Tp = 4, Tf = Tp + time_dur, lat, lon, Afunc, Bfunc, theta1 = M_PI / 3.0;
     latlon = lat_lon(curr_pos);
     lat = latlon[0];
@@ -89,7 +89,7 @@ double ssw_force(const vector<double>& curr_pos, const double time, const double
     return 0.6 * omega * Afunc * Bfunc * cos(wavenumber * lon) * pow(wavenumber, 2);
 }
 
-double ssw_blend(const vector<double>& curr_pos, const double time, const double omega, const double time_dur) {
+double ssw_blend(const std::vector<double>& curr_pos, const double time, const double omega, const double time_dur) {
     double Tp = 4, Tf = Tp + time_dur;
     if (time < Tp) {
         return ssw_force(curr_pos, time, omega, 1, time_dur);
@@ -103,7 +103,7 @@ double ssw_blend(const vector<double>& curr_pos, const double time, const double
     }
 }
 
-double vor_force_func(const run_config& run_information, const vector<double>& curr_pos, const double time, const double omega) {
+double vor_force_func(const run_config& run_information, const std::vector<double>& curr_pos, const double time, const double omega) {
     if (run_information.vor_forcing == "ssw") {
         return ssw_force(curr_pos, time, omega, run_information.forcing_param1, run_information.forcing_param2);
     } else if (run_information.vor_forcing == "ssw_blend") {

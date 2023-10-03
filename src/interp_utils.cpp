@@ -8,7 +8,7 @@ extern "C" { // lapack
     extern int dgetrs_(char*,int*,int*,double*,int*,int*,double*,int*,int*);
 }
 
-void fekete_init(vector<vector<double>>& points, const int degree) {
+void fekete_init(std::vector<std::vector<double>>& points, const int degree) {
     double delta_x = 1.0 / degree;
     int index;
     double a, b, c;
@@ -28,7 +28,7 @@ void fekete_init(vector<vector<double>>& points, const int degree) {
     }
 }
 
-void interp_mat_init(vector<double>& mat, const vector<vector<double>>& points, const int degree, const int point_count) { // sets up matrix to interpolate with fekete points
+void interp_mat_init(std::vector<double>& mat, const std::vector<std::vector<double>>& points, const int degree, const int point_count) { // sets up matrix to interpolate with fekete points
     int index, place;
     double a, b;
     for (int i = 0; i < degree + 1; i++) {
@@ -44,7 +44,7 @@ void interp_mat_init(vector<double>& mat, const vector<vector<double>>& points, 
     }
 }
 
-double interp_eval(const vector<double>& alphas, const double s, const double t, const int degree) { // evaluate interpolation polynomial with coefficients alpha and barycentric point (s, t)
+double interp_eval(const std::vector<double>& alphas, const double s, const double t, const int degree) { // evaluate interpolation polynomial with coefficients alpha and barycentric point (s, t)
     double accum = 0;
     int index;
     for (int i = 0; i < degree + 1; i++) {
@@ -56,9 +56,9 @@ double interp_eval(const vector<double>& alphas, const double s, const double t,
     return accum;
 }
 
-vector<double> bilinear_interp(const run_config& run_information, const vector<double>& target_point,
-        const int iv1, const int iv2, const int iv3, const vector<double>& dynamics_state) {
-    vector<double> v1, v2, v3, bary_cords, out;
+std::vector<double> bilinear_interp(const run_config& run_information, const std::vector<double>& target_point,
+        const int iv1, const int iv2, const int iv3, const std::vector<double>& dynamics_state) {
+    std::vector<double> v1, v2, v3, bary_cords, out;
 
     v1 = slice(dynamics_state, run_information.info_per_point * iv1, 1, 3);
     v2 = slice(dynamics_state, run_information.info_per_point * iv2, 1, 3);
@@ -76,16 +76,16 @@ vector<double> bilinear_interp(const run_config& run_information, const vector<d
     return out;
 }
 
-vector<double> biquadratic_interp(const run_config& run_information, const vector<double>& target_point, const int iv1, const int iv2,
-        const int iv3, const int iv4, const int iv5, const int iv6, const vector<double>& dynamics_state) {
+std::vector<double> biquadratic_interp(const run_config& run_information, const std::vector<double>& target_point, const int iv1, const int iv2,
+        const int iv3, const int iv4, const int iv5, const int iv6, const std::vector<double>& dynamics_state) {
 
-    vector<double> v1, v2, v3, v4, v5, v6, curr_alphas, bary_cords;
-    vector<vector<double>> points(6, vector<double> (3, 0));
-    vector<double> vorticity_values (6, 0);
-    vector<double> output_values (run_information.info_per_point);
-    vector<double> tracer_values (6 * run_information.tracer_count, 0);
-    vector<double> interp_matrix (36, 0);
-    vector<int> ipiv (6, 0);
+    std::vector<double> v1, v2, v3, v4, v5, v6, curr_alphas, bary_cords;
+    std::vector<std::vector<double>> points(6, std::vector<double> (3, 0));
+    std::vector<double> vorticity_values (6, 0);
+    std::vector<double> output_values (run_information.info_per_point);
+    std::vector<double> tracer_values (6 * run_information.tracer_count, 0);
+    std::vector<double> interp_matrix (36, 0);
+    std::vector<int> ipiv (6, 0);
     char trans = 'N';
     int Num = 6, nrhs, info;
 
@@ -127,10 +127,10 @@ vector<double> biquadratic_interp(const run_config& run_information, const vecto
     dgetrf_(&Num, &Num, &*interp_matrix.begin(), &Num, &*ipiv.begin(), &info);
     nrhs = 1;
     dgetrs_(&trans, &Num, &nrhs, &*interp_matrix.begin(), &Num, &*ipiv.begin(), &*vorticity_values.begin(), &Num, &info);
-    if (info > 0) cout << "biquadratic_interp: " << info << endl;
+    if (info > 0) std::cout << "biquadratic_interp: " << info << std::endl;
     nrhs = run_information.tracer_count;
     dgetrs_(&trans, &Num, &nrhs, &*interp_matrix.begin(), &Num, &*ipiv.begin(), &*tracer_values.begin(), &Num, &info);
-    if (info > 0) cout << "biquadratic_interp: " << info << endl;
+    if (info > 0) std::cout << "biquadratic_interp: " << info << std::endl;
     bary_cords = barycoords(v1, v2, v3, target_point);
     output_values[3] = interp_eval(vorticity_values, bary_cords[0], bary_cords[1], 2);
     for (int j = 0; j < run_information.tracer_count; j++) {
@@ -140,10 +140,10 @@ vector<double> biquadratic_interp(const run_config& run_information, const vecto
     return output_values;
 }
 
-void remesh_points(const run_config& run_information, vector<double>& target_points, const vector<double>& dynamics_state,
-        const vector<vector<vector<int>>>& dynamics_triangles, const vector<vector<bool>>& dynamics_triangles_is_leaf, const int point_count, const double omega) {
+void remesh_points(const run_config& run_information, std::vector<double>& target_points, const std::vector<double>& dynamics_state,
+        const std::vector<std::vector<std::vector<int>>>& dynamics_triangles, const std::vector<std::vector<bool>>& dynamics_triangles_is_leaf, const int point_count, const double omega) {
     // remesh points back to regular point distribution
-    vector<double> curr_target;
+    std::vector<double> curr_target;
     int iv1, iv2, iv3, iv4, iv5, iv6, curr_level, tri_loc, super_tri_loc; // , lb, ub;
     double vor1, vor2, vor3, vor4, vor5, vor6, vormax, vormin, vor;
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
@@ -151,10 +151,10 @@ void remesh_points(const run_config& run_information, vector<double>& target_poi
             curr_target.assign(run_information.info_per_point, 0);
         } else {
             curr_target = slice(target_points, run_information.info_per_point * i, 1, 3);
-            tie(curr_level, tri_loc) = find_leaf_tri(curr_target, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, run_information.info_per_point, run_information.dynamics_levels_max);
+            std::tie(curr_level, tri_loc) = find_leaf_tri(curr_target, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, run_information.info_per_point, run_information.dynamics_levels_max);
             super_tri_loc = floor(tri_loc / 4.0);
             if (tri_loc == -1) {
-                cout << "find error" << endl;
+                std::cout << "find error" << std::endl;
             }
 
             iv1 = dynamics_triangles[curr_level-1][super_tri_loc][0];
@@ -175,8 +175,8 @@ void remesh_points(const run_config& run_information, vector<double>& target_poi
                 vor5 = dynamics_state[run_information.info_per_point * iv5 + 3] + 2 * omega * dynamics_state[run_information.info_per_point * iv5 + 2];
                 vor6 = dynamics_state[run_information.info_per_point * iv6 + 3] + 2 * omega * dynamics_state[run_information.info_per_point * iv6 + 2];
 
-                vormax = max(vor1, max(vor2, max(vor3, max(vor4, max(vor5, vor6)))));
-                vormin = min(vor1, min(vor2, min(vor3, min(vor4, min(vor5, vor6)))));
+                vormax = std::max(vor1, std::max(vor2, std::max(vor3, std::max(vor4, std::max(vor5, vor6)))));
+                vormin = std::min(vor1, std::min(vor2, std::min(vor3, std::min(vor4, std::min(vor5, vor6)))));
 
                 if (vormax > 0) { // some leeway
                     vormax *= 1.1;
@@ -201,9 +201,9 @@ void remesh_points(const run_config& run_information, vector<double>& target_poi
             }
 
             if (count_nans(curr_target) > 0) {
-                cout << "point: " << i << " level: " << curr_level << " super tri loc " << super_tri_loc << " tri_loc: " << tri_loc << endl;
-                cout << iv1 << "," << iv2 << "," << iv3 << "," << iv4 << "," << iv5 << "," << iv6 << endl;
-                cout << curr_target[0] << "," << curr_target[1] << "," << curr_target[2] << endl;
+                std::cout << "point: " << i << " level: " << curr_level << " super tri loc " << super_tri_loc << " tri_loc: " << tri_loc << std::endl;
+                std::cout << iv1 << "," << iv2 << "," << iv3 << "," << iv4 << "," << iv5 << "," << iv6 << std::endl;
+                std::cout << curr_target[0] << "," << curr_target[1] << "," << curr_target[2] << std::endl;
             }
         }
 

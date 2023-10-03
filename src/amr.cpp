@@ -3,13 +3,13 @@
 #include "interp_utils.hpp"
 #include "init_utils.hpp"
 
-void amr(run_config& run_information, vector<double>& new_dynamics_state, const vector<double>& old_dynamics_state,
-        vector<vector<vector<int>>>& new_dynamics_triangles, const vector<vector<vector<int>>>& old_dynamics_triangles,
-        vector<vector<bool>>& new_dynamics_triangles_is_leaf, const vector<vector<bool>>& old_dynamics_triangles_is_leaf,
-        vector<double>& dynamics_areas, const double omega) {
+void amr(run_config& run_information, std::vector<double>& new_dynamics_state, const std::vector<double>& old_dynamics_state,
+        std::vector<std::vector<std::vector<int>>>& new_dynamics_triangles, const std::vector<std::vector<std::vector<int>>>& old_dynamics_triangles,
+        std::vector<std::vector<bool>>& new_dynamics_triangles_is_leaf, const std::vector<std::vector<bool>>& old_dynamics_triangles_is_leaf,
+        std::vector<double>& dynamics_areas, const double omega) {
 
     int iv, iv1, iv2, iv3, iv12, iv23, iv31, iv1n, iv2n, iv3n, iv4n, iv5n, iv6n, tri_level, tri_index, super_tri_index;
-    vector<double> v, v1, v2, v3, v12, v23, v31, v11, v22, v33;
+    std::vector<double> v, v1, v2, v3, v12, v23, v31, v11, v22, v33;
     double vormin, vormax, vor1, vor2, vor3, tri_area, vor;
     int old_point_count = run_information.dynamics_curr_point_count;
 
@@ -23,11 +23,11 @@ void amr(run_config& run_information, vector<double>& new_dynamics_state, const 
 
     run_information.dynamics_curr_point_count = run_information.dynamics_initial_points;
     run_information.dynamics_curr_tri_count = run_information.dynamics_initial_triangles;
-    new_dynamics_triangles_is_leaf[run_information.dynamics_levels_min-1] = vector<bool> (run_information.dynamics_initial_triangles, true);
+    new_dynamics_triangles_is_leaf[run_information.dynamics_levels_min-1] = std::vector<bool> (run_information.dynamics_initial_triangles, true);
     new_dynamics_triangles_is_leaf.resize(run_information.dynamics_levels_max);
     for (int i = run_information.dynamics_levels_min; i < run_information.dynamics_levels_max; i++) {
-        new_dynamics_triangles_is_leaf[i] = vector<bool> (20 * pow(4, i), false);
-        new_dynamics_triangles[i] = vector<vector<int>> (20 * pow(4, i), vector<int> (4, 0));
+        new_dynamics_triangles_is_leaf[i] = std::vector<bool> (20 * pow(4, i), false);
+        new_dynamics_triangles[i] = std::vector<std::vector<int>> (20 * pow(4, i), std::vector<int> (4, 0));
     }
 
     for (int i = run_information.dynamics_levels_min - 1; i < run_information.dynamics_levels_max - 1; i++) {
@@ -44,8 +44,8 @@ void amr(run_config& run_information, vector<double>& new_dynamics_state, const 
                 vor2 = new_dynamics_state[run_information.info_per_point * iv2 + 3];
                 vor3 = new_dynamics_state[run_information.info_per_point * iv3 + 3];
                 vor = abs((vor1 + vor2 + vor3) / 3.0);
-                vormax = max(vor1, max(vor2, vor3));
-                vormin = min(vor1, min(vor2, vor3));
+                vormax = std::max(vor1, std::max(vor2, vor3));
+                vormin = std::min(vor1, std::min(vor2, vor3));
                 if ((tri_area * vor > run_information.amr_circ_thresh) or (vormax - vormin > run_information.amr_vor_thresh)) {
                     // refine
                     dynamics_areas[iv1] -= tri_area / 6.0;
@@ -77,7 +77,7 @@ void amr(run_config& run_information, vector<double>& new_dynamics_state, const 
                         iv12 = check_point_exist2(old_dynamics_state, v12, old_point_count, pow(10, -14), run_information.info_per_point);
                         if (iv12 == -1) {
                             // did not exist at previous time step
-                            tie(tri_level, tri_index) = find_leaf_tri(v12, old_dynamics_state, old_dynamics_triangles, old_dynamics_triangles_is_leaf, run_information.info_per_point, run_information.dynamics_levels_max);
+                            std::tie(tri_level, tri_index) = find_leaf_tri(v12, old_dynamics_state, old_dynamics_triangles, old_dynamics_triangles_is_leaf, run_information.info_per_point, run_information.dynamics_levels_max);
                             super_tri_index = floor(tri_index / 4.0);
                             iv1n = old_dynamics_triangles[tri_level-1][super_tri_index][0];
                             iv2n = old_dynamics_triangles[tri_level-1][super_tri_index][1];
@@ -101,7 +101,7 @@ void amr(run_config& run_information, vector<double>& new_dynamics_state, const 
                     if (iv23 == -1) {
                         iv23 = check_point_exist2(old_dynamics_state, v23, old_point_count, pow(10, -14), run_information.info_per_point);
                         if (iv23 == -1) {
-                            tie(tri_level, tri_index) = find_leaf_tri(v23, old_dynamics_state, old_dynamics_triangles, old_dynamics_triangles_is_leaf, run_information.info_per_point, run_information.dynamics_levels_max);
+                            std::tie(tri_level, tri_index) = find_leaf_tri(v23, old_dynamics_state, old_dynamics_triangles, old_dynamics_triangles_is_leaf, run_information.info_per_point, run_information.dynamics_levels_max);
                             super_tri_index = floor(tri_index / 4.0);
                             iv1n = old_dynamics_triangles[tri_level-1][super_tri_index][0];
                             iv2n = old_dynamics_triangles[tri_level-1][super_tri_index][1];
@@ -123,7 +123,7 @@ void amr(run_config& run_information, vector<double>& new_dynamics_state, const 
                     if (iv31 == -1) {
                         iv31 = check_point_exist2(old_dynamics_state, v31, old_point_count, pow(10, -14), run_information.info_per_point);
                         if (iv31 == -1) {
-                            tie(tri_level, tri_index) = find_leaf_tri(v31, old_dynamics_state, old_dynamics_triangles, old_dynamics_triangles_is_leaf, run_information.info_per_point, run_information.dynamics_levels_max);
+                            std::tie(tri_level, tri_index) = find_leaf_tri(v31, old_dynamics_state, old_dynamics_triangles, old_dynamics_triangles_is_leaf, run_information.info_per_point, run_information.dynamics_levels_max);
                             super_tri_index = floor(tri_index / 4.0);
                             iv1n = old_dynamics_triangles[tri_level-1][super_tri_index][0];
                             iv2n = old_dynamics_triangles[tri_level-1][super_tri_index][1];
@@ -157,12 +157,12 @@ void amr(run_config& run_information, vector<double>& new_dynamics_state, const 
     }
 }
 
-void amr_wrapper(run_config& run_information, vector<double>& dynamics_state, vector<vector<vector<int>>>& dynamics_triangles,
-        vector<vector<bool>>& dynamics_triangles_is_leaf, vector<double>& dynamics_areas, const double omega) {
+void amr_wrapper(run_config& run_information, std::vector<double>& dynamics_state, std::vector<std::vector<std::vector<int>>>& dynamics_triangles,
+        std::vector<std::vector<bool>>& dynamics_triangles_is_leaf, std::vector<double>& dynamics_areas, const double omega) {
     // wraps amr routine
-    vector<double> new_dynamics_state;
-    vector<vector<vector<int>>> new_dynamics_triangles;
-    vector<vector<bool>> new_dynamics_triangles_is_leaf;
+    std::vector<double> new_dynamics_state;
+    std::vector<std::vector<std::vector<int>>> new_dynamics_triangles;
+    std::vector<std::vector<bool>> new_dynamics_triangles_is_leaf;
     amr(run_information, new_dynamics_state, dynamics_state, new_dynamics_triangles, dynamics_triangles, new_dynamics_triangles_is_leaf, dynamics_triangles_is_leaf, dynamics_areas, omega);
     dynamics_state.assign(new_dynamics_state.begin(), new_dynamics_state.end());
     dynamics_triangles = new_dynamics_triangles;

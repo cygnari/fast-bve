@@ -20,4 +20,4 @@
 !makefile
 *.so
 !*CMakeLists.txt
-/build/*
+*./build/*

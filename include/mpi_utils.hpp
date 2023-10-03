@@ -11,8 +11,18 @@ void bounds_determine(run_config& run_information, const int P, const int ID);
 
 bool test_is_same(const int x);
 
-void sync_updates(const run_config& run_information, vector<double>& vals, const int P, const int ID, const MPI_Win *win);
-
-void sync_updates_int(const run_config& run_information, vector<int>& vals, const int P, const int ID, const MPI_Win *win);
+template <typename T> void sync_updates(const run_config& run_information, vector<T>& vals, const int P, const int ID, const MPI_Win *win, MPI_Datatype type) {
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Win_fence(0, *win);
+    if (ID != 0) {
+        MPI_Accumulate(&vals[0], vals.size(), type, 0, 0, vals.size(), type, MPI_SUM, *win);
+    }
+    MPI_Win_fence(0, *win);
+    if (ID != 0) {
+        MPI_Get(&vals[0], vals.size(), type, 0, 0, vals.size(), type, *win);
+    }
+    MPI_Win_fence(0, *win);
+    MPI_Barrier(MPI_COMM_WORLD);
+}
 
 #endif

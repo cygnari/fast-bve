@@ -127,7 +127,8 @@ int main(int argc, char** argv) {
 
     if (run_information.write_stream) {
         convolve_stream(run_information, stream_func, dynamics_state, dynamics_state, dynamics_areas, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, 0, omega);
-        sync_updates(run_information, stream_func, P, ID, &win_stream);
+        sync_updates<double>(run_information, stream_func, P, ID, &win_stream, MPI_DOUBLE);
+        // sync_updates(run_information, stream_func, P, ID, &win_stream);
         for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
             dynamics_state[(i + 1) * run_information.info_per_point - 1] = stream_func[i];
         }
@@ -237,7 +238,8 @@ int main(int argc, char** argv) {
         MPI_Barrier(MPI_COMM_WORLD);
 
         rhs_func(run_information, c_1, dynamics_state, dynamics_state, dynamics_areas, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time, omega); // RK4 k_1
-        sync_updates(run_information, c_1, P, ID, &win_c1);
+        sync_updates<double>(run_information, c_1, P, ID, &win_c1, MPI_DOUBLE);
+        // sync_updates(run_information, c_1, P, ID, &win_c1);
         inter_state = c_1; // k_1
         scalar_mult(inter_state, run_information.delta_t / 2.0); // delta_t/2*k1
         vec_add(inter_state, dynamics_state); // x+delta_t/2*k1
@@ -245,7 +247,8 @@ int main(int argc, char** argv) {
         MPI_Barrier(MPI_COMM_WORLD);
 
         rhs_func(run_information, c_2, inter_state, inter_state, dynamics_areas, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time, omega); // RK4 k_2
-        sync_updates(run_information, c_2, P, ID, &win_c2);
+        sync_updates<double>(run_information, c_2, P, ID, &win_c2, MPI_DOUBLE);
+        // sync_updates(run_information, c_2, P, ID, &win_c2);
         inter_state = c_2; // k_2
         scalar_mult(inter_state, run_information.delta_t / 2.0); // delta_t/2 * k_2
         vec_add(inter_state, dynamics_state); // x+delta_t/2*k2
@@ -253,7 +256,8 @@ int main(int argc, char** argv) {
         MPI_Barrier(MPI_COMM_WORLD);
 
         rhs_func(run_information, c_3, inter_state, inter_state, dynamics_areas, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time, omega); // RK4 k_3
-        sync_updates(run_information, c_3, P, ID, &win_c3);
+        sync_updates<double>(run_information, c_3, P, ID, &win_c3, MPI_DOUBLE);
+        // sync_updates(run_information, c_3, P, ID, &win_c3);
         inter_state = c_3; // k_3
         scalar_mult(inter_state, run_information.delta_t); // delta_t * k_3
         vec_add(inter_state, dynamics_state); // x + delta_t * k_3
@@ -261,7 +265,8 @@ int main(int argc, char** argv) {
         MPI_Barrier(MPI_COMM_WORLD);
 
         rhs_func(run_information, c_4, inter_state, inter_state, dynamics_areas, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time, omega); // RK4 k_4
-        sync_updates(run_information, c_4, P, ID, &win_c4);
+        sync_updates<double>(run_information, c_4, P, ID, &win_c4, MPI_DOUBLE);
+        // sync_updates(run_information, c_4, P, ID, &win_c4);
 
         c1234 = c_1;
         scalar_mult(c_2, 2);
@@ -280,7 +285,8 @@ int main(int argc, char** argv) {
             vec_add(c1234, dynamics_state);
             project_points(run_information, c1234, omega);
             remesh_points(run_information, dynamics_state, c1234, dynamics_triangles, dynamics_triangles_is_leaf, run_information.dynamics_curr_point_count, omega);
-            sync_updates(run_information, dynamics_state, P, ID, &win_dynstate);
+            sync_updates<double>(run_information, dynamics_state, P, ID, &win_dynstate, MPI_DOUBLE);
+            // sync_updates(run_information, dynamics_state, P, ID, &win_dynstate);
         } else {
             vec_add(dynamics_state, c1234);
             project_points(run_information, dynamics_state, omega);
@@ -296,7 +302,8 @@ int main(int argc, char** argv) {
                 tree_traverse(run_information, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_info, fast_sum_tree_interactions, dt_interaction);
             }
             convolve_stream(run_information, stream_func, dynamics_state, dynamics_state, dynamics_areas, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time, omega);
-            sync_updates(run_information, stream_func, P, ID, &win_stream);
+            sync_updates<double>(run_information, stream_func, P, ID, &win_stream, MPI_DOUBLE);
+            // sync_updates(run_information, stream_func, P, ID, &win_stream);
             for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
                 dynamics_state[(i + 1) * run_information.info_per_point - 1] = stream_func[i];
             }

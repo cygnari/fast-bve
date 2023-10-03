@@ -60,33 +60,16 @@ bool test_is_same(const int x) { // test if all processes have the same value fo
     return (p[0] == -p[1]);
 }
 
-void sync_updates(const run_config& run_information, vector<double>& vals, const int P, const int ID, const MPI_Win *win) {
-    // add all the vals from all the processes together, then distribute
+template <typename T> void sync_updates(const run_config& run_information, vector<T>& vals, const int P, const int ID, const MPI_Win *win, MPI_Datatype type) {
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Win_fence(0, *win);
     if (ID != 0) {
-        MPI_Accumulate(&vals[0], vals.size(), MPI_DOUBLE, 0, 0, vals.size(), MPI_DOUBLE, MPI_SUM, *win);
+        MPI_Accumulate(&vals[0], vals.size(), type, 0, 0, vals.size(), type, MPI_SUM, *win);
     }
     MPI_Win_fence(0, *win);
     if (ID != 0) {
-        MPI_Get(&vals[0], vals.size(), MPI_DOUBLE, 0, 0, vals.size(), MPI_DOUBLE, *win);
+        MPI_Get(&vals[0], vals.size(), type, 0, 0, vals.size(), type, *win);
     }
     MPI_Win_fence(0, *win);
     MPI_Barrier(MPI_COMM_WORLD);
-}
-
-void sync_updates_int(const run_config& run_information, vector<int>& vals, const int P, const int ID, const MPI_Win *win) {
-    // add all the vals from all the processes together, then distribute
-    MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Win_fence(0, *win);
-    if (ID != 0) {
-        MPI_Accumulate(&vals[0], vals.size(), MPI_INT, 0, 0, vals.size(), MPI_INT, MPI_SUM, *win);
-    }
-    MPI_Win_fence(0, *win);
-    if (ID != 0) {
-        MPI_Get(&vals[0], vals.size(), MPI_INT, 0, 0, vals.size(), MPI_INT, *win);
-    }
-    MPI_Win_fence(0, *win);
-    MPI_Barrier(MPI_COMM_WORLD);
-    
 }

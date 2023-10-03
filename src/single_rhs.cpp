@@ -152,7 +152,7 @@ int main(int argc, char** argv) {
     }
 
     rhs_func(run_information, c_1, dynamics_state, dynamics_state, dynamics_areas, fast_sum_tree_interactions, fast_sum_tree_tri_points, fast_sum_tree_tri_points, fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time, omega);
-    sync_updates(run_information, c_1, P, ID, &win_c1);
+    sync_updates<double>(run_information, c_1, P, ID, &win_c1, MPI_DOUBLE);
 
     if (ID == 0) {
         end = chrono::steady_clock::now();

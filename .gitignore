@@ -19,5 +19,4 @@
 *.o
 *.so
 !*CMakeLists.txt
-*/build/*
-*/build/src/*
+build

@@ -248,6 +248,30 @@ std::vector<double> barycoords(const std::vector<double> &p1,
   return coords;
 }
 
+std::vector<double> barycoords(const std::vector<double> &p1,
+                               const std::vector<double> &p2,
+                               const std::vector<double> &p3,
+                               const double x, const double y, const double z) {
+  // finds triangle barycentric coordinates of point p
+  assert(p1.size() == 3);
+  assert(p2.size() == 3);
+  assert(p3.size() == 3);
+  std::vector<double> coords {x, y, z};
+  int dim = 3, nrhs = 1, info;
+  std::vector<double> mat{p1[0], p1[1], p1[2], p2[0], p2[1],
+                          p2[2], p3[0], p3[1], p3[2]};
+  std::vector<int> ipiv(3);
+  dgesv_(&dim, &nrhs, &*mat.begin(), &dim, &*ipiv.begin(), &*coords.begin(),
+         &dim, &info);
+  if (info != 0) {
+    coords[0] = -1;
+    coords[1] = -1;
+    coords[2] = -1;
+    std::cout << "barycoords: " << info << std::endl;
+  }
+  return coords;
+}
+
 std::vector<double> normalized_barycoords(const std::vector<double> &p1,
                                           const std::vector<double> &p2,
                                           const std::vector<double> &p3,
@@ -264,6 +288,17 @@ bool check_in_tri(
     const std::vector<double> &p3,
     const std::vector<double> &p) { // checks if point p is in triangle
   std::vector<double> bary_coord = barycoords(p1, p2, p3, p);
+  if ((bary_coord[0] >= 0) and (bary_coord[1] >= 0) and (bary_coord[2] >= 0))
+    return true;
+  else
+    return false;
+}
+
+bool check_in_tri(
+    const std::vector<double> &p1, const std::vector<double> &p2,
+    const std::vector<double> &p3,
+    const double x, const double y, const double z) { // checks if point p is in triangle
+  std::vector<double> bary_coord = barycoords(p1, p2, p3, x, y, z);
   if ((bary_coord[0] >= 0) and (bary_coord[1] >= 0) and (bary_coord[2] >= 0))
     return true;
   else

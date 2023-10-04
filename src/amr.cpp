@@ -45,7 +45,7 @@ void amr(run_config& run_information, std::vector<double>& new_dynamics_state, c
                 vor1 = new_dynamics_state[run_information.info_per_point * iv1 + 3];
                 vor2 = new_dynamics_state[run_information.info_per_point * iv2 + 3];
                 vor3 = new_dynamics_state[run_information.info_per_point * iv3 + 3];
-                vor = abs((vor1 + vor2 + vor3) / 3.0);
+                vor = std::abs((vor1 + vor2 + vor3) / 3.0);
                 vormax = std::max(vor1, std::max(vor2, vor3));
                 vormin = std::min(vor1, std::min(vor2, vor3));
                 if ((tri_area * vor > run_information.amr_circ_thresh) or (vormax - vormin > run_information.amr_vor_thresh)) {

@@ -1,6 +1,7 @@
 #include "general_utils.hpp"
 #include "structs.hpp"
 #include <iostream>
+#include <cmath>
 
 void clip_assured_sum(const run_config& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const double qmin, const double qmax, const double target_mass, const int target_species) {
     // CAAS as described in Bradley et al 2019
@@ -11,7 +12,7 @@ void clip_assured_sum(const run_config& run_information, std::vector<double>& dy
         prelim_values[i] = std::max(std::min(dynamics_state[run_information.info_per_point * i + 4 + target_species], qmax), qmin);
         prelim_mass += prelim_values[i] * dynamics_areas[i];
     }
-    if (abs(prelim_mass - target_mass) < pow(10, -10)) {
+    if (std::abs(prelim_mass - target_mass) < pow(10, -10)) {
         for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
             dynamics_state[run_information.info_per_point * i + 4 + target_species] = prelim_values[i];
         }
@@ -58,7 +59,7 @@ void vorticity_fix_limiter(const run_config& run_information, std::vector<double
         prelim_abs_vor[i] = std::max(std::min(abs_vor, qmax), qmin);
         prelim_total += prelim_abs_vor[i] * dynamics_areas[i];
     }
-    if (abs(prelim_total) < pow(10, -10)) {
+    if (std::abs(prelim_total) < pow(10, -10)) {
         for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
             abs_vor = prelim_abs_vor[i];
             rel_vor = abs_vor - 2 * omega * dynamics_state[run_information.info_per_point * i + 2];

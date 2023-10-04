@@ -210,7 +210,7 @@ int main(int argc, char** argv) {
             amr_wrapper(run_information, dynamics_state, dynamics_triangles, dynamics_triangles_is_leaf, dynamics_areas, omega);
             test_area = 0;
             for (int i = 0; i < dynamics_areas.size(); i++) test_area += dynamics_areas[i];
-            if (abs(test_area - 4 * M_PI) > pow(10, -8)) std::cout << "thread: " << ID << " wrong area: " << std::setprecision(15) << test_area << std::endl;
+            if (std::abs(test_area - 4 * M_PI) > pow(10, -8)) std::cout << "thread: " << ID << " wrong area: " << std::setprecision(15) << test_area << std::endl;
             project_points(run_information, dynamics_state, omega);
             inter_state.resize(run_information.dynamics_curr_point_count * run_information.info_per_point);
             bounds_determine(run_information, P, ID);

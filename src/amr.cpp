@@ -2,6 +2,8 @@
 #include "structs.hpp"
 #include "interp_utils.hpp"
 #include "init_utils.hpp"
+#include <cmath>
+#include <tuple>
 
 void amr(run_config& run_information, std::vector<double>& new_dynamics_state, const std::vector<double>& old_dynamics_state,
         std::vector<std::vector<std::vector<int>>>& new_dynamics_triangles, const std::vector<std::vector<std::vector<int>>>& old_dynamics_triangles,

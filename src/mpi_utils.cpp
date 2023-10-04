@@ -1,6 +1,7 @@
 #include "structs.hpp"
 #include <cassert>
 #include <mpi.h>
+#include <vector>
 #define assertm(exp, msg) assert(((void)msg, exp))
 
 void bounds_determine(run_config& run_information, const int P, const int ID) {

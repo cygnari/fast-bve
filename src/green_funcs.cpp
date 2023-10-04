@@ -1,4 +1,5 @@
 #include "general_utils.hpp"
+#include <cmath>
 
 std::vector<double> bve_gfunc(const std::vector<double>& x, const std::vector<double>& y) { // interaction function for barotropic vorticity equations
     double denom = 1.0 - dot_prod(x, y);

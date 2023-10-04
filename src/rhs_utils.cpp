@@ -4,6 +4,7 @@
 #include "vorticity_functions.hpp"
 #include "green_funcs.hpp"
 #include "direct_sum_utils.hpp"
+#include <vector>
 
 void rhs_fast_sum_vel(const run_config& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
         const std::vector<double>& area, const std::vector<interaction_pair>& interactions, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,

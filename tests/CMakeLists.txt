@@ -1,5 +1,5 @@
-add_executable(CountNanTest countnantest.cpp)
-target_link_libraries(CountNanTest PUBLIC SrcLib GTest::gtest_main)
+add_executable(general_util_tests general_util_tests.cpp)
+target_link_libraries(general_util_tests PUBLIC SrcLib GTest::gtest_main)
 
 include(GoogleTest)
-gtest_discover_tests(CountNanTest)
+gtest_discover_tests(general_util_tests)

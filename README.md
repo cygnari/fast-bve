@@ -7,4 +7,4 @@ and on Derecho
 
 Modify things in bin/namelist.txt
 
-Clone repo, `mkdir build`, `cd build`, then `make`. 
+Clone repo, `mkdir build`, `cd build`, then `cmake ..`, then `make`. 

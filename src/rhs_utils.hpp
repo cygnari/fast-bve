@@ -13,9 +13,7 @@ void rhs_fast_sum_vel(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega);
+    const IcosTree &icos_tree, const double time, const double omega);
 
 void rhs_fast_sum_stream(
     const RunConfig &run_information, std::vector<double> &modify,
@@ -26,9 +24,7 @@ void rhs_fast_sum_stream(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega);
+    const IcosTree &icos_tree, const double time, const double omega);
 
 void convolve_vel(
     const RunConfig &run_information, std::vector<double> &modify,
@@ -39,9 +35,7 @@ void convolve_vel(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega);
+    const IcosTree &icos_tree, const double time, const double omega);
 
 void convolve_stream(
     const RunConfig &run_information, std::vector<double> &modify,
@@ -52,9 +46,7 @@ void convolve_stream(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega);
+    const IcosTree &icos_tree, const double time, const double omega);
 
 void rhs_func(
     const RunConfig &run_information, std::vector<double> &modify,
@@ -65,9 +57,7 @@ void rhs_func(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega);
+    const IcosTree &icos_tree, const double time, const double omega);
 
 void project_points(const RunConfig &run_information,
                     std::vector<double> &dynamics_state, const double omega);

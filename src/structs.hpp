@@ -2,6 +2,7 @@
 #define H_STRUCTS_H
 
 #include <string>
+#include <vector>
 
 struct RunConfig {
   // primitive configuration options
@@ -78,6 +79,13 @@ struct RunConfig {
   int target_lb;
   int target_ub;
   int target_own;
+};
+
+struct IcosTree {
+    std::vector<std::vector<double>> icosahedron_vertex_coords;
+    std::vector<std::vector<std::vector<double>>> icosahedron_tri_centers;
+    std::vector<std::vector<double>> icosahedron_tri_radii;
+    std::vector<std::vector<std::vector<int>>> icosahedron_triangle_vertex_indices;
 };
 
 struct InteractionPair {

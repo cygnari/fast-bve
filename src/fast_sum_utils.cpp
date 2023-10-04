@@ -19,11 +19,8 @@ extern int dgetrs_(char *, int *, int *, double *, int *, int *, double *,
 
 void point_assign(
     const RunConfig &run_information, const std::vector<double> &point,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
-    std::vector<std::vector<int>> &fast_sum_tree_point_locs,
-    const int point_id) {
+    const IcosTree &icos_tree, std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
+    std::vector<std::vector<int>> &fast_sum_tree_point_locs, const int point_id) {
   // find which fast sum triangles each point is in
   int iv1, iv2, iv3, lb, ub;
   std::vector<double> v1, v2, v3;
@@ -39,12 +36,12 @@ void point_assign(
       ub = 20;
     }
     for (int j = lb; j < ub; j++) {
-      iv1 = fast_sum_icos_tri_verts[i][j][0];
-      iv2 = fast_sum_icos_tri_verts[i][j][1];
-      iv3 = fast_sum_icos_tri_verts[i][j][2];
-      v1 = fast_sum_icos_verts[iv1];
-      v2 = fast_sum_icos_verts[iv2];
-      v3 = fast_sum_icos_verts[iv3];
+      iv1 = icos_tree.icosahedron_triangle_vertex_indices[i][j][0];
+      iv2 = icos_tree.icosahedron_triangle_vertex_indices[i][j][1];
+      iv3 = icos_tree.icosahedron_triangle_vertex_indices[i][j][2];
+      v1 = icos_tree.icosahedron_vertex_coords[iv1];
+      v2 = icos_tree.icosahedron_vertex_coords[iv2];
+      v3 = icos_tree.icosahedron_vertex_coords[iv3];
       if (check_in_tri(v1, v2, v3, point)) {
         fast_sum_tree_point_locs[i][point_id] = j;
         fast_sum_tree_tri_points[i][j].push_back(point_id);
@@ -55,8 +52,8 @@ void point_assign(
 }
 
 // void new_point_assign(RunConfig& run_information, vector<double>& point,
-// vector<vector<double>>& fast_sum_icos_verts,
-//         vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<int>&
+// vector<vector<double>>& icos_tree.icosahedron_vertex_coords,
+//         vector<vector<vector<int>>>& icos_tree.icosahedron_triangle_vertex_indices, vector<int>&
 //         fast_sum_tree_point_locs, int point_id) {
 //     // finds which triangle each point is in
 //     int iv1, iv2, iv3, lb, ub, index;
@@ -73,12 +70,12 @@ void point_assign(
 //         }
 //         for (int j = lb; j < ub; j++) {
 //             // cout << "j " << j << endl;
-//             iv1 = fast_sum_icos_tri_verts[i][j][0];
-//             iv2 = fast_sum_icos_tri_verts[i][j][1];
-//             iv3 = fast_sum_icos_tri_verts[i][j][2];
-//             v1 = fast_sum_icos_verts[iv1];
-//             v2 = fast_sum_icos_verts[iv2];
-//             v3 = fast_sum_icos_verts[iv3];
+//             iv1 = icos_tree.icosahedron_triangle_vertex_indices[i][j][0];
+//             iv2 = icos_tree.icosahedron_triangle_vertex_indices[i][j][1];
+//             iv3 = icos_tree.icosahedron_triangle_vertex_indices[i][j][2];
+//             v1 = icos_tree.icosahedron_vertex_coords[iv1];
+//             v2 = icos_tree.icosahedron_vertex_coords[iv2];
+//             v3 = icos_tree.icosahedron_vertex_coords[iv3];
 //             if (check_in_tri(v1, v2, v3, point)) {
 //                 // cout << "point: " << point_id <<
 //                 index = i * run_information.dynamics_max_points + point_id;
@@ -90,9 +87,7 @@ void point_assign(
 
 void points_assign(
     const RunConfig &run_information, const std::vector<double> &dynamics_state,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
+    const IcosTree &icos_tree, std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
     std::vector<std::vector<int>> &fast_sum_tree_point_locs) {
   // assigns each point to triangles in the fast sum tree structure
   std::vector<double> point;
@@ -103,15 +98,14 @@ void points_assign(
   }
   for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
     point = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
-    point_assign(run_information, point, fast_sum_icos_verts,
-                 fast_sum_icos_tri_verts, fast_sum_tree_tri_points,
+    point_assign(run_information, point, icos_tree, fast_sum_tree_tri_points,
                  fast_sum_tree_point_locs, i);
   }
 }
 
 // void points_find_tris(RunConfig& run_information, vector<double>&
-// dynamics_state, vector<vector<double>>& fast_sum_icos_verts,
-//         vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<int>&
+// dynamics_state, vector<vector<double>>& icos_tree.icosahedron_vertex_coords,
+//         vector<vector<vector<int>>>& icos_tree.icosahedron_triangle_vertex_indices, vector<int>&
 //         fast_sum_tree_point_locs) {
 //     // finds which triangle each point is in
 //     vector<double> point;
@@ -122,14 +116,14 @@ void points_assign(
 //         point = slice(dynamics_state, run_information.info_per_point * i, 1,
 //         3);
 //         // cout << i << endl;
-//         new_point_assign(run_information, point, fast_sum_icos_verts,
-//         fast_sum_icos_tri_verts, fast_sum_tree_point_locs, i);
+//         new_point_assign(run_information, point, icos_tree.icosahedron_vertex_coords,
+//         icos_tree.icosahedron_triangle_vertex_indices, fast_sum_tree_point_locs, i);
 //     }
 // }
 
 // void points_assign_tris(RunConfig& run_information, vector<double>&
-// dynamics_state, vector<vector<double>>& fast_sum_icos_verts,
-//         vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
+// dynamics_state, vector<vector<double>>& icos_tree.icosahedron_vertex_coords,
+//         vector<vector<vector<int>>>& icos_tree.icosahedron_triangle_vertex_indices,
 //         vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<int>&
 //         fast_sum_tree_point_locs) {
 //     // assigns each triangle the points it contains
@@ -153,8 +147,7 @@ void tree_traverse(
         &fast_sum_tree_tri_points_source,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_target,
-    const std::vector<std::vector<std::vector<double>>> &fast_sum_icos_tri_info,
-    std::vector<InteractionPair> &tree_interactions,
+    const IcosTree &icos_tree, std::vector<InteractionPair> &tree_interactions,
     MPI_Datatype dt_interaction) {
   // determines {C,P}-{C,P} interactions
   int curr_source, curr_target, lev_target, lev_source;
@@ -240,14 +233,12 @@ void tree_traverse(
         fast_sum_tree_tri_points_source[lev_source][curr_source].size();
     if ((particle_count_target == 0) or (particle_count_source == 0))
       continue; // if no work, continue to next
-    center_target =
-        slice(fast_sum_icos_tri_info[lev_target][curr_target], 0, 1, 3);
-    center_source =
-        slice(fast_sum_icos_tri_info[lev_source][curr_source], 0, 1, 3);
+    center_target = icos_tree.icosahedron_tri_centers[lev_target][curr_target];
+    center_source = icos_tree.icosahedron_tri_centers[lev_source][curr_source];
     distance =
         great_circ_dist(center_target, center_source, run_information.radius);
-    separation = (fast_sum_icos_tri_info[lev_target][curr_target][3] +
-                  fast_sum_icos_tri_info[lev_source][curr_source][3]) /
+    separation = (icos_tree.icosahedron_tri_radii[lev_target][curr_target] +
+                  icos_tree.icosahedron_tri_radii[lev_source][curr_source]) /
                  distance;
 
     if ((distance > 0) and
@@ -406,9 +397,7 @@ void pc_vel(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega) {
+    const IcosTree &icos_tree, const double time, const double omega) {
   std::vector<double> v1s, v2s, v3s, target_particle, placeholder1,
       placeholder2, placeholder3, bary_cord, source_particle;
   std::vector<double> func_vals(3 * run_information.interp_point_count, 0),
@@ -431,12 +420,12 @@ void pc_vel(
   interp_mat_init(interp_matrix, interp_points, run_information.interp_degree,
                   run_information.interp_point_count);
   dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
-  iv1s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][0];
-  iv2s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][1];
-  iv3s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][2];
-  v1s = fast_sum_icos_verts[iv1s];
-  v2s = fast_sum_icos_verts[iv2s];
-  v3s = fast_sum_icos_verts[iv3s];
+  iv1s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][0];
+  iv2s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][1];
+  iv3s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][2];
+  v1s = icos_tree.icosahedron_vertex_coords[iv1s];
+  v2s = icos_tree.icosahedron_vertex_coords[iv2s];
+  v3s = icos_tree.icosahedron_vertex_coords[iv3s];
   for (int i = 0; i < interact.count_target; i++) {
     point_index = fast_sum_tree_tri_points_target[interact.lev_target]
                                                  [interact.curr_target][i];
@@ -501,9 +490,7 @@ void cp_vel(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega) {
+    const IcosTree &icos_tree, const double time, const double omega) {
   int iv1, iv2, iv3, point_index;
   std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3,
       source_particle, target_particle, bary_cord;
@@ -530,12 +517,12 @@ void cp_vel(
   if (info > 0) {
     std::cout << info << std::endl;
   }
-  iv1 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][0];
-  iv2 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][1];
-  iv3 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][2];
-  v1 = fast_sum_icos_verts[iv1];
-  v2 = fast_sum_icos_verts[iv2];
-  v3 = fast_sum_icos_verts[iv3];
+  iv1 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][0];
+  iv2 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][1];
+  iv3 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][2];
+  v1 = icos_tree.icosahedron_vertex_coords[iv1];
+  v2 = icos_tree.icosahedron_vertex_coords[iv2];
+  v3 = icos_tree.icosahedron_vertex_coords[iv3];
   for (int i = 0; i < run_information.interp_point_count; i++) {
     u = interp_points[i][0];
     v = interp_points[i][1];
@@ -602,9 +589,7 @@ void cc_vel(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega) {
+    const IcosTree &icos_tree, const double time, const double omega) {
   int iv1, iv2, iv3, iv1s, iv2s, iv3s, point_index;
   std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, v1s,
       v2s, v3s, func_vals(3 * run_information.interp_point_count, 0),
@@ -628,12 +613,12 @@ void cc_vel(
   interp_mat_init(interp_matrix, interp_points, run_information.interp_degree,
                   run_information.interp_point_count);
   dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
-  iv1 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][0];
-  iv2 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][1];
-  iv3 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][2];
-  v1 = fast_sum_icos_verts[iv1];
-  v2 = fast_sum_icos_verts[iv2];
-  v3 = fast_sum_icos_verts[iv3];
+  iv1 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][0];
+  iv2 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][1];
+  iv3 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][2];
+  v1 = icos_tree.icosahedron_vertex_coords[iv1];
+  v2 = icos_tree.icosahedron_vertex_coords[iv2];
+  v3 = icos_tree.icosahedron_vertex_coords[iv3];
   for (int i = 0; i < run_information.interp_point_count;
        i++) { // interpolation points in target triangle
     u = interp_points[i][0];
@@ -649,12 +634,12 @@ void cc_vel(
     curr_points[i] = placeholder1;
   }
 
-  iv1s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][0];
-  iv2s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][1];
-  iv3s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][2];
-  v1s = fast_sum_icos_verts[iv1s];
-  v2s = fast_sum_icos_verts[iv2s];
-  v3s = fast_sum_icos_verts[iv3s];
+  iv1s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][0];
+  iv2s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][1];
+  iv3s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][2];
+  v1s = icos_tree.icosahedron_vertex_coords[iv1s];
+  v2s = icos_tree.icosahedron_vertex_coords[iv2s];
+  v3s = icos_tree.icosahedron_vertex_coords[iv3s];
   for (int i = 0; i < run_information.interp_point_count;
        i++) { // loop across target interpolation points
     for (int j = 0; j < run_information.interp_point_count;
@@ -782,9 +767,7 @@ void pc_stream(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega) {
+    const IcosTree &icos_tree, const double time, const double omega) {
   std::vector<double> v1s, v2s, v3s, target_particle, placeholder1,
       placeholder2, placeholder3, bary_cord, source_particle;
   std::vector<double> func_vals(run_information.interp_point_count, 0);
@@ -803,12 +786,12 @@ void pc_stream(
   interp_mat_init(interp_matrix, interp_points, run_information.interp_degree,
                   run_information.interp_point_count);
   dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
-  iv1s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][0];
-  iv2s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][1];
-  iv3s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][2];
-  v1s = fast_sum_icos_verts[iv1s];
-  v2s = fast_sum_icos_verts[iv2s];
-  v3s = fast_sum_icos_verts[iv3s];
+  iv1s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][0];
+  iv2s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][1];
+  iv3s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][2];
+  v1s = icos_tree.icosahedron_vertex_coords[iv1s];
+  v2s = icos_tree.icosahedron_vertex_coords[iv2s];
+  v3s = icos_tree.icosahedron_vertex_coords[iv3s];
   for (int i = 0; i < interact.count_target; i++) {
     point_index = fast_sum_tree_tri_points_target[interact.lev_target]
                                                  [interact.curr_target][i];
@@ -858,9 +841,7 @@ void cp_stream(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega) {
+    const IcosTree &icos_tree, const double time, const double omega) {
   int iv1, iv2, iv3, point_index;
   std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3,
       source_particle, target_particle, bary_cord;
@@ -883,12 +864,12 @@ void cp_stream(
   if (info > 0) {
     std::cout << info << std::endl;
   }
-  iv1 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][0];
-  iv2 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][1];
-  iv3 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][2];
-  v1 = fast_sum_icos_verts[iv1];
-  v2 = fast_sum_icos_verts[iv2];
-  v3 = fast_sum_icos_verts[iv3];
+  iv1 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][0];
+  iv2 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][1];
+  iv3 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][2];
+  v1 = icos_tree.icosahedron_vertex_coords[iv1];
+  v2 = icos_tree.icosahedron_vertex_coords[iv2];
+  v3 = icos_tree.icosahedron_vertex_coords[iv3];
   for (int i = 0; i < run_information.interp_point_count; i++) {
     u = interp_points[i][0];
     v = interp_points[i][1];
@@ -941,9 +922,7 @@ void cc_stream(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega) {
+    const IcosTree &icos_tree, const double time, const double omega) {
   int iv1, iv2, iv3, iv1s, iv2s, iv3s, point_index;
   std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, v1s,
       v2s, v3s, func_vals(run_information.interp_point_count, 0);
@@ -964,12 +943,12 @@ void cc_stream(
   interp_mat_init(interp_matrix, interp_points, run_information.interp_degree,
                   run_information.interp_point_count);
   dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
-  iv1 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][0];
-  iv2 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][1];
-  iv3 = fast_sum_icos_tri_verts[interact.lev_target][interact.curr_target][2];
-  v1 = fast_sum_icos_verts[iv1];
-  v2 = fast_sum_icos_verts[iv2];
-  v3 = fast_sum_icos_verts[iv3];
+  iv1 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][0];
+  iv2 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][1];
+  iv3 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][2];
+  v1 = icos_tree.icosahedron_vertex_coords[iv1];
+  v2 = icos_tree.icosahedron_vertex_coords[iv2];
+  v3 = icos_tree.icosahedron_vertex_coords[iv3];
   for (int i = 0; i < run_information.interp_point_count;
        i++) { // interpolation points in target triangle
     u = interp_points[i][0];
@@ -985,12 +964,12 @@ void cc_stream(
     curr_points[i] = placeholder1;
   }
 
-  iv1s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][0];
-  iv2s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][1];
-  iv3s = fast_sum_icos_tri_verts[interact.lev_source][interact.curr_source][2];
-  v1s = fast_sum_icos_verts[iv1s];
-  v2s = fast_sum_icos_verts[iv2s];
-  v3s = fast_sum_icos_verts[iv3s];
+  iv1s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][0];
+  iv2s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][1];
+  iv3s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][2];
+  v1s = icos_tree.icosahedron_vertex_coords[iv1s];
+  v2s = icos_tree.icosahedron_vertex_coords[iv2s];
+  v3s = icos_tree.icosahedron_vertex_coords[iv3s];
 
   for (int i = 0; i < run_information.interp_point_count;
        i++) { // loop across target interpolation points

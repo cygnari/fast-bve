@@ -107,14 +107,13 @@ int main(int argc, char **argv) {
     }
   }
 
+  IcosTree icos_tree;
   if (run_information.use_fast) {
-    fast_sum_icos_init(run_information, fast_sum_icos_verts,
-                       fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
-    points_assign(run_information, dynamics_state, fast_sum_icos_verts,
-                  fast_sum_icos_tri_verts, fast_sum_tree_tri_points,
+    fast_sum_icos_init(run_information, icos_tree);
+    points_assign(run_information, dynamics_state, icos_tree, fast_sum_tree_tri_points,
                   fast_sum_tree_point_locs);
     tree_traverse(run_information, fast_sum_tree_tri_points,
-                  fast_sum_tree_tri_points, fast_sum_icos_tri_info,
+                  fast_sum_tree_tri_points, icos_tree,
                   fast_sum_tree_interactions, dt_interaction);
   }
 
@@ -208,8 +207,7 @@ int main(int argc, char **argv) {
 
   rhs_func(run_information, c_1, dynamics_state, dynamics_state, dynamics_areas,
            fast_sum_tree_interactions, fast_sum_tree_tri_points,
-           fast_sum_tree_tri_points, fast_sum_icos_tri_verts,
-           fast_sum_icos_verts, curr_time, omega);
+           fast_sum_tree_tri_points, icos_tree, curr_time, omega);
   sync_updates<double>(run_information, c_1, P, ID, &win_c1, MPI_DOUBLE);
 
   if (ID == 0) {

@@ -127,21 +127,22 @@ int main(int argc, char **argv) {
                target_mass, omega);
   }
 
-  // if (ID == 0) {
-  //     t1 = chrono::steady_clock::now();
-  // }
+  IcosTree icos_tree;
+
+  if (ID == 0) {
+      t1 = std::chrono::steady_clock::now();
+  }
 
   if (run_information.use_fast) {
-    fast_sum_icos_init(run_information, fast_sum_icos_verts,
-                       fast_sum_icos_tri_info, fast_sum_icos_tri_verts);
-    // if (ID == 0) {
-    //     t2 = chrono::steady_clock::now();
-    //     cout << "icos setup time: " <<
-    //     chrono::duration_cast<chrono::microseconds>(t2 - t1).count() << "
-    //     microseconds" << endl; t1 = chrono::steady_clock::now();
-    // }
-    points_assign(run_information, dynamics_state, fast_sum_icos_verts,
-                  fast_sum_icos_tri_verts, fast_sum_tree_tri_points,
+    fast_sum_icos_init(run_information, icos_tree);
+    if (ID == 0) {
+        t2 = std::chrono::steady_clock::now();
+        std::cout << "icos setup time: " <<
+        std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() <<
+        " microseconds" << std::endl;
+        // t1 = chrono::steady_clock::now();
+    }
+    points_assign(run_information, dynamics_state, icos_tree, fast_sum_tree_tri_points,
                   fast_sum_tree_point_locs);
     // if (ID == 0) {
     //     t2 = chrono::steady_clock::now();
@@ -150,7 +151,7 @@ int main(int argc, char **argv) {
     //     microseconds" << endl; t1 = chrono::steady_clock::now();
     // }
     tree_traverse(run_information, fast_sum_tree_tri_points,
-                  fast_sum_tree_tri_points, fast_sum_icos_tri_info,
+                  fast_sum_tree_tri_points, icos_tree,
                   fast_sum_tree_interactions, dt_interaction);
     // if (ID == 0) {
     //     t2 = chrono::steady_clock::now();
@@ -188,7 +189,7 @@ int main(int argc, char **argv) {
     convolve_stream(run_information, stream_func, dynamics_state,
                     dynamics_state, dynamics_areas, fast_sum_tree_interactions,
                     fast_sum_tree_tri_points, fast_sum_tree_tri_points,
-                    fast_sum_icos_tri_verts, fast_sum_icos_verts, 0, omega);
+                    icos_tree, 0, omega);
     sync_updates<double>(run_information, stream_func, P, ID, &win_stream,
                          MPI_DOUBLE);
     // sync_updates(run_information, stream_func, P, ID, &win_stream);
@@ -318,11 +319,10 @@ int main(int argc, char **argv) {
         fast_sum_tree_tri_points.clear();
         fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
         fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
-        points_assign(run_information, dynamics_state, fast_sum_icos_verts,
-                      fast_sum_icos_tri_verts, fast_sum_tree_tri_points,
-                      fast_sum_tree_point_locs);
+        points_assign(run_information, dynamics_state, icos_tree,
+                      fast_sum_tree_tri_points, fast_sum_tree_point_locs);
         tree_traverse(run_information, fast_sum_tree_tri_points,
-                      fast_sum_tree_tri_points, fast_sum_icos_tri_info,
+                      fast_sum_tree_tri_points, icos_tree,
                       fast_sum_tree_interactions, dt_interaction);
       }
     }
@@ -344,8 +344,7 @@ int main(int argc, char **argv) {
     rhs_func(run_information, c_1, dynamics_state, dynamics_state,
              dynamics_areas, fast_sum_tree_interactions,
              fast_sum_tree_tri_points, fast_sum_tree_tri_points,
-             fast_sum_icos_tri_verts, fast_sum_icos_verts, curr_time,
-             omega); // RK4 k_1
+             icos_tree, curr_time, omega); // RK4 k_1
     sync_updates<double>(run_information, c_1, P, ID, &win_c1, MPI_DOUBLE);
     // sync_updates(run_information, c_1, P, ID, &win_c1);
     inter_state = c_1;                                       // k_1
@@ -356,8 +355,7 @@ int main(int argc, char **argv) {
 
     rhs_func(run_information, c_2, inter_state, inter_state, dynamics_areas,
              fast_sum_tree_interactions, fast_sum_tree_tri_points,
-             fast_sum_tree_tri_points, fast_sum_icos_tri_verts,
-             fast_sum_icos_verts, curr_time, omega); // RK4 k_2
+             fast_sum_tree_tri_points, icos_tree, curr_time, omega); // RK4 k_2
     sync_updates<double>(run_information, c_2, P, ID, &win_c2, MPI_DOUBLE);
     // sync_updates(run_information, c_2, P, ID, &win_c2);
     inter_state = c_2;                                       // k_2
@@ -368,8 +366,7 @@ int main(int argc, char **argv) {
 
     rhs_func(run_information, c_3, inter_state, inter_state, dynamics_areas,
              fast_sum_tree_interactions, fast_sum_tree_tri_points,
-             fast_sum_tree_tri_points, fast_sum_icos_tri_verts,
-             fast_sum_icos_verts, curr_time, omega); // RK4 k_3
+             fast_sum_tree_tri_points, icos_tree, curr_time, omega); // RK4 k_3
     sync_updates<double>(run_information, c_3, P, ID, &win_c3, MPI_DOUBLE);
     // sync_updates(run_information, c_3, P, ID, &win_c3);
     inter_state = c_3;                                 // k_3
@@ -380,8 +377,7 @@ int main(int argc, char **argv) {
 
     rhs_func(run_information, c_4, inter_state, inter_state, dynamics_areas,
              fast_sum_tree_interactions, fast_sum_tree_tri_points,
-             fast_sum_tree_tri_points, fast_sum_icos_tri_verts,
-             fast_sum_icos_verts, curr_time, omega); // RK4 k_4
+             fast_sum_tree_tri_points, icos_tree, curr_time, omega); // RK4 k_4
     sync_updates<double>(run_information, c_4, P, ID, &win_c4, MPI_DOUBLE);
     // sync_updates(run_information, c_4, P, ID, &win_c4);
 
@@ -418,18 +414,16 @@ int main(int argc, char **argv) {
         fast_sum_tree_tri_points.clear();
         fast_sum_tree_tri_points.resize(run_information.fast_sum_tree_levels);
         fast_sum_tree_point_locs.resize(run_information.fast_sum_tree_levels);
-        points_assign(run_information, inter_state, fast_sum_icos_verts,
-                      fast_sum_icos_tri_verts, fast_sum_tree_tri_points,
-                      fast_sum_tree_point_locs);
+        points_assign(run_information, inter_state, icos_tree,
+                      fast_sum_tree_tri_points, fast_sum_tree_point_locs);
         tree_traverse(run_information, fast_sum_tree_tri_points,
-                      fast_sum_tree_tri_points, fast_sum_icos_tri_info,
+                      fast_sum_tree_tri_points, icos_tree,
                       fast_sum_tree_interactions, dt_interaction);
       }
       convolve_stream(run_information, stream_func, dynamics_state,
                       dynamics_state, dynamics_areas,
                       fast_sum_tree_interactions, fast_sum_tree_tri_points,
-                      fast_sum_tree_tri_points, fast_sum_icos_tri_verts,
-                      fast_sum_icos_verts, curr_time, omega);
+                      fast_sum_tree_tri_points, icos_tree, curr_time, omega);
       sync_updates<double>(run_information, stream_func, P, ID, &win_stream,
                            MPI_DOUBLE);
       // sync_updates(run_information, stream_func, P, ID, &win_stream);

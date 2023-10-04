@@ -30,9 +30,6 @@ void fixer_init(const RunConfig &run_information,
                 std::vector<double> &target_mass, const double omega);
 
 void fast_sum_icos_init(
-    const RunConfig &run_information,
-    std::vector<std::vector<double>> &fast_sum_icos_verts,
-    std::vector<std::vector<std::vector<double>>> &fast_sum_icos_tri_info,
-    std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts);
+    const RunConfig &run_information, IcosTree &icos_tree);
 
 #endif

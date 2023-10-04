@@ -7,9 +7,7 @@
 
 void point_assign(
     const RunConfig &run_information, const std::vector<double> &point,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
+    const IcosTree &icos_tree, std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
     std::vector<std::vector<int>> &fast_sum_tree_point_locs,
     const int point_id);
 
@@ -20,9 +18,7 @@ void point_assign(
 
 void points_assign(
     const RunConfig &run_information, const std::vector<double> &dynamics_state,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
+    const IcosTree &icos_tree, std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
     std::vector<std::vector<int>> &fast_sum_tree_point_locs);
 
 // void points_find_tris(RunConfig& run_information, vector<double>&
@@ -42,8 +38,7 @@ void tree_traverse(
         &fast_sum_tree_tri_points_source,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_target,
-    const std::vector<std::vector<std::vector<double>>> &fast_sum_icos_tri_info,
-    std::vector<InteractionPair> &tree_interactions,
+    const IcosTree &icos_tree, std::vector<InteractionPair> &tree_interactions,
     MPI_Datatype dt_interaction);
 
 void pp_vel(const RunConfig &run_information, std::vector<double> &modify,
@@ -64,9 +59,7 @@ void pc_vel(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega);
+    const IcosTree &icos_tree, const double time, const double omega);
 
 void cp_vel(
     const RunConfig &run_information, std::vector<double> &modify,
@@ -76,9 +69,7 @@ void cp_vel(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega);
+    const IcosTree &icos_tree, const double time, const double omega);
 
 void cc_vel(
     const RunConfig &run_information, std::vector<double> &modify,
@@ -88,9 +79,7 @@ void cc_vel(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega);
+    const IcosTree &icos_tree, const double time, const double omega);
 
 void pp_stream(const RunConfig &run_information, std::vector<double> &modify,
                const std::vector<double> &targets,
@@ -110,9 +99,7 @@ void pc_stream(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega);
+    const IcosTree &icos_tree, const double time, const double omega);
 
 void cp_stream(
     const RunConfig &run_information, std::vector<double> &modify,
@@ -122,9 +109,7 @@ void cp_stream(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega);
+    const IcosTree &icos_tree, const double time, const double omega);
 
 void cc_stream(
     const RunConfig &run_information, std::vector<double> &modify,
@@ -134,8 +119,6 @@ void cc_stream(
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>> &fast_sum_icos_tri_verts,
-    const std::vector<std::vector<double>> &fast_sum_icos_verts,
-    const double time, const double omega);
+    const IcosTree &icos_tree, const double time, const double omega);
 
 #endif

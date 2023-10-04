@@ -3,8 +3,6 @@
 
 #include <string>
 
-using namespace std;
-
 struct run_config {
     // primitive configuration options
     bool use_amr = false;
@@ -15,7 +13,7 @@ struct run_config {
     bool vor_limiter = false;
     bool bltc = false;
     bool same_source_targets = true;
-    string out_path; // ../run-output/ locally, on Derecho, /glade/derecho/scratch/achen/bve/
+    std::string out_path; // ../run-output/ locally, on Derecho, /glade/derecho/scratch/achen/bve/
     int write_precision = 6; // number of decimal places, 6 for data visualization, 16 for error testing
     bool write_output = false;
     bool write_tris = false;
@@ -25,8 +23,8 @@ struct run_config {
     double delta_t; // time step size
     int dynamics_levels_min; // initial icosahedron refinement levels, 0 = base icosahedron
     int dynamics_levels_max; // max icosahedron refinement if using amr
-    string initial_vor_condition; // initial vorticity distribution
-    string vor_forcing; // vorticity forcing, if there is one
+    std::string initial_vor_condition; // initial vorticity distribution
+    std::string vor_forcing; // vorticity forcing, if there is one
     int init_cond_param1; // parameter for initial condition
     double init_cond_param2; // parameter for initial condition
     // for RH, ICP1 is wavenumber, ICP2 is wave speed, default ICP1 = 4, ICP2 = 0

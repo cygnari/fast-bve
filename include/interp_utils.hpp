@@ -4,21 +4,19 @@
 #include "structs.hpp"
 #include <vector>
 
-using namespace std;
+void fekete_init(std::vector<std::vector<double>>& points, const int degree);
 
-void fekete_init(vector<vector<double>>& points, const int degree);
+void interp_mat_init(std::vector<double>& mat, const std::vector<std::vector<double>>& points, const int degree, const int point_count);
 
-void interp_mat_init(vector<double>& mat, const vector<vector<double>>& points, const int degree, const int point_count);
+double interp_eval(const std::vector<double>& alphas, const double s, const double t, const int degree);
 
-double interp_eval(const vector<double>& alphas, const double s, const double t, const int degree);
+std::vector<double> bilinear_interp(const run_config& run_information, const std::vector<double>& target_point,
+        const int iv1, const int iv2, const int iv3, const std::vector<double>& dynamics_state);
 
-vector<double> bilinear_interp(const run_config& run_information, const vector<double>& target_point,
-        const int iv1, const int iv2, const int iv3, const vector<double>& dynamics_state);
+std::vector<double> biquadratic_interp(const run_config& run_information, const std::vector<double>& target_point, const int iv1, const int iv2,
+        const int iv3, const int iv4, const int iv5, const int iv6, const std::vector<double>& dynamics_state);
 
-vector<double> biquadratic_interp(const run_config& run_information, const vector<double>& target_point, const int iv1, const int iv2,
-        const int iv3, const int iv4, const int iv5, const int iv6, const vector<double>& dynamics_state);
-
-void remesh_points(const run_config& run_information, vector<double>& target_points, const vector<double>& dynamics_state,
-        const vector<vector<vector<int>>>& dynamics_triangles, const vector<vector<bool>>& dynamics_triangles_is_leaf, const int point_count, const double omega);
+void remesh_points(const run_config& run_information, std::vector<double>& target_points, const std::vector<double>& dynamics_state,
+        const std::vector<std::vector<std::vector<int>>>& dynamics_triangles, const std::vector<std::vector<bool>>& dynamics_triangles_is_leaf, const int point_count, const double omega);
 
 #endif

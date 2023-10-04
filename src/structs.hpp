@@ -74,7 +74,7 @@ struct RunConfig {
     int target_own;
 };
 
-struct interaction_pair {
+struct InteractionPair {
     int lev_target; //icosahedron level of target/source
     int lev_source;
     int curr_target; // index of target/source

@@ -127,7 +127,7 @@ void points_assign(const RunConfig& run_information, const std::vector<double>& 
 
 void tree_traverse(const RunConfig& run_information, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source,
         const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target, const std::vector<std::vector<std::vector<double>>>& fast_sum_icos_tri_info,
-        std::vector<interaction_pair>& tree_interactions, MPI_Datatype dt_interaction) {
+        std::vector<InteractionPair>& tree_interactions, MPI_Datatype dt_interaction) {
     // determines {C,P}-{C,P} interactions
     int curr_source, curr_target, lev_target, lev_source;
     int particle_count_target, particle_count_source;
@@ -136,7 +136,7 @@ void tree_traverse(const RunConfig& run_information, const std::vector<std::vect
     std::vector<std::vector<int>> tri_interactions;
     std::vector<int> curr_interact (4, 0);
 
-    std::vector<interaction_pair> own_interactions;
+    std::vector<InteractionPair> own_interactions;
 
     int out_lb, out_ub, in_lb, in_ub;
     int P = run_information.mpi_P;
@@ -215,7 +215,7 @@ void tree_traverse(const RunConfig& run_information, const std::vector<std::vect
         separation = (fast_sum_icos_tri_info[lev_target][curr_target][3] + fast_sum_icos_tri_info[lev_source][curr_source][3]) / distance;
 
         if ((distance > 0) and (separation < run_information.fast_sum_theta)) { // triangles are well separated
-            interaction_pair new_interact = {lev_target, lev_source, curr_target, curr_source, particle_count_target, particle_count_source, 0};
+            InteractionPair new_interact = {lev_target, lev_source, curr_target, curr_source, particle_count_target, particle_count_source, 0};
             if (particle_count_target > run_information.fast_sum_cluster_thresh) {
                 new_interact.type += 1;
             }
@@ -225,10 +225,10 @@ void tree_traverse(const RunConfig& run_information, const std::vector<std::vect
             own_interactions.push_back(new_interact);
         } else {
             if ((particle_count_target < run_information.fast_sum_cluster_thresh) and (particle_count_source < run_information.fast_sum_cluster_thresh)) { // both have few particles, pp
-                interaction_pair new_interact = {lev_target, lev_source, curr_target, curr_source, particle_count_target, particle_count_source, 0};
+                InteractionPair new_interact = {lev_target, lev_source, curr_target, curr_source, particle_count_target, particle_count_source, 0};
                 own_interactions.push_back(new_interact);
             } else if ((lev_target == run_information.fast_sum_tree_levels - 1) and (lev_source == run_information.fast_sum_tree_levels - 1)) { // both are leaves, pp
-                interaction_pair new_interact = {lev_target, lev_source, curr_target, curr_source, particle_count_target, particle_count_source, 0};
+                InteractionPair new_interact = {lev_target, lev_source, curr_target, curr_source, particle_count_target, particle_count_source, 0};
                 own_interactions.push_back(new_interact);
             } else if (lev_target == run_information.fast_sum_tree_levels - 1) { // target is leaf, tree traverse source
                 tri_interactions.push_back(std::vector<int> {curr_target, 4 * curr_source, lev_target, lev_source + 1});
@@ -277,7 +277,7 @@ void tree_traverse(const RunConfig& run_information, const std::vector<std::vect
 }
 
 void pp_vel(const RunConfig& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
-        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<double>& area, const InteractionPair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
         const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const double time, const double omega) {
     // particle particle interaction
     int target_i, source_j;
@@ -305,7 +305,7 @@ void pp_vel(const RunConfig& run_information, std::vector<double>& modify, const
 }
 
 void pc_vel(const RunConfig& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
-        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<double>& area, const InteractionPair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
         const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
         const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     std::vector<double> v1s, v2s, v3s, target_particle, placeholder1, placeholder2, placeholder3, bary_cord, source_particle;
@@ -370,7 +370,7 @@ void pc_vel(const RunConfig& run_information, std::vector<double>& modify, const
 }
 
 void cp_vel(const RunConfig& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
-        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<double>& area, const InteractionPair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
         const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
         const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     int iv1, iv2, iv3, point_index;
@@ -445,7 +445,7 @@ void cp_vel(const RunConfig& run_information, std::vector<double>& modify, const
 }
 
 void cc_vel(const RunConfig& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
-        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<double>& area, const InteractionPair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
         const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
         const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     int iv1, iv2, iv3, iv1s, iv2s, iv3s, point_index;
@@ -551,7 +551,7 @@ void cc_vel(const RunConfig& run_information, std::vector<double>& modify, const
 }
 
 void pp_stream(const RunConfig& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
-        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<double>& area, const InteractionPair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
         const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const double time, const double omega) {
     // particle particle interaction
     int target_i, source_j;
@@ -575,7 +575,7 @@ void pp_stream(const RunConfig& run_information, std::vector<double>& modify, co
 }
 
 void pc_stream(const RunConfig& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
-        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<double>& area, const InteractionPair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
         const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
         const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     std::vector<double> v1s, v2s, v3s, target_particle, placeholder1, placeholder2, placeholder3, bary_cord, source_particle;
@@ -632,7 +632,7 @@ void pc_stream(const RunConfig& run_information, std::vector<double>& modify, co
 }
 
 void cp_stream(const RunConfig& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
-        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<double>& area, const InteractionPair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
         const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
         const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     int iv1, iv2, iv3, point_index;
@@ -696,7 +696,7 @@ void cp_stream(const RunConfig& run_information, std::vector<double>& modify, co
 }
 
 void cc_stream(const RunConfig& run_information, std::vector<double>& modify, const std::vector<double>& targets, const std::vector<double>& curr_state,
-        const std::vector<double>& area, const interaction_pair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
+        const std::vector<double>& area, const InteractionPair& interact, const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_target,
         const std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points_source, const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
         const std::vector<std::vector<double>>& fast_sum_icos_verts, const double time, const double omega) {
     int iv1, iv2, iv3, iv1s, iv2s, iv3s, point_index;

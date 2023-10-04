@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     std::vector<std::vector<int>> fast_sum_tree_point_locs (run_information.fast_sum_tree_levels); // triangle each point is in
     // vector<vector<vector<int>>> fast_sum_tree_tri_points_target (run_information.fast_sum_tree_levels); // points inside each triangle
     // vector<vector<int>> fast_sum_tree_point_locs_target (run_information.fast_sum_tree_levels); // triangle each point is in
-    std::vector<interaction_pair> fast_sum_tree_interactions; // c/p - c/p interactions
+    std::vector<InteractionPair> fast_sum_tree_interactions; // c/p - c/p interactions
 
     std::vector<double> qmins; // min value for absolute vorticity + each tracer
     std::vector<double> qmaxs; // max values for absolute vorticity + each tracer

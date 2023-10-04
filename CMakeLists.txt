@@ -9,12 +9,7 @@ set(default_build_type "Release")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-if (BUILD_TYPE EQUAL Release)
-  add_compile_options(-O0)
-else ()
-  add_compile_options(-g)
-endif()
+set(CMAKE_CXX_FLAGS_RELEASE -O3)
 
 printvar(BUILD_TYPE)
 

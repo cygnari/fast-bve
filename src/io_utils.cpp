@@ -1,6 +1,9 @@
 #include <fstream>
 #include <sstream>
 #include "structs.hpp"
+#include <iomanip>
+#include <cmath>
+#include <vector>
 
 void write_state(const run_config& run_information, const std::vector<double>& dynamics_state, const std::vector<double>& dynamics_area, std::ofstream& file_writer1, std::ofstream& file_writer2) {
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) { // write out initial state

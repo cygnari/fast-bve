@@ -2,6 +2,7 @@
 #include <sstream>
 #include "structs.hpp"
 #include <iostream>
+#include <cmath>
 
 void read_run_config(const std::string file_name, run_config& run_information) {
     // reads run information of file_name

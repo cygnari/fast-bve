@@ -282,7 +282,7 @@ int check_point_exist(const std::vector<std::vector<int>>& parent_points, const 
 
 int check_point_exist2(const std::vector<double>& state, const std::vector<double>& target_point, const int point_count, const double tol, const int info_per_point) {
     for (int i = 0; i < point_count; i++) {
-        if ((abs(state[i * info_per_point] - target_point[0]) < tol) and (abs(state[i * info_per_point + 1] - target_point[1]) < tol) and (abs(state[i * info_per_point + 2] - target_point[2]) < tol)) {
+        if ((std::abs(state[i * info_per_point] - target_point[0]) < tol) and (std::abs(state[i * info_per_point + 1] - target_point[1]) < tol) and (std::abs(state[i * info_per_point + 2] - target_point[2]) < tol)) {
             return i;
         }
     }

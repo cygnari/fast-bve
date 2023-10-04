@@ -3,7 +3,7 @@
 
 #include <string>
 
-struct run_config {
+struct RunConfig {
     // primitive configuration options
     bool use_amr = false;
     bool use_remesh = false;

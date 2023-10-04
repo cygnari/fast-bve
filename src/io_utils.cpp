@@ -5,7 +5,7 @@
 #include <cmath>
 #include <vector>
 
-void write_state(const run_config& run_information, const std::vector<double>& dynamics_state, const std::vector<double>& dynamics_area, std::ofstream& file_writer1, std::ofstream& file_writer2) {
+void write_state(const RunConfig& run_information, const std::vector<double>& dynamics_state, const std::vector<double>& dynamics_area, std::ofstream& file_writer1, std::ofstream& file_writer2) {
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) { // write out initial state
         for (int j = 0; j < run_information.info_per_point; j++) {
             file_writer1 << std::setprecision(run_information.write_precision) << dynamics_state[run_information.info_per_point * i + j] << ",";
@@ -15,11 +15,11 @@ void write_state(const run_config& run_information, const std::vector<double>& d
     file_writer2 << run_information.dynamics_curr_point_count << "\n";
 }
 
-// void write_vec(run_config& run_information, vector<double>& vec_to_write, vector<double>& dynamics_area, ofstream& file_writer, int vec_per_row) {
+// void write_vec(RunConfig& run_information, vector<double>& vec_to_write, vector<double>& dynamics_area, ofstream& file_writer, int vec_per_row) {
 //
 // }
 
-void write_triangles(const run_config& run_information, const std::vector<std::vector<std::vector<int>>>& dynamics_triangles,
+void write_triangles(const RunConfig& run_information, const std::vector<std::vector<std::vector<int>>>& dynamics_triangles,
             const std::vector<std::vector<bool>>& dynamics_triangles_is_leaf, std::ofstream& file_writer3, std::ofstream& file_writer4) {
     for (int i = 0; i < run_information.dynamics_levels_max; i++) {
         for (int j = 0; j < 20 * pow(4, i); j++) {
@@ -34,7 +34,7 @@ void write_triangles(const run_config& run_information, const std::vector<std::v
     file_writer4 << run_information.dynamics_curr_tri_count << "\n";
 }
 
-std::string create_config(const run_config& run_information) {
+std::string create_config(const RunConfig& run_information) {
     std::stringstream ss1, ss2, ss3;
     int precision;
     std::string output_filename = std::to_string(run_information.dynamics_initial_points) + "_" + run_information.initial_vor_condition + "_";

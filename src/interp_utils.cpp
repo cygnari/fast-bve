@@ -58,7 +58,7 @@ double interp_eval(const std::vector<double>& alphas, const double s, const doub
     return accum;
 }
 
-std::vector<double> bilinear_interp(const run_config& run_information, const std::vector<double>& target_point,
+std::vector<double> bilinear_interp(const RunConfig& run_information, const std::vector<double>& target_point,
         const int iv1, const int iv2, const int iv3, const std::vector<double>& dynamics_state) {
     std::vector<double> v1, v2, v3, bary_cords, out;
 
@@ -78,7 +78,7 @@ std::vector<double> bilinear_interp(const run_config& run_information, const std
     return out;
 }
 
-std::vector<double> biquadratic_interp(const run_config& run_information, const std::vector<double>& target_point, const int iv1, const int iv2,
+std::vector<double> biquadratic_interp(const RunConfig& run_information, const std::vector<double>& target_point, const int iv1, const int iv2,
         const int iv3, const int iv4, const int iv5, const int iv6, const std::vector<double>& dynamics_state) {
 
     std::vector<double> v1, v2, v3, v4, v5, v6, curr_alphas, bary_cords;
@@ -142,7 +142,7 @@ std::vector<double> biquadratic_interp(const run_config& run_information, const 
     return output_values;
 }
 
-void remesh_points(const run_config& run_information, std::vector<double>& target_points, const std::vector<double>& dynamics_state,
+void remesh_points(const RunConfig& run_information, std::vector<double>& target_points, const std::vector<double>& dynamics_state,
         const std::vector<std::vector<std::vector<int>>>& dynamics_triangles, const std::vector<std::vector<bool>>& dynamics_triangles_is_leaf, const int point_count, const double omega) {
     // remesh points back to regular point distribution
     std::vector<double> curr_target;

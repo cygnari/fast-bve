@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cmath>
 
-void read_run_config(const std::string file_name, run_config& run_information) {
+void read_run_config(const std::string file_name, RunConfig& run_information) {
     // reads run information of file_name
     std::ifstream config_file(file_name);
     std::string line, word1, word2;

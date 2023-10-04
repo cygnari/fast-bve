@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     MPI_Type_contiguous(7, MPI_INT, &dt_interaction);
     MPI_Type_commit(&dt_interaction);
 
-    run_config run_information;
+    RunConfig run_information;
     read_run_config("namelist.txt", run_information); // reads in run configuration information
     run_information.mpi_P = P;
     run_information.mpi_ID = ID;

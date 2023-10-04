@@ -2,7 +2,7 @@
 #include "structs.hpp"
 #include <cmath>
 
-void rossby_haurwitz(const run_config& run_information, std::vector<double>& dynamics_state, const double omega) {
+void rossby_haurwitz(const RunConfig& run_information, std::vector<double>& dynamics_state, const double omega) {
     std::vector<double> curr_pos, latlon;
     double lat, lon;
     int deg = run_information.init_cond_param1;
@@ -16,7 +16,7 @@ void rossby_haurwitz(const run_config& run_information, std::vector<double>& dyn
     }
 }
 
-void gauss_vortex(const run_config& run_information, std::vector<double>& dynamics_state) {
+void gauss_vortex(const RunConfig& run_information, std::vector<double>& dynamics_state) {
     std::vector<double> curr_pos, latlon, p1;
     double lat, dist;
     double center_lat = run_information.init_cond_param2 * M_PI;
@@ -32,7 +32,7 @@ void gauss_vortex(const run_config& run_information, std::vector<double>& dynami
     }
 }
 
-void rankine_vortex(const run_config& run_information, std::vector<double>& dynamics_state) {
+void rankine_vortex(const RunConfig& run_information, std::vector<double>& dynamics_state) {
     std::vector<double> curr_pos, latlon, p1;
     double lat, dist, val;
     double center_lat = run_information.init_cond_param2 * M_PI;
@@ -55,7 +55,7 @@ void rankine_vortex(const run_config& run_information, std::vector<double>& dyna
     }
 }
 
-void polar_vortex(const run_config& run_information, std::vector<double>& dynamics_state) {
+void polar_vortex(const RunConfig& run_information, std::vector<double>& dynamics_state) {
     std::vector<double> curr_pos, latlon;
     double theta0 = 15.0 * M_PI / 32.0, beta = 1.5;
     double lat, vor;
@@ -104,7 +104,7 @@ double ssw_blend(const std::vector<double>& curr_pos, const double time, const d
     }
 }
 
-double vor_force_func(const run_config& run_information, const std::vector<double>& curr_pos, const double time, const double omega) {
+double vor_force_func(const RunConfig& run_information, const std::vector<double>& curr_pos, const double time, const double omega) {
     if (run_information.vor_forcing == "ssw") {
         return ssw_force(curr_pos, time, omega, run_information.forcing_param1, run_information.forcing_param2);
     } else if (run_information.vor_forcing == "ssw_blend") {

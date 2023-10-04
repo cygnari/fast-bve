@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-void clip_assured_sum(const run_config& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const double qmin, const double qmax, const double target_mass, const int target_species) {
+void clip_assured_sum(const RunConfig& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const double qmin, const double qmax, const double target_mass, const int target_species) {
     // CAAS as described in Bradley et al 2019
     double capacity = 0, prelim_mass = 0;
     std::vector<double> prelim_values (run_information.dynamics_curr_point_count, 0);
@@ -36,7 +36,7 @@ void clip_assured_sum(const run_config& run_information, std::vector<double>& dy
     }
 }
 
-void vorticity_fix(const run_config& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const double qmin, const double qmax, const double omega) {
+void vorticity_fix(const RunConfig& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const double qmin, const double qmax, const double omega) {
     double capacity = 0, prelim_total = 0, rel_vor, abs_vor;
     std::vector<double> prelim_rel_vor (run_information.dynamics_curr_point_count, 0);
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
@@ -49,7 +49,7 @@ void vorticity_fix(const run_config& run_information, std::vector<double>& dynam
     }
 }
 
-void vorticity_fix_limiter(const run_config& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const double qmin, const double qmax, const double omega) {
+void vorticity_fix_limiter(const RunConfig& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const double qmin, const double qmax, const double omega) {
     double capacity = 0, prelim_total = 0, rel_vor, abs_vor;
     std::vector<double> prelim_abs_vor (run_information.dynamics_curr_point_count, 0);
 
@@ -89,7 +89,7 @@ void vorticity_fix_limiter(const run_config& run_information, std::vector<double
     }
 }
 
-void reconstruct_safely(const run_config& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const double qmin, const double qmax, const double target_mass, const int target_species) {
+void reconstruct_safely(const RunConfig& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const double qmin, const double qmax, const double target_mass, const int target_species) {
     // wraps caas and checks feasibility
     double lower_possible, upper_possible;
     lower_possible = 4 * M_PI * qmin;
@@ -101,7 +101,7 @@ void reconstruct_safely(const run_config& run_information, std::vector<double>& 
     }
 }
 
-void enforce_conservation(const run_config& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const std::vector<double>& qmins, const std::vector<double>& qmaxs, const std::vector<double>& target_mass, const double omega) {
+void enforce_conservation(const RunConfig& run_information, std::vector<double>& dynamics_state, const std::vector<double>& dynamics_areas, const std::vector<double>& qmins, const std::vector<double>& qmaxs, const std::vector<double>& target_mass, const double omega) {
     for (int i = 0; i < run_information.tracer_count; i++) {
         reconstruct_safely(run_information, dynamics_state, dynamics_areas, qmins[i + 1], qmaxs[i + 1], target_mass[i + 1], i);
     }

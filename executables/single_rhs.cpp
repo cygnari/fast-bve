@@ -2,6 +2,8 @@
 #include <mpi.h>
 #include <cstdio>
 #include <iostream>
+#include <cmath>
+#include <iomanip>
 
 #include "../src/general_utils.hpp"
 #include "../src/interp_utils.hpp"

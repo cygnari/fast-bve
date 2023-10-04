@@ -17,7 +17,6 @@
 *.ipynb
 !namelist.txt
 *.o
-!makefile
 *.so
 !*CMakeLists.txt
-*./build/*
+*/build/*

@@ -4,6 +4,6 @@
 #include "structs.hpp"
 #include <vector>
 
-void read_run_config(const std::string file_name, run_config& run_information);
+void read_run_config(const std::string file_name, RunConfig &run_information);
 
 #endif

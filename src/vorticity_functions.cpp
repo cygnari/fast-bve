@@ -1,5 +1,6 @@
 #include "general_utils.hpp"
 #include "structs.hpp"
+#include <cmath>
 
 void rossby_haurwitz(const run_config& run_information, std::vector<double>& dynamics_state, const double omega) {
     std::vector<double> curr_pos, latlon;

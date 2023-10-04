@@ -1,6 +1,8 @@
 #include "general_utils.hpp"
 #include "structs.hpp"
 #include <iostream>
+#include <tuple>
+#include <cmath>
 
 extern "C" { // lapack
     extern int dgesv_(int*,int*,double*,int*,int*,double*,int*,int*);

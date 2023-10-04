@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cassert>
 #include <mpi.h>
+#include <cmath>
 #define assertm(exp, msg) assert(((void)msg, exp))
 
 extern "C" { // lapack

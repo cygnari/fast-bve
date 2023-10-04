@@ -10,7 +10,13 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-printvar(PROJECT_SOURCE_DIR)
+if (BUILD_TYPE EQUAL Release)
+  add_compile_options(-O0)
+else ()
+  add_compile_options(-g)
+endif()
+
+printvar(BUILD_TYPE)
 
 find_package(MPI REQUIRED COMPONENTS C)
 find_package(LAPACK REQUIRED)

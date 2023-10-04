@@ -3,7 +3,7 @@
 #include "vorticity_functions.hpp"
 #include <cmath>
 #include <vector>
-#include <limits>
+#include <limits.h>
 
 void dynamics_points_initialize(run_config& run_information, std::vector<double>& dynamics_state,
         std::vector<std::vector<std::vector<int>>>& dynamics_triangles, std::vector<std::vector<bool>>& dynamics_triangles_is_leaf,

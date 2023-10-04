@@ -13,7 +13,7 @@
 *.txt
 *.csv
 *.mp4
-*/run-output/
+run-output
 *.ipynb
 !namelist.txt
 *.o

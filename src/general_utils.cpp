@@ -231,10 +231,7 @@ std::vector<double> barycoords(const std::vector<double> &p1,
   dgesv_(&dim, &nrhs, &*mat.begin(), &dim, &*ipiv.begin(), &*coords.begin(),
          &dim, &info);
   if (info != 0) {
-    coords[0] = -1;
-    coords[1] = -1;
-    coords[2] = -1;
-    std::cout << "barycoords: " << info << std::endl;
+    throw std::runtime_error("Error in barycentric coordinate computation, line 234");
   }
   return coords;
 }
@@ -255,10 +252,7 @@ std::vector<double> barycoords(const std::vector<double> &p1,
   dgesv_(&dim, &nrhs, &*mat.begin(), &dim, &*ipiv.begin(), &*coords.begin(),
          &dim, &info);
   if (info != 0) {
-    coords[0] = -1;
-    coords[1] = -1;
-    coords[2] = -1;
-    std::cout << "barycoords: " << info << std::endl;
+    throw std::runtime_error("Error in barycentric coordinate computation, line 255");
   }
   return coords;
 }

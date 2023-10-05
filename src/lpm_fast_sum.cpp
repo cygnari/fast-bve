@@ -271,7 +271,7 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
                  dt_interaction, mpi_communicator);
   MPI_Barrier(mpi_communicator);
   // cout << "interactions: " << tree_interactions.size() << endl;
-  if (not test_is_same(tree_interactions.size())) {
+  if (not test_is_same(tree_interactions.size(), mpi_communicator)) {
     // std::cout << "Tree Traverse Error" << std::endl;
     throw std::runtime_error("Tree traversal error, interaction lists not the same");
   }

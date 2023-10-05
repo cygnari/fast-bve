@@ -158,13 +158,11 @@ biquadratic_interp(const RunConfig &run_information,
   dgetrs_(&trans, &Num, &nrhs, &*interp_matrix.begin(), &Num, &*ipiv.begin(),
           &*vorticity_values.begin(), &Num, &info);
   if (info > 0)
-    // std::cout << "biquadratic_interp: " << info << std::endl;
     throw std::runtime_error("Biquadratic interpolation linear solve failed at line 162");
   nrhs = run_information.tracer_count;
   dgetrs_(&trans, &Num, &nrhs, &*interp_matrix.begin(), &Num, &*ipiv.begin(),
           &*tracer_values.begin(), &Num, &info);
   if (info > 0)
-    // std::cout << "biquadratic_interp: " << info << std::endl;
     throw std::runtime_error("Biquadratic interpolation linear solve failed at line 168");
   bary_cords = barycoords(v1, v2, v3, target_point);
   output_values[3] =

@@ -22,11 +22,6 @@ void write_state(const RunConfig &run_information,
   file_writer2 << run_information.dynamics_curr_point_count << "\n";
 }
 
-// void write_vec(RunConfig& run_information, vector<double>& vec_to_write,
-// vector<double>& dynamics_area, ofstream& file_writer, int vec_per_row) {
-//
-// }
-
 void write_triangles(
     const RunConfig &run_information,
     const std::vector<std::vector<std::vector<int>>> &dynamics_triangles,

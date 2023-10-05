@@ -50,7 +50,7 @@ void point_assign(const std::vector<double> &point,
   }
 }
 
-void points_assign(const std::vector<std::vector<double>> &point_coords,
+void points_assign(const std::vector<double> &point_coords,
     const IcosTree &icos_tree, std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
     std::vector<std::vector<int>> &fast_sum_tree_point_locs, const int point_count, const int tree_levels) {
   // assigns each point to triangles in the fast sum tree structure
@@ -61,8 +61,8 @@ void points_assign(const std::vector<std::vector<double>> &point_coords,
         std::vector<int>(point_count, 0);
   }
   for (int i = 0; i < point_count; i++) {
-    particle = point_coords[i];
-    point_assign(point_coords[i], icos_tree, fast_sum_tree_tri_points,
+    particle = slice(point_coords, 3 * i, 1, 3);
+    point_assign(particle, icos_tree, fast_sum_tree_tri_points,
                  fast_sum_tree_point_locs, i, tree_levels);
   }
 }
@@ -73,7 +73,7 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_target,
     const IcosTree &icos_tree, std::vector<InteractionPair> &tree_interactions,
     MPI_Datatype dt_interaction, const int P, const int ID, const double radius, const double theta, const int cluster_thresh,
-    const int tree_levels) {
+    const int tree_levels, MPI_Comm mpi_communicator) {
   // determines {C,P}-{C,P} interactions
   int curr_source, curr_target, lev_target, lev_source;
   int particle_count_target, particle_count_source;
@@ -243,34 +243,34 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
       }
     }
   }
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(mpi_communicator);
   int size = static_cast<int>(own_interactions.size());
   std::vector<int> array_sizes_buff(P, 0);
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(mpi_communicator);
   MPI_Allgather(&size, 1, MPI_INT, &array_sizes_buff[0], 1, MPI_INT,
-                MPI_COMM_WORLD);
-  MPI_Barrier(MPI_COMM_WORLD);
+                mpi_communicator);
+  MPI_Barrier(mpi_communicator);
   std::vector<int> offsets(P, 0);
   for (int i = 1; i < P; i++) {
     offsets[i] = offsets[i - 1] + array_sizes_buff[i - 1];
   }
   int total = offsets[P - 1] + array_sizes_buff[P - 1];
   tree_interactions.resize(total);
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(mpi_communicator);
   MPI_Allgatherv(&own_interactions[0],
                  static_cast<int>(own_interactions.size()), dt_interaction,
                  &tree_interactions[0], &array_sizes_buff[0], &offsets[0],
-                 dt_interaction, MPI_COMM_WORLD);
-  MPI_Barrier(MPI_COMM_WORLD);
+                 dt_interaction, mpi_communicator);
+  MPI_Barrier(mpi_communicator);
   // cout << "interactions: " << tree_interactions.size() << endl;
   if (not test_is_same(tree_interactions.size())) {
     std::cout << "Tree Traverse Error" << std::endl;
   }
 }
 
-void pp_vel(std::vector<std::vector<double>> &modify,
-            const std::vector<std::vector<double>> &targets,
-            const std::vector<std::vector<double>> &sources,
+void pp_vel(std::vector<double> &modify,
+            const std::vector<double> &targets,
+            const std::vector<double> &sources,
             const std::vector<double> &vorticities,
             const std::vector<double> &area, const InteractionPair &interact,
             const std::vector<std::vector<std::vector<int>>>
@@ -286,12 +286,14 @@ void pp_vel(std::vector<std::vector<double>> &modify,
     target_i = fast_sum_tree_tri_points_target[interact.lev_target]
                                               [interact.curr_target][i];
     std::vector<double> pos_change(3, 0);
-    particle_i = targets[target_i];
+    particle_i = slice(targets, 3 * target_i, 1, 3);
     for (int j = 0; j < interact.count_source; j++) {
       source_j = fast_sum_tree_tri_points_source[interact.lev_source]
                                                 [interact.curr_source][j];
-      if (target_i != source_j) {
-        particle_j = sources[source_j];
+      // if (target_i != source_j) {
+      // particle_j = sources[source_j];
+      particle_j = slice(sources, 3 * source_j, 1, 3);
+      if ((abs(particle_j[0] - particle_i[0]) > 1e-14) and (abs(particle_j[1] - particle_i[1]) > 1e-14) and (abs(particle_j[2] - particle_i[2]) > 1e-14)) {
         contribution = bve_gfunc(particle_i, particle_j);
         vor = vorticities[source_j];
         scalar_mult(contribution, vor * area[source_j]);
@@ -299,14 +301,14 @@ void pp_vel(std::vector<std::vector<double>> &modify,
       }
     }
     for (int j = 0; j < 3; j++) {
-      modify[target_i][j] += pos_change[j];
+      modify[3 * target_i + j] += pos_change[j];
     }
   }
 }
 
-void pc_vel(std::vector<std::vector<double>> &modify,
-    const std::vector<std::vector<double>> &targets,
-    const std::vector<std::vector<double>> &sources,
+void pc_vel(std::vector<double> &modify,
+    const std::vector<double> &targets,
+    const std::vector<double> &sources,
     const std::vector<double> &vorticities,
     const std::vector<double> &area, const InteractionPair &interact,
     const std::vector<std::vector<std::vector<int>>>
@@ -346,7 +348,8 @@ void pc_vel(std::vector<std::vector<double>> &modify,
   for (int i = 0; i < interact.count_target; i++) {
     point_index = fast_sum_tree_tri_points_target[interact.lev_target]
                                                  [interact.curr_target][i];
-    target_particle = targets[point_index];
+    // target_particle = targets[point_index];
+    target_particle = slice(targets, 3 * point_index, 1, 3);
     for (int j = 0; j < interp_point_count; j++) {
       us = interp_points[j][0];
       vs = interp_points[j][1];
@@ -377,18 +380,19 @@ void pc_vel(std::vector<std::vector<double>> &modify,
     for (int j = 0; j < interact.count_source; j++) {
       point_index = fast_sum_tree_tri_points_source[interact.lev_source]
                                                    [interact.curr_source][j];
-      source_particle = sources[point_index];
+      // source_particle = sources[point_index];
+      source_particle = slice(sources, 3 * point_index, 1, 3);
       bary_cord = barycoords(v1s, v2s, v3s, source_particle);
       vor = vorticities[point_index];
-      modify[point_index][0] +=
+      modify[3 * point_index] +=
           interp_eval(alphas_x, bary_cord[0], bary_cord[1],
                       interp_degree) *
           vor * area[point_index];
-      modify[point_index][1] +=
+      modify[3 * point_index + 1] +=
           interp_eval(alphas_y, bary_cord[0], bary_cord[1],
                       interp_degree) *
           vor * area[point_index];
-      modify[point_index][2] +=
+      modify[3 * point_index + 2] +=
           interp_eval(alphas_z, bary_cord[0], bary_cord[1],
                       interp_degree) *
           vor * area[point_index];
@@ -396,9 +400,9 @@ void pc_vel(std::vector<std::vector<double>> &modify,
   }
 }
 
-void cp_vel(std::vector<std::vector<double>> &modify,
-    const std::vector<std::vector<double>> &targets,
-    const std::vector<std::vector<double>> &sources,
+void cp_vel(std::vector<double> &modify,
+    const std::vector<double> &targets,
+    const std::vector<double> &sources,
     const std::vector<double> &vorticities,
     const std::vector<double> &area, const InteractionPair &interact,
     const std::vector<std::vector<std::vector<int>>>
@@ -457,7 +461,8 @@ void cp_vel(std::vector<std::vector<double>> &modify,
     for (int j = 0; j < interact.count_source; j++) {
       point_index = fast_sum_tree_tri_points_source[interact.lev_source]
                                                    [interact.curr_source][j];
-      source_particle = sources[point_index];
+      // source_particle = sources[point_index];
+      source_particle = slice(sources, 3 * point_index, 1, 3);
       func_val = bve_gfunc(curr_points[i], source_particle);
       vor = vorticities[point_index];
       interptargets[i] += func_val[0] * vor * area[point_index];
@@ -483,20 +488,21 @@ void cp_vel(std::vector<std::vector<double>> &modify,
   for (int i = 0; i < interact.count_target; i++) {
     point_index = fast_sum_tree_tri_points_target[interact.lev_target]
                                                  [interact.curr_target][i];
-    target_particle = targets[point_index];
+    // target_particle = targets[point_index];
+    target_particle = slice(targets, 3 * point_index, 1, 3);
     bary_cord = barycoords(v1, v2, v3, target_particle);
-    modify[point_index][0] += interp_eval(
+    modify[3 * point_index] += interp_eval(
         alphas_x, bary_cord[0], bary_cord[1], interp_degree);
-    modify[point_index][1] += interp_eval(
+    modify[3 * point_index + 1] += interp_eval(
         alphas_y, bary_cord[0], bary_cord[1], interp_degree);
-    modify[point_index][2] += interp_eval(
+    modify[3 * point_index + 2] += interp_eval(
         alphas_z, bary_cord[0], bary_cord[1], interp_degree);
   }
 }
 
-void cc_vel(std::vector<std::vector<double>> &modify,
-    const std::vector<std::vector<double>> &targets,
-    const std::vector<std::vector<double>> &sources,
+void cc_vel(std::vector<double> &modify,
+    const std::vector<double> &targets,
+    const std::vector<double> &sources,
     const std::vector<double> &vorticities,
     const std::vector<double> &area, const InteractionPair &interact,
     const std::vector<std::vector<std::vector<int>>>
@@ -592,7 +598,8 @@ void cc_vel(std::vector<std::vector<double>> &modify,
          j++) { // interpolate green's function into interior of source triangle
       point_index = fast_sum_tree_tri_points_source[interact.lev_source]
                                                    [interact.curr_source][j];
-      source_particle = sources[point_index];
+      // source_particle = sources[point_index];
+      source_particle = slice(sources, 3 * point_index, 1, 3);
       bary_cord = barycoords(v1s, v2s, v3s, source_particle);
       vor = vorticities[point_index];
       interptargets[i] += interp_eval(alphas_x, bary_cord[0], bary_cord[1],
@@ -626,22 +633,48 @@ void cc_vel(std::vector<std::vector<double>> &modify,
        i++) { // interpolate interaction into target triangle
     point_index = fast_sum_tree_tri_points_target[interact.lev_target]
                                                  [interact.curr_target][i];
-    target_particle = targets[point_index];
+    // target_particle = targets[point_index];
+    target_particle = slice(targets, 3 * point_index, 1, 3);
     bary_cord = barycoords(v1, v2, v3, target_particle);
-    modify[point_index][0] += interp_eval(
+    modify[3 * point_index] += interp_eval(
         alphas_x, bary_cord[0], bary_cord[1], interp_degree);
-    modify[point_index][1] += interp_eval(
+    modify[3 * point_index + 1] += interp_eval(
         alphas_y, bary_cord[0], bary_cord[1], interp_degree);
-    modify[point_index][2] += interp_eval(
+    modify[3 * point_index + 2] += interp_eval(
         alphas_z, bary_cord[0], bary_cord[1], interp_degree);
   }
 }
 
-void lpm_interface(std::vector<std::vector<double>> &active_target_velocities,
-    std::vector<std::vector<double>> &passive_target_velocities,
-    const std::vector<std::vector<double>> &source_coordinates,
-    const std::vector<double> &vorticities, const std::vector<double> &areas,
-    const IcosTree &icos_tree, const double time, const int active_target_count,
-    const int passive_target_count, const int source_count, const int P, const int ID) {
-  // interace for LPM to call fast summation to compute BVE velocities 
+void fast_sum_vel(std::vector<double> &modify,
+    const std::vector<double> &targets,
+    const std::vector<double> &sources,
+    const std::vector<double> &vorticities,
+    const std::vector<double> &area,
+    const std::vector<InteractionPair> &interactions,
+    const std::vector<std::vector<std::vector<int>>>
+        &fast_sum_tree_tri_points_target,
+    const std::vector<std::vector<std::vector<int>>>
+        &fast_sum_tree_tri_points_source,
+    const IcosTree &icos_tree, const double time, const int interp_degree,
+    const int interp_point_count, const int mpi_P, const int mpi_ID) {
+  for (int i = 0; i < interactions.size(); i++) {
+    if (i % mpi_P == mpi_ID) { // evenly split up interactions
+      if (interactions[i].type == 0)
+        pp_vel(modify, targets, sources, vorticities, area,
+               interactions[i], fast_sum_tree_tri_points_target,
+               fast_sum_tree_tri_points_source, time);
+      else if (interactions[i].type == 2)
+        cp_vel(modify, targets, sources, vorticities, area,
+               interactions[i], fast_sum_tree_tri_points_target,
+               fast_sum_tree_tri_points_source, icos_tree, time, interp_degree, interp_point_count);
+      else if (interactions[i].type == 1)
+        pp_vel(modify, targets, sources, vorticities, area,
+               interactions[i], fast_sum_tree_tri_points_target,
+               fast_sum_tree_tri_points_source, time);
+      else if (interactions[i].type == 3)
+        cp_vel(modify, targets, sources, vorticities, area,
+               interactions[i], fast_sum_tree_tri_points_target,
+               fast_sum_tree_tri_points_source, icos_tree, time, interp_degree, interp_point_count);
+    }
+  }
 }

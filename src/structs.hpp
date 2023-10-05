@@ -82,6 +82,7 @@ struct RunConfig {
 };
 
 struct IcosTree {
+    int tree_depth;
     std::vector<std::vector<double>> icosahedron_vertex_coords;
     std::vector<std::vector<std::vector<double>>> icosahedron_tri_centers;
     std::vector<std::vector<double>> icosahedron_tri_radii;

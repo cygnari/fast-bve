@@ -300,9 +300,9 @@ void pp_vel(std::vector<double> &modify, const std::vector<double> &targets,
       // if (target_i != source_j) {
       // particle_j = sources[source_j];
       particle_j = slice(sources, 3 * source_j, 1, 3);
-      if ((abs(particle_j[0] - particle_i[0]) > 1e-14) and
-          (abs(particle_j[1] - particle_i[1]) > 1e-14) and
-          (abs(particle_j[2] - particle_i[2]) > 1e-14)) {
+      if ((std::abs(particle_j[0] - particle_i[0]) > 1e-14) and
+          (std::abs(particle_j[1] - particle_i[1]) > 1e-14) and
+          (std::abs(particle_j[2] - particle_i[2]) > 1e-14)) {
         contribution = bve_gfunc(particle_i, particle_j);
         vor = vorticities[source_j];
         scalar_mult(contribution, vor * area[source_j]);

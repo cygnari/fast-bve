@@ -15,15 +15,6 @@ extern int dgetrs_(char *, int *, int *, double *, int *, int *, double *,
                    int *, int *);
 }
 
-int count_nans(const std::vector<double> &x) {
-  int count = 0;
-  for (int i = 0; i < x.size(); i++) {
-    if (std::isnan(x[i]))
-      count += 1;
-  }
-  return count;
-}
-
 double
 dot_prod(const std::vector<double> &x,
          const std::vector<double> &y) { // dot product of vectors x and y
@@ -512,26 +503,13 @@ std::tuple<int, int> find_leaf_tri(
         v3 = slice(dynamics_state, info_per_point * iv3, 1, 3);
         bary_cords = barycoords(v1, v2, v3, target_point);
         if (check_in_tri_thresh(v1, v2, v3, target_point, epsilon)) {
-          if ((i == 6) and (j == 0)) {
-            std::cout << "target points: " << target_point[0] << ","
-                      << target_point[1] << "," << target_point[2] << std::endl;
-            std::cout << "barycords: " << bary_cords[0] << "," << bary_cords[1]
-                      << "," << bary_cords[2] << std::endl;
-            std::cout << "points: " << iv1 << "," << iv2 << "," << iv3
-                      << std::endl;
-            std::cout << "v1: " << v1[0] << "," << v1[1] << "," << v1[2]
-                      << std::endl;
-            std::cout << "v2: " << v2[0] << "," << v2[1] << "," << v2[2]
-                      << std::endl;
-            std::cout << "v3: " << v3[0] << "," << v3[1] << "," << v3[2]
-                      << std::endl;
-          }
           curr_level = i;
           tri_loc = j;
           return std::make_tuple(curr_level, tri_loc);
         }
       }
     }
+    throw std::runtime_error("Failed to locate point in a leaf triangle");
     return std::make_tuple(-1, -1);
   }
 }

@@ -4,12 +4,12 @@ endfunction()
 
 cmake_minimum_required(VERSION 3.10)
 project(Fast-BVE VERSION 1.0 LANGUAGES CXX C)
-set(default_build_type "Release")
+set(default_build_type Release)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_FLAGS -O2)
+set(CMAKE_CXX_FLAGS -O3)
 
 printvar(BUILD_TYPE)
 

@@ -158,12 +158,14 @@ biquadratic_interp(const RunConfig &run_information,
   dgetrs_(&trans, &Num, &nrhs, &*interp_matrix.begin(), &Num, &*ipiv.begin(),
           &*vorticity_values.begin(), &Num, &info);
   if (info > 0)
-    std::cout << "biquadratic_interp: " << info << std::endl;
+    // std::cout << "biquadratic_interp: " << info << std::endl;
+    throw std::runtime_error("Biquadratic interpolation linear solve failed at line 162");
   nrhs = run_information.tracer_count;
   dgetrs_(&trans, &Num, &nrhs, &*interp_matrix.begin(), &Num, &*ipiv.begin(),
           &*tracer_values.begin(), &Num, &info);
   if (info > 0)
-    std::cout << "biquadratic_interp: " << info << std::endl;
+    // std::cout << "biquadratic_interp: " << info << std::endl;
+    throw std::runtime_error("Biquadratic interpolation linear solve failed at line 168");
   bary_cords = barycoords(v1, v2, v3, target_point);
   output_values[3] =
       interp_eval(vorticity_values, bary_cords[0], bary_cords[1], 2);
@@ -198,9 +200,6 @@ void remesh_points(
           dynamics_triangles_is_leaf, run_information.info_per_point,
           run_information.dynamics_levels_max);
       super_tri_loc = floor(tri_loc / 4.0);
-      if (tri_loc == -1) {
-        std::cout << "find error" << std::endl;
-      }
 
       iv1 = dynamics_triangles[curr_level - 1][super_tri_loc][0];
       iv2 = dynamics_triangles[curr_level - 1][super_tri_loc][1];
@@ -266,15 +265,15 @@ void remesh_points(
         }
       }
 
-      if (count_nans(curr_target) > 0) {
-        std::cout << "point: " << i << " level: " << curr_level
-                  << " super tri loc " << super_tri_loc
-                  << " tri_loc: " << tri_loc << std::endl;
-        std::cout << iv1 << "," << iv2 << "," << iv3 << "," << iv4 << "," << iv5
-                  << "," << iv6 << std::endl;
-        std::cout << curr_target[0] << "," << curr_target[1] << ","
-                  << curr_target[2] << std::endl;
-      }
+      // if (count_nans(curr_target) > 0) {
+      //   std::cout << "point: " << i << " level: " << curr_level
+      //             << " super tri loc " << super_tri_loc
+      //             << " tri_loc: " << tri_loc << std::endl;
+      //   std::cout << iv1 << "," << iv2 << "," << iv3 << "," << iv4 << "," << iv5
+      //             << "," << iv6 << std::endl;
+      //   std::cout << curr_target[0] << "," << curr_target[1] << ","
+      //             << curr_target[2] << std::endl;
+      // }
     }
 
     vector_copy(target_points, curr_target, run_information.info_per_point * i,

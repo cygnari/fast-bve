@@ -3,8 +3,6 @@
 
 #include <vector>
 
-int count_nans(const std::vector<double> &x);
-
 double dot_prod(const std::vector<double> &x, const std::vector<double> &y);
 
 double vec_norm(const std::vector<double> &x);

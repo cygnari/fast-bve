@@ -17,9 +17,11 @@ extern int dgetrs_(char *, int *, int *, double *, int *, int *, double *,
                    int *, int *);
 }
 
-void point_assign(const std::vector<double> &point,
-    const IcosTree &icos_tree, std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
-    std::vector<std::vector<int>> &fast_sum_tree_point_locs, const int point_id, const int tree_levels) {
+void point_assign(
+    const std::vector<double> &point, const IcosTree &icos_tree,
+    std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
+    std::vector<std::vector<int>> &fast_sum_tree_point_locs, const int point_id,
+    const int tree_levels) {
   // find which fast sum triangles each point is in
   int iv1, iv2, iv3, lb, ub;
   std::vector<double> v1, v2, v3;
@@ -50,15 +52,16 @@ void point_assign(const std::vector<double> &point,
   }
 }
 
-void points_assign(const std::vector<double> &point_coords,
-    const IcosTree &icos_tree, std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
-    std::vector<std::vector<int>> &fast_sum_tree_point_locs, const int point_count, const int tree_levels) {
+void points_assign(
+    const std::vector<double> &point_coords, const IcosTree &icos_tree,
+    std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
+    std::vector<std::vector<int>> &fast_sum_tree_point_locs,
+    const int point_count, const int tree_levels) {
   // assigns each point to triangles in the fast sum tree structure
   std::vector<double> particle;
   for (int i = 0; i < tree_levels; i++) {
     fast_sum_tree_tri_points[i] = std::vector<std::vector<int>>(20 * pow(4, i));
-    fast_sum_tree_point_locs[i] =
-        std::vector<int>(point_count, 0);
+    fast_sum_tree_point_locs[i] = std::vector<int>(point_count, 0);
   }
   for (int i = 0; i < point_count; i++) {
     particle = slice(point_coords, 3 * i, 1, 3);
@@ -68,12 +71,15 @@ void points_assign(const std::vector<double> &point_coords,
 }
 
 void tree_traverse(const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_source,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_target,
-    const IcosTree &icos_tree, std::vector<InteractionPair> &tree_interactions,
-    MPI_Datatype dt_interaction, const int P, const int ID, const double radius, const double theta, const int cluster_thresh,
-    const int tree_levels, MPI_Comm mpi_communicator) {
+                       &fast_sum_tree_tri_points_source,
+                   const std::vector<std::vector<std::vector<int>>>
+                       &fast_sum_tree_tri_points_target,
+                   const IcosTree &icos_tree,
+                   std::vector<InteractionPair> &tree_interactions,
+                   MPI_Datatype dt_interaction, const int P, const int ID,
+                   const double radius, const double theta,
+                   const int cluster_thresh, const int tree_levels,
+                   MPI_Comm mpi_communicator) {
   // determines {C,P}-{C,P} interactions
   int curr_source, curr_target, lev_target, lev_source;
   int particle_count_target, particle_count_source;
@@ -158,8 +164,7 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
       continue; // if no work, continue to next
     center_target = icos_tree.icosahedron_tri_centers[lev_target][curr_target];
     center_source = icos_tree.icosahedron_tri_centers[lev_source][curr_source];
-    distance =
-        great_circ_dist(center_target, center_source, radius);
+    distance = great_circ_dist(center_target, center_source, radius);
     separation = (icos_tree.icosahedron_tri_radii[lev_target][curr_target] +
                   icos_tree.icosahedron_tri_radii[lev_source][curr_source]) /
                  distance;
@@ -182,7 +187,8 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
       own_interactions.push_back(new_interact);
     } else {
       if ((particle_count_target < cluster_thresh) and
-          (particle_count_source < cluster_thresh)) { // both have few particles, pp
+          (particle_count_source <
+           cluster_thresh)) { // both have few particles, pp
         InteractionPair new_interact = {lev_target,
                                         lev_source,
                                         curr_target,
@@ -201,7 +207,8 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
                                         particle_count_source,
                                         0};
         own_interactions.push_back(new_interact);
-      } else if (lev_target == tree_levels - 1) { // target is leaf, tree traverse source
+      } else if (lev_target ==
+                 tree_levels - 1) { // target is leaf, tree traverse source
         tri_interactions.push_back(std::vector<int>{
             curr_target, 4 * curr_source, lev_target, lev_source + 1});
         tri_interactions.push_back(std::vector<int>{
@@ -210,7 +217,8 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
             curr_target, 4 * curr_source + 2, lev_target, lev_source + 1});
         tri_interactions.push_back(std::vector<int>{
             curr_target, 4 * curr_source + 3, lev_target, lev_source + 1});
-      } else if (lev_source == tree_levels - 1) { // source is leaf, tree traverse target
+      } else if (lev_source ==
+                 tree_levels - 1) { // source is leaf, tree traverse target
         tri_interactions.push_back(std::vector<int>{
             4 * curr_target, curr_source, lev_target + 1, lev_source});
         tri_interactions.push_back(std::vector<int>{
@@ -268,8 +276,7 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
   }
 }
 
-void pp_vel(std::vector<double> &modify,
-            const std::vector<double> &targets,
+void pp_vel(std::vector<double> &modify, const std::vector<double> &targets,
             const std::vector<double> &sources,
             const std::vector<double> &vorticities,
             const std::vector<double> &area, const InteractionPair &interact,
@@ -293,7 +300,9 @@ void pp_vel(std::vector<double> &modify,
       // if (target_i != source_j) {
       // particle_j = sources[source_j];
       particle_j = slice(sources, 3 * source_j, 1, 3);
-      if ((abs(particle_j[0] - particle_i[0]) > 1e-14) and (abs(particle_j[1] - particle_i[1]) > 1e-14) and (abs(particle_j[2] - particle_i[2]) > 1e-14)) {
+      if ((abs(particle_j[0] - particle_i[0]) > 1e-14) and
+          (abs(particle_j[1] - particle_i[1]) > 1e-14) and
+          (abs(particle_j[2] - particle_i[2]) > 1e-14)) {
         contribution = bve_gfunc(particle_i, particle_j);
         vor = vorticities[source_j];
         scalar_mult(contribution, vor * area[source_j]);
@@ -306,42 +315,40 @@ void pp_vel(std::vector<double> &modify,
   }
 }
 
-void pc_vel(std::vector<double> &modify,
-    const std::vector<double> &targets,
-    const std::vector<double> &sources,
-    const std::vector<double> &vorticities,
-    const std::vector<double> &area, const InteractionPair &interact,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_target,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_source,
-    const IcosTree &icos_tree, const double time, const int interp_degree,
-    const int interp_point_count) {
+void pc_vel(std::vector<double> &modify, const std::vector<double> &targets,
+            const std::vector<double> &sources,
+            const std::vector<double> &vorticities,
+            const std::vector<double> &area, const InteractionPair &interact,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_target,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_source,
+            const IcosTree &icos_tree, const double time,
+            const int interp_degree, const int interp_point_count) {
   std::vector<double> v1s, v2s, v3s, target_particle, placeholder1,
       placeholder2, placeholder3, bary_cord, source_particle;
-  std::vector<double> func_vals(3 * interp_point_count, 0),
-      func_val(3, 0);
+  std::vector<double> func_vals(3 * interp_point_count, 0), func_val(3, 0);
   std::vector<double> alphas_x(interp_point_count, 0),
-      alphas_y(interp_point_count, 0),
-      alphas_z(interp_point_count, 0);
+      alphas_y(interp_point_count, 0), alphas_z(interp_point_count, 0);
   int iv1s, iv2s, iv3s, point_index;
   double vor;
   double us, vs;
   char trans = 'N';
   int nrhs = 3, dim = interp_point_count, info;
-  std::vector<double> interp_matrix(interp_point_count *
-                                        interp_point_count,
-                                    0);
+  std::vector<double> interp_matrix(interp_point_count * interp_point_count, 0);
   std::vector<int> ipiv(interp_point_count, 0);
-  std::vector<std::vector<double>> interp_points(
-      interp_point_count, std::vector<double>(3, 0));
+  std::vector<std::vector<double>> interp_points(interp_point_count,
+                                                 std::vector<double>(3, 0));
   fekete_init(interp_points, interp_degree);
   interp_mat_init(interp_matrix, interp_points, interp_degree,
                   interp_point_count);
   dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
-  iv1s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][0];
-  iv2s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][1];
-  iv3s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][2];
+  iv1s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][0];
+  iv2s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][1];
+  iv3s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][2];
   v1s = icos_tree.icosahedron_vertex_coords[iv1s];
   v2s = icos_tree.icosahedron_vertex_coords[iv2s];
   v3s = icos_tree.icosahedron_vertex_coords[iv3s];
@@ -385,51 +392,43 @@ void pc_vel(std::vector<double> &modify,
       bary_cord = barycoords(v1s, v2s, v3s, source_particle);
       vor = vorticities[point_index];
       modify[3 * point_index] +=
-          interp_eval(alphas_x, bary_cord[0], bary_cord[1],
-                      interp_degree) *
+          interp_eval(alphas_x, bary_cord[0], bary_cord[1], interp_degree) *
           vor * area[point_index];
       modify[3 * point_index + 1] +=
-          interp_eval(alphas_y, bary_cord[0], bary_cord[1],
-                      interp_degree) *
+          interp_eval(alphas_y, bary_cord[0], bary_cord[1], interp_degree) *
           vor * area[point_index];
       modify[3 * point_index + 2] +=
-          interp_eval(alphas_z, bary_cord[0], bary_cord[1],
-                      interp_degree) *
+          interp_eval(alphas_z, bary_cord[0], bary_cord[1], interp_degree) *
           vor * area[point_index];
     }
   }
 }
 
-void cp_vel(std::vector<double> &modify,
-    const std::vector<double> &targets,
-    const std::vector<double> &sources,
-    const std::vector<double> &vorticities,
-    const std::vector<double> &area, const InteractionPair &interact,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_target,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_source,
-    const IcosTree &icos_tree, const double time, const int interp_degree,
-    const int interp_point_count) {
+void cp_vel(std::vector<double> &modify, const std::vector<double> &targets,
+            const std::vector<double> &sources,
+            const std::vector<double> &vorticities,
+            const std::vector<double> &area, const InteractionPair &interact,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_target,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_source,
+            const IcosTree &icos_tree, const double time,
+            const int interp_degree, const int interp_point_count) {
   int iv1, iv2, iv3, point_index;
   std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3,
       source_particle, target_particle, bary_cord;
   double u, v, vor;
-  std::vector<std::vector<double>> curr_points(
-      interp_point_count, std::vector<double>(3, 0));
-  std::vector<double> interptargets(3 * interp_point_count, 0),
-      func_val(3, 0);
+  std::vector<std::vector<double>> curr_points(interp_point_count,
+                                               std::vector<double>(3, 0));
+  std::vector<double> interptargets(3 * interp_point_count, 0), func_val(3, 0);
   char trans = 'N';
   int nrhs = 3, dim = interp_point_count, info;
   std::vector<double> alphas_x(interp_point_count, 0),
-      alphas_y(interp_point_count, 0),
-      alphas_z(interp_point_count, 0);
-  std::vector<double> interp_matrix(interp_point_count *
-                                        interp_point_count,
-                                    0);
+      alphas_y(interp_point_count, 0), alphas_z(interp_point_count, 0);
+  std::vector<double> interp_matrix(interp_point_count * interp_point_count, 0);
   std::vector<int> ipiv(interp_point_count, 0);
-  std::vector<std::vector<double>> interp_points(
-      interp_point_count, std::vector<double>(3, 0));
+  std::vector<std::vector<double>> interp_points(interp_point_count,
+                                                 std::vector<double>(3, 0));
   fekete_init(interp_points, interp_degree);
   interp_mat_init(interp_matrix, interp_points, interp_degree,
                   interp_point_count);
@@ -437,9 +436,12 @@ void cp_vel(std::vector<double> &modify,
   if (info > 0) {
     std::cout << info << std::endl;
   }
-  iv1 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][0];
-  iv2 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][1];
-  iv3 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][2];
+  iv1 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][0];
+  iv2 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][1];
+  iv3 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][2];
   v1 = icos_tree.icosahedron_vertex_coords[iv1];
   v2 = icos_tree.icosahedron_vertex_coords[iv2];
   v3 = icos_tree.icosahedron_vertex_coords[iv3];
@@ -491,52 +493,51 @@ void cp_vel(std::vector<double> &modify,
     // target_particle = targets[point_index];
     target_particle = slice(targets, 3 * point_index, 1, 3);
     bary_cord = barycoords(v1, v2, v3, target_particle);
-    modify[3 * point_index] += interp_eval(
-        alphas_x, bary_cord[0], bary_cord[1], interp_degree);
-    modify[3 * point_index + 1] += interp_eval(
-        alphas_y, bary_cord[0], bary_cord[1], interp_degree);
-    modify[3 * point_index + 2] += interp_eval(
-        alphas_z, bary_cord[0], bary_cord[1], interp_degree);
+    modify[3 * point_index] +=
+        interp_eval(alphas_x, bary_cord[0], bary_cord[1], interp_degree);
+    modify[3 * point_index + 1] +=
+        interp_eval(alphas_y, bary_cord[0], bary_cord[1], interp_degree);
+    modify[3 * point_index + 2] +=
+        interp_eval(alphas_z, bary_cord[0], bary_cord[1], interp_degree);
   }
 }
 
-void cc_vel(std::vector<double> &modify,
-    const std::vector<double> &targets,
-    const std::vector<double> &sources,
-    const std::vector<double> &vorticities,
-    const std::vector<double> &area, const InteractionPair &interact,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_target,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_source,
-    const IcosTree &icos_tree, const double time, const int interp_degree,
-    const int interp_point_count) {
+void cc_vel(std::vector<double> &modify, const std::vector<double> &targets,
+            const std::vector<double> &sources,
+            const std::vector<double> &vorticities,
+            const std::vector<double> &area, const InteractionPair &interact,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_target,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_source,
+            const IcosTree &icos_tree, const double time,
+            const int interp_degree, const int interp_point_count) {
   int iv1, iv2, iv3, iv1s, iv2s, iv3s, point_index;
   std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, v1s,
-      v2s, v3s, func_vals(3 * interp_point_count, 0),
-      func_val(3, 0), alphas_x(interp_point_count, 0),
-      alphas_y(interp_point_count, 0),
+      v2s, v3s, func_vals(3 * interp_point_count, 0), func_val(3, 0),
+      alphas_x(interp_point_count, 0), alphas_y(interp_point_count, 0),
       alphas_z(interp_point_count, 0);
   double u, v, us, vs, vor;
-  std::vector<std::vector<double>> curr_points(
-      interp_point_count, std::vector<double>(3, 0));
+  std::vector<std::vector<double>> curr_points(interp_point_count,
+                                               std::vector<double>(3, 0));
   int nrhs = 3, dim = interp_point_count, info;
   char trans = 'N';
   std::vector<double> bary_cord, target_particle, source_particle;
   std::vector<double> interptargets(3 * interp_point_count, 0);
-  std::vector<double> interp_matrix(interp_point_count *
-                                        interp_point_count,
-                                    0);
+  std::vector<double> interp_matrix(interp_point_count * interp_point_count, 0);
   std::vector<int> ipiv(interp_point_count, 0);
-  std::vector<std::vector<double>> interp_points(
-      interp_point_count, std::vector<double>(3, 0));
+  std::vector<std::vector<double>> interp_points(interp_point_count,
+                                                 std::vector<double>(3, 0));
   fekete_init(interp_points, interp_degree);
   interp_mat_init(interp_matrix, interp_points, interp_degree,
                   interp_point_count);
   dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
-  iv1 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][0];
-  iv2 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][1];
-  iv3 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target][interact.curr_target][2];
+  iv1 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][0];
+  iv2 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][1];
+  iv3 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][2];
   v1 = icos_tree.icosahedron_vertex_coords[iv1];
   v2 = icos_tree.icosahedron_vertex_coords[iv2];
   v3 = icos_tree.icosahedron_vertex_coords[iv3];
@@ -555,9 +556,12 @@ void cc_vel(std::vector<double> &modify,
     curr_points[i] = placeholder1;
   }
 
-  iv1s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][0];
-  iv2s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][1];
-  iv3s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source][interact.curr_source][2];
+  iv1s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][0];
+  iv2s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][1];
+  iv3s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][2];
   v1s = icos_tree.icosahedron_vertex_coords[iv1s];
   v2s = icos_tree.icosahedron_vertex_coords[iv2s];
   v3s = icos_tree.icosahedron_vertex_coords[iv3s];
@@ -602,16 +606,14 @@ void cc_vel(std::vector<double> &modify,
       source_particle = slice(sources, 3 * point_index, 1, 3);
       bary_cord = barycoords(v1s, v2s, v3s, source_particle);
       vor = vorticities[point_index];
-      interptargets[i] += interp_eval(alphas_x, bary_cord[0], bary_cord[1],
-                                      interp_degree) *
-                          vor * area[point_index];
+      interptargets[i] +=
+          interp_eval(alphas_x, bary_cord[0], bary_cord[1], interp_degree) *
+          vor * area[point_index];
       interptargets[i + interp_point_count] +=
-          interp_eval(alphas_y, bary_cord[0], bary_cord[1],
-                      interp_degree) *
+          interp_eval(alphas_y, bary_cord[0], bary_cord[1], interp_degree) *
           vor * area[point_index];
       interptargets[i + 2 * interp_point_count] +=
-          interp_eval(alphas_z, bary_cord[0], bary_cord[1],
-                      interp_degree) *
+          interp_eval(alphas_z, bary_cord[0], bary_cord[1], interp_degree) *
           vor * area[point_index];
     }
   }
@@ -636,45 +638,46 @@ void cc_vel(std::vector<double> &modify,
     // target_particle = targets[point_index];
     target_particle = slice(targets, 3 * point_index, 1, 3);
     bary_cord = barycoords(v1, v2, v3, target_particle);
-    modify[3 * point_index] += interp_eval(
-        alphas_x, bary_cord[0], bary_cord[1], interp_degree);
-    modify[3 * point_index + 1] += interp_eval(
-        alphas_y, bary_cord[0], bary_cord[1], interp_degree);
-    modify[3 * point_index + 2] += interp_eval(
-        alphas_z, bary_cord[0], bary_cord[1], interp_degree);
+    modify[3 * point_index] +=
+        interp_eval(alphas_x, bary_cord[0], bary_cord[1], interp_degree);
+    modify[3 * point_index + 1] +=
+        interp_eval(alphas_y, bary_cord[0], bary_cord[1], interp_degree);
+    modify[3 * point_index + 2] +=
+        interp_eval(alphas_z, bary_cord[0], bary_cord[1], interp_degree);
   }
 }
 
 void fast_sum_vel(std::vector<double> &modify,
-    const std::vector<double> &targets,
-    const std::vector<double> &sources,
-    const std::vector<double> &vorticities,
-    const std::vector<double> &area,
-    const std::vector<InteractionPair> &interactions,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_target,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_source,
-    const IcosTree &icos_tree, const double time, const int interp_degree,
-    const int interp_point_count, const int mpi_P, const int mpi_ID) {
+                  const std::vector<double> &targets,
+                  const std::vector<double> &sources,
+                  const std::vector<double> &vorticities,
+                  const std::vector<double> &area,
+                  const std::vector<InteractionPair> &interactions,
+                  const std::vector<std::vector<std::vector<int>>>
+                      &fast_sum_tree_tri_points_target,
+                  const std::vector<std::vector<std::vector<int>>>
+                      &fast_sum_tree_tri_points_source,
+                  const IcosTree &icos_tree, const double time,
+                  const int interp_degree, const int interp_point_count,
+                  const int mpi_P, const int mpi_ID) {
   for (int i = 0; i < interactions.size(); i++) {
     if (i % mpi_P == mpi_ID) { // evenly split up interactions
       if (interactions[i].type == 0)
-        pp_vel(modify, targets, sources, vorticities, area,
-               interactions[i], fast_sum_tree_tri_points_target,
-               fast_sum_tree_tri_points_source, time);
+        pp_vel(modify, targets, sources, vorticities, area, interactions[i],
+               fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
+               time);
       else if (interactions[i].type == 2)
-        cp_vel(modify, targets, sources, vorticities, area,
-               interactions[i], fast_sum_tree_tri_points_target,
-               fast_sum_tree_tri_points_source, icos_tree, time, interp_degree, interp_point_count);
+        cp_vel(modify, targets, sources, vorticities, area, interactions[i],
+               fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
+               icos_tree, time, interp_degree, interp_point_count);
       else if (interactions[i].type == 1)
-        pp_vel(modify, targets, sources, vorticities, area,
-               interactions[i], fast_sum_tree_tri_points_target,
-               fast_sum_tree_tri_points_source, time);
+        pp_vel(modify, targets, sources, vorticities, area, interactions[i],
+               fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
+               time);
       else if (interactions[i].type == 3)
-        cp_vel(modify, targets, sources, vorticities, area,
-               interactions[i], fast_sum_tree_tri_points_target,
-               fast_sum_tree_tri_points_source, icos_tree, time, interp_degree, interp_point_count);
+        cp_vel(modify, targets, sources, vorticities, area, interactions[i],
+               fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
+               icos_tree, time, interp_degree, interp_point_count);
     }
   }
 }

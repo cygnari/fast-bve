@@ -8,6 +8,7 @@ add_library(SrcLib amr.cpp
     input_utils.cpp
     interp_utils.cpp
     io_utils.cpp
+    lpm_fast_sum.cpp
     mpi_utils.cpp
     rhs_utils.cpp
     vorticity_functions.cpp)
@@ -24,6 +25,7 @@ install(FILES amr.hpp
     input_utils.hpp
     interp_utils.hpp
     io_utils.hpp
+    lpm_fast_sum.hpp
     mpi_utils.hpp
     rhs_utils.hpp
     structs.hpp

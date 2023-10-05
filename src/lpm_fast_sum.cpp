@@ -298,8 +298,6 @@ void pp_vel(std::vector<double> &modify, const std::vector<double> &targets,
     for (int j = 0; j < interact.count_source; j++) {
       source_j = fast_sum_tree_tri_points_source[interact.lev_source]
                                                 [interact.curr_source][j];
-      // if (target_i != source_j) {
-      // particle_j = sources[source_j];
       particle_j = slice(sources, 3 * source_j, 1, 3);
       if ((std::abs(particle_j[0] - particle_i[0]) > 1e-14) and
           (std::abs(particle_j[1] - particle_i[1]) > 1e-14) and
@@ -356,7 +354,6 @@ void pc_vel(std::vector<double> &modify, const std::vector<double> &targets,
   for (int i = 0; i < interact.count_target; i++) {
     point_index = fast_sum_tree_tri_points_target[interact.lev_target]
                                                  [interact.curr_target][i];
-    // target_particle = targets[point_index];
     target_particle = slice(targets, 3 * point_index, 1, 3);
     for (int j = 0; j < interp_point_count; j++) {
       us = interp_points[j][0];
@@ -377,7 +374,6 @@ void pc_vel(std::vector<double> &modify, const std::vector<double> &targets,
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
             &*func_vals.begin(), &dim, &info);
     if (info > 0) {
-      // std::cout << info << std::endl;
       throw std::runtime_error("Problem in pc vel linear solve");
     }
 
@@ -389,7 +385,6 @@ void pc_vel(std::vector<double> &modify, const std::vector<double> &targets,
     for (int j = 0; j < interact.count_source; j++) {
       point_index = fast_sum_tree_tri_points_source[interact.lev_source]
                                                    [interact.curr_source][j];
-      // source_particle = sources[point_index];
       source_particle = slice(sources, 3 * point_index, 1, 3);
       bary_cord = barycoords(v1s, v2s, v3s, source_particle);
       vor = vorticities[point_index];
@@ -465,7 +460,6 @@ void cp_vel(std::vector<double> &modify, const std::vector<double> &targets,
     for (int j = 0; j < interact.count_source; j++) {
       point_index = fast_sum_tree_tri_points_source[interact.lev_source]
                                                    [interact.curr_source][j];
-      // source_particle = sources[point_index];
       source_particle = slice(sources, 3 * point_index, 1, 3);
       func_val = bve_gfunc(curr_points[i], source_particle);
       vor = vorticities[point_index];
@@ -480,7 +474,6 @@ void cp_vel(std::vector<double> &modify, const std::vector<double> &targets,
   dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
           &*interptargets.begin(), &dim, &info);
   if (info > 0) {
-    // std::cout << info << std::endl;
     throw std::runtime_error("Problem in cp vel linear solve");
   }
 
@@ -493,7 +486,6 @@ void cp_vel(std::vector<double> &modify, const std::vector<double> &targets,
   for (int i = 0; i < interact.count_target; i++) {
     point_index = fast_sum_tree_tri_points_target[interact.lev_target]
                                                  [interact.curr_target][i];
-    // target_particle = targets[point_index];
     target_particle = slice(targets, 3 * point_index, 1, 3);
     bary_cord = barycoords(v1, v2, v3, target_particle);
     modify[3 * point_index] +=
@@ -592,7 +584,6 @@ void cc_vel(std::vector<double> &modify, const std::vector<double> &targets,
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
             &*func_vals.begin(), &dim, &info);
     if (info > 0) {
-      // std::cout << info << std::endl;
       throw std::runtime_error("Problem in cc vel linear solve, line 596");
     }
 
@@ -606,7 +597,6 @@ void cc_vel(std::vector<double> &modify, const std::vector<double> &targets,
          j++) { // interpolate green's function into interior of source triangle
       point_index = fast_sum_tree_tri_points_source[interact.lev_source]
                                                    [interact.curr_source][j];
-      // source_particle = sources[point_index];
       source_particle = slice(sources, 3 * point_index, 1, 3);
       bary_cord = barycoords(v1s, v2s, v3s, source_particle);
       vor = vorticities[point_index];
@@ -626,7 +616,6 @@ void cc_vel(std::vector<double> &modify, const std::vector<double> &targets,
           &*interptargets.begin(), &dim, &info);
 
   if (info > 0) {
-    // std::cout << info << std::endl;
     throw std::runtime_error("Problem in cc vel linear solve, line 630");
   }
 
@@ -640,7 +629,6 @@ void cc_vel(std::vector<double> &modify, const std::vector<double> &targets,
        i++) { // interpolate interaction into target triangle
     point_index = fast_sum_tree_tri_points_target[interact.lev_target]
                                                  [interact.curr_target][i];
-    // target_particle = targets[point_index];
     target_particle = slice(targets, 3 * point_index, 1, 3);
     bary_cord = barycoords(v1, v2, v3, target_particle);
     modify[3 * point_index] +=
@@ -681,6 +669,338 @@ void fast_sum_vel(std::vector<double> &modify,
                time); // pp or pc
       else if (interactions[i].type == 3)
         cp_vel(modify, targets, sources, vorticities, area, interactions[i],
+               fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
+               icos_tree, time, interp_degree, interp_point_count); // cp or cc
+    }
+  }
+}
+
+void pp_stream_func(std::vector<double> &modify, const std::vector<double> &targets,
+            const std::vector<double> &sources,
+            const std::vector<double> &vorticities,
+            const std::vector<double> &area, const InteractionPair &interact,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_target,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_source,
+            const double time) {
+  // particle particle interaction
+  int target_i, source_j;
+  std::vector<double> particle_i, particle_j;
+  double vor, stream_func, contribution;
+  for (int i = 0; i < interact.count_target; i++) {
+    target_i = fast_sum_tree_tri_points_target[interact.lev_target]
+                                              [interact.curr_target][i];
+    stream_func = 0;
+    particle_i = slice(targets, 3 * target_i, 1, 3);
+    for (int j = 0; j < interact.count_source; j++) {
+      source_j = fast_sum_tree_tri_points_source[interact.lev_source]
+                                                [interact.curr_source][j];
+      particle_j = slice(sources, 3 * source_j, 1, 3);
+      if ((std::abs(particle_j[0] - particle_i[0]) > 1e-14) and
+          (std::abs(particle_j[1] - particle_i[1]) > 1e-14) and
+          (std::abs(particle_j[2] - particle_i[2]) > 1e-14)) {
+        contribution = stream_gfunc(particle_i, particle_j);
+        vor = vorticities[source_j];
+        stream_func += contribution * vor * area[source_j];
+      }
+    }
+    modify[target_i] += stream_func;
+  }
+}
+
+void pc_stream_func(std::vector<double> &modify, const std::vector<double> &targets,
+            const std::vector<double> &sources,
+            const std::vector<double> &vorticities,
+            const std::vector<double> &area, const InteractionPair &interact,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_target,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_source,
+            const IcosTree &icos_tree, const double time,
+            const int interp_degree, const int interp_point_count) {
+  std::vector<double> v1s, v2s, v3s, target_particle, placeholder1,
+      placeholder2, placeholder3, bary_cord, source_particle;
+  std::vector<double> func_vals(interp_point_count, 0);
+  int iv1s, iv2s, iv3s, point_index;
+  double vor;
+  double us, vs;
+  char trans = 'N';
+  int nrhs = 1, dim = interp_point_count, info;
+  std::vector<double> interp_matrix(interp_point_count * interp_point_count, 0);
+  std::vector<int> ipiv(interp_point_count, 0);
+  std::vector<std::vector<double>> interp_points(interp_point_count,
+                                                 std::vector<double>(3, 0));
+  fekete_init(interp_points, interp_degree);
+  interp_mat_init(interp_matrix, interp_points, interp_degree,
+                  interp_point_count);
+  dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
+  iv1s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][0];
+  iv2s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][1];
+  iv3s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][2];
+  v1s = icos_tree.icosahedron_vertex_coords[iv1s];
+  v2s = icos_tree.icosahedron_vertex_coords[iv2s];
+  v3s = icos_tree.icosahedron_vertex_coords[iv3s];
+  for (int i = 0; i < interact.count_target; i++) {
+    point_index = fast_sum_tree_tri_points_target[interact.lev_target]
+                                                 [interact.curr_target][i];
+    target_particle = slice(targets, 3 * point_index, 1, 3);
+    for (int j = 0; j < interp_point_count; j++) {
+      us = interp_points[j][0];
+      vs = interp_points[j][1];
+      placeholder1 = v1s;
+      placeholder2 = v2s;
+      placeholder3 = v3s;
+      scalar_mult(placeholder1, us);
+      scalar_mult(placeholder2, vs);
+      scalar_mult(placeholder3, 1.0 - us - vs);
+      vec_add(placeholder1, placeholder2);
+      vec_add(placeholder1, placeholder3);
+      func_vals[j] = stream_gfunc(target_particle, placeholder1);
+    }
+
+    dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
+            &*func_vals.begin(), &dim, &info);
+    if (info > 0) {
+      throw std::runtime_error("Problem in pc stream linear solve");
+    }
+
+    for (int j = 0; j < interact.count_source; j++) {
+      point_index = fast_sum_tree_tri_points_source[interact.lev_source]
+                                                   [interact.curr_source][j];
+      source_particle = slice(sources, 3 * point_index, 1, 3);
+      bary_cord = barycoords(v1s, v2s, v3s, source_particle);
+      vor = vorticities[point_index];
+      modify[point_index] += interp_eval(func_vals, bary_cord[0], bary_cord[1], interp_degree) * vor * area[point_index];
+    }
+  }
+}
+
+void cp_stream_func(std::vector<double> &modify, const std::vector<double> &targets,
+            const std::vector<double> &sources,
+            const std::vector<double> &vorticities,
+            const std::vector<double> &area, const InteractionPair &interact,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_target,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_source,
+            const IcosTree &icos_tree, const double time,
+            const int interp_degree, const int interp_point_count) {
+  int iv1, iv2, iv3, point_index;
+  std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3,
+      source_particle, target_particle, bary_cord;
+  double u, v, vor, func_val;
+  std::vector<std::vector<double>> curr_points(interp_point_count,
+                                               std::vector<double>(3, 0));
+  std::vector<double> interptargets(interp_point_count, 0);
+  char trans = 'N';
+  int nrhs = 1, dim = interp_point_count, info;
+  std::vector<double> interp_matrix(interp_point_count * interp_point_count, 0);
+  std::vector<int> ipiv(interp_point_count, 0);
+  std::vector<std::vector<double>> interp_points(interp_point_count,
+                                                 std::vector<double>(3, 0));
+  fekete_init(interp_points, interp_degree);
+  interp_mat_init(interp_matrix, interp_points, interp_degree,
+                  interp_point_count);
+  dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
+  if (info > 0) {
+    std::cout << info << std::endl;
+  }
+  iv1 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][0];
+  iv2 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][1];
+  iv3 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][2];
+  v1 = icos_tree.icosahedron_vertex_coords[iv1];
+  v2 = icos_tree.icosahedron_vertex_coords[iv2];
+  v3 = icos_tree.icosahedron_vertex_coords[iv3];
+  for (int i = 0; i < interp_point_count; i++) {
+    u = interp_points[i][0];
+    v = interp_points[i][1];
+    placeholder1 = v1;
+    placeholder2 = v2;
+    placeholder3 = v3;
+    scalar_mult(placeholder1, u);
+    scalar_mult(placeholder2, v);
+    scalar_mult(placeholder3, 1.0 - u - v);
+    vec_add(placeholder1, placeholder2);
+    vec_add(placeholder1, placeholder3);
+    curr_points[i] = placeholder1;
+  }
+
+  for (int i = 0; i < interp_point_count; i++) {
+    for (int j = 0; j < interact.count_source; j++) {
+      point_index = fast_sum_tree_tri_points_source[interact.lev_source]
+                                                   [interact.curr_source][j];
+      source_particle = slice(sources, 3 * point_index, 1, 3);
+      func_val = stream_gfunc(curr_points[i], source_particle);
+      vor = vorticities[point_index];
+      interptargets[i] += func_val * vor * area[point_index];
+    }
+  }
+
+  dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
+          &*interptargets.begin(), &dim, &info);
+  if (info > 0) {
+    throw std::runtime_error("Problem in cp stream linear solve");
+  }
+
+  for (int i = 0; i < interact.count_target; i++) {
+    point_index = fast_sum_tree_tri_points_target[interact.lev_target]
+                                                 [interact.curr_target][i];
+    target_particle = slice(targets, 3 * point_index, 1, 3);
+    bary_cord = barycoords(v1, v2, v3, target_particle);
+    modify[point_index] += interp_eval(interptargets, bary_cord[0], bary_cord[1], interp_degree);
+  }
+}
+
+void cc_stream_func(std::vector<double> &modify, const std::vector<double> &targets,
+            const std::vector<double> &sources,
+            const std::vector<double> &vorticities,
+            const std::vector<double> &area, const InteractionPair &interact,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_target,
+            const std::vector<std::vector<std::vector<int>>>
+                &fast_sum_tree_tri_points_source,
+            const IcosTree &icos_tree, const double time,
+            const int interp_degree, const int interp_point_count) {
+  int iv1, iv2, iv3, iv1s, iv2s, iv3s, point_index;
+  std::vector<double> v1, v2, v3, placeholder1, placeholder2, placeholder3, v1s,
+      v2s, v3s, func_vals(interp_point_count, 0);
+  double u, v, us, vs, vor, func_val;
+  std::vector<std::vector<double>> curr_points(interp_point_count,
+                                               std::vector<double>(3, 0));
+  int nrhs = 1, dim = interp_point_count, info;
+  char trans = 'N';
+  std::vector<double> bary_cord, target_particle, source_particle;
+  std::vector<double> interptargets(interp_point_count, 0);
+  std::vector<double> interp_matrix(interp_point_count * interp_point_count, 0);
+  std::vector<int> ipiv(interp_point_count, 0);
+  std::vector<std::vector<double>> interp_points(interp_point_count,
+                                                 std::vector<double>(3, 0));
+  fekete_init(interp_points, interp_degree);
+  interp_mat_init(interp_matrix, interp_points, interp_degree,
+                  interp_point_count);
+  dgetrf_(&dim, &dim, &*interp_matrix.begin(), &dim, &*ipiv.begin(), &info);
+  iv1 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][0];
+  iv2 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][1];
+  iv3 = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_target]
+                                                     [interact.curr_target][2];
+  v1 = icos_tree.icosahedron_vertex_coords[iv1];
+  v2 = icos_tree.icosahedron_vertex_coords[iv2];
+  v3 = icos_tree.icosahedron_vertex_coords[iv3];
+  for (int i = 0; i < interp_point_count;
+       i++) { // interpolation points in target triangle
+    u = interp_points[i][0];
+    v = interp_points[i][1];
+    placeholder1 = v1;
+    placeholder2 = v2;
+    placeholder3 = v3;
+    scalar_mult(placeholder1, u);
+    scalar_mult(placeholder2, v);
+    scalar_mult(placeholder3, 1.0 - u - v);
+    vec_add(placeholder1, placeholder2);
+    vec_add(placeholder1, placeholder3);
+    curr_points[i] = placeholder1;
+  }
+
+  iv1s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][0];
+  iv2s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][1];
+  iv3s = icos_tree.icosahedron_triangle_vertex_indices[interact.lev_source]
+                                                      [interact.curr_source][2];
+  v1s = icos_tree.icosahedron_vertex_coords[iv1s];
+  v2s = icos_tree.icosahedron_vertex_coords[iv2s];
+  v3s = icos_tree.icosahedron_vertex_coords[iv3s];
+  for (int i = 0; i < interp_point_count;
+       i++) { // loop across target interpolation points
+    for (int j = 0; j < interp_point_count;
+         j++) { // loop across source interpolation points
+      // for each target interpolation point, interact with the source
+      // interpolation points
+      us = interp_points[j][0];
+      vs = interp_points[j][1];
+      placeholder1 = v1s;
+      placeholder2 = v2s;
+      placeholder3 = v3s;
+      scalar_mult(placeholder1, us);
+      scalar_mult(placeholder2, vs);
+      scalar_mult(placeholder3, 1.0 - us - vs);
+      vec_add(placeholder1, placeholder2);
+      vec_add(placeholder1, placeholder3);
+      func_vals[j] = stream_gfunc(curr_points[i], placeholder1);
+    }
+
+    dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
+            &*func_vals.begin(), &dim, &info);
+    if (info > 0) {
+      throw std::runtime_error("Problem in cc stream linear solve, line 948");
+    }
+
+    for (int j = 0; j < interact.count_source;
+         j++) { // interpolate green's function into interior of source triangle
+      point_index = fast_sum_tree_tri_points_source[interact.lev_source]
+                                                   [interact.curr_source][j];
+      source_particle = slice(sources, 3 * point_index, 1, 3);
+      bary_cord = barycoords(v1s, v2s, v3s, source_particle);
+      vor = vorticities[point_index];
+      interptargets[i] += interp_eval(func_vals, bary_cord[0], bary_cord[1], interp_degree) * vor * area[point_index];
+    }
+  }
+
+  dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
+          &*interptargets.begin(), &dim, &info);
+
+  if (info > 0) {
+    throw std::runtime_error("Problem in cc stream linear solve, line 980");
+  }
+
+  for (int i = 0; i < interact.count_target;
+       i++) { // interpolate interaction into target triangle
+    point_index = fast_sum_tree_tri_points_target[interact.lev_target]
+                                                 [interact.curr_target][i];
+    target_particle = slice(targets, 3 * point_index, 1, 3);
+    bary_cord = barycoords(v1, v2, v3, target_particle);
+    modify[point_index] += interp_eval(interptargets, bary_cord[0], bary_cord[1], interp_degree);
+  }
+}
+
+void fast_sum_stream_func(std::vector<double> &modify,
+                  const std::vector<double> &targets,
+                  const std::vector<double> &sources,
+                  const std::vector<double> &vorticities,
+                  const std::vector<double> &area,
+                  const std::vector<InteractionPair> &interactions,
+                  const std::vector<std::vector<std::vector<int>>>
+                      &fast_sum_tree_tri_points_target,
+                  const std::vector<std::vector<std::vector<int>>>
+                      &fast_sum_tree_tri_points_source,
+                  const IcosTree &icos_tree, const double time,
+                  const int interp_degree, const int interp_point_count,
+                  const int mpi_P, const int mpi_ID) {
+  for (int i = 0; i < interactions.size(); i++) {
+    if (i % mpi_P == mpi_ID) { // evenly split up interactions
+      if (interactions[i].type == 0)
+        pp_stream_func(modify, targets, sources, vorticities, area, interactions[i],
+               fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
+               time);
+      else if (interactions[i].type == 2)
+        cp_stream_func(modify, targets, sources, vorticities, area, interactions[i],
+               fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
+               icos_tree, time, interp_degree, interp_point_count);
+      else if (interactions[i].type == 1)
+        pp_stream_func(modify, targets, sources, vorticities, area, interactions[i],
+               fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
+               time); // pp or pc
+      else if (interactions[i].type == 3)
+        cp_stream_func(modify, targets, sources, vorticities, area, interactions[i],
                fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
                icos_tree, time, interp_degree, interp_point_count); // cp or cc
     }

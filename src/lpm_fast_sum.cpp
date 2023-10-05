@@ -272,7 +272,8 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
   MPI_Barrier(mpi_communicator);
   // cout << "interactions: " << tree_interactions.size() << endl;
   if (not test_is_same(tree_interactions.size())) {
-    std::cout << "Tree Traverse Error" << std::endl;
+    // std::cout << "Tree Traverse Error" << std::endl;
+    throw std::runtime_error("Tree traversal error, interaction lists not the same");
   }
 }
 
@@ -376,7 +377,8 @@ void pc_vel(std::vector<double> &modify, const std::vector<double> &targets,
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
             &*func_vals.begin(), &dim, &info);
     if (info > 0) {
-      std::cout << info << std::endl;
+      // std::cout << info << std::endl;
+      throw std::runtime_error("Problem in pc vel linear solve");
     }
 
     for (int j = 0; j < interp_point_count; j++) {
@@ -478,7 +480,8 @@ void cp_vel(std::vector<double> &modify, const std::vector<double> &targets,
   dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
           &*interptargets.begin(), &dim, &info);
   if (info > 0) {
-    std::cout << info << std::endl;
+    // std::cout << info << std::endl;
+    throw std::runtime_error("Problem in cp vel linear solve");
   }
 
   for (int i = 0; i < interp_point_count; i++) {
@@ -589,7 +592,8 @@ void cc_vel(std::vector<double> &modify, const std::vector<double> &targets,
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
             &*func_vals.begin(), &dim, &info);
     if (info > 0) {
-      std::cout << info << std::endl;
+      // std::cout << info << std::endl;
+      throw std::runtime_error("Problem in cc vel linear solve, line 596");
     }
 
     for (int j = 0; j < interp_point_count; j++) {
@@ -622,7 +626,8 @@ void cc_vel(std::vector<double> &modify, const std::vector<double> &targets,
           &*interptargets.begin(), &dim, &info);
 
   if (info > 0) {
-    std::cout << info << std::endl;
+    // std::cout << info << std::endl;
+    throw std::runtime_error("Problem in cc vel linear solve, line 630");
   }
 
   for (int i = 0; i < interp_point_count; i++) {
@@ -673,11 +678,11 @@ void fast_sum_vel(std::vector<double> &modify,
       else if (interactions[i].type == 1)
         pp_vel(modify, targets, sources, vorticities, area, interactions[i],
                fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
-               time);
+               time); // pp or pc
       else if (interactions[i].type == 3)
         cp_vel(modify, targets, sources, vorticities, area, interactions[i],
                fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
-               icos_tree, time, interp_degree, interp_point_count);
+               icos_tree, time, interp_degree, interp_point_count); // cp or cc
     }
   }
 }

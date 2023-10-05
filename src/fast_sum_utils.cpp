@@ -355,7 +355,8 @@ void tree_traverse(const RunConfig &run_information,
   MPI_Barrier(MPI_COMM_WORLD);
   // cout << "interactions: " << tree_interactions.size() << endl;
   if (not test_is_same(tree_interactions.size())) {
-    std::cout << "Tree Traverse Error" << std::endl;
+    // std::cout << "Tree Traverse Error" << std::endl;
+    throw std::runtime_error("Tree Traversal Error, not all interaction lists are the same");
   }
 }
 
@@ -461,7 +462,8 @@ void pc_vel(const RunConfig &run_information, std::vector<double> &modify,
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
             &*func_vals.begin(), &dim, &info);
     if (info > 0) {
-      std::cout << info << std::endl;
+      // std::cout << info << std::endl;
+      throw std::runtime_error("Error with linear solve in pc vel computation");
     }
 
     for (int j = 0; j < run_information.interp_point_count; j++) {
@@ -571,7 +573,8 @@ void cp_vel(const RunConfig &run_information, std::vector<double> &modify,
   dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
           &*interptargets.begin(), &dim, &info);
   if (info > 0) {
-    std::cout << info << std::endl;
+    // std::cout << info << std::endl;
+    throw std::runtime_error("Error with linear solve in cp vel computation");
   }
 
   for (int i = 0; i < run_information.interp_point_count; i++) {
@@ -684,7 +687,8 @@ void cc_vel(const RunConfig &run_information, std::vector<double> &modify,
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
             &*func_vals.begin(), &dim, &info);
     if (info > 0) {
-      std::cout << info << std::endl;
+      // std::cout << info << std::endl;
+      throw std::runtime_error("Error with linear solve in cc vel computation line 691");
     }
 
     for (int j = 0; j < run_information.interp_point_count; j++) {
@@ -720,7 +724,8 @@ void cc_vel(const RunConfig &run_information, std::vector<double> &modify,
           &*interptargets.begin(), &dim, &info);
 
   if (info > 0) {
-    std::cout << info << std::endl;
+    // std::cout << info << std::endl;
+    throw std::runtime_error("Error with linear solve in cc vel computation line 728");
   }
 
   for (int i = 0; i < run_information.interp_point_count; i++) {
@@ -839,7 +844,8 @@ void pc_stream(const RunConfig &run_information, std::vector<double> &modify,
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
             &*func_vals.begin(), &dim, &info);
     if (info > 0) {
-      std::cout << info << std::endl;
+      // std::cout << info << std::endl;
+      throw std::runtime_error("Error with linear solve in pc stream computation");
     }
 
     for (int j = 0; j < interact.count_source; j++) {
@@ -928,7 +934,8 @@ void cp_stream(const RunConfig &run_information, std::vector<double> &modify,
   dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
           &*interptargets.begin(), &dim, &info);
   if (info > 0) {
-    std::cout << info << std::endl;
+    // std::cout << info << std::endl;
+    throw std::runtime_error("Error with linear solve in cp stream computation");
   }
 
   for (int i = 0; i < interact.count_target; i++) {
@@ -1029,7 +1036,8 @@ void cc_stream(const RunConfig &run_information, std::vector<double> &modify,
     dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
             &*func_vals.begin(), &dim, &info);
     if (info > 0) {
-      std::cout << info << std::endl;
+      // std::cout << info << std::endl;
+      throw std::runtime_error("Error with linear solve in cc stream computation line 1040");
     }
 
     for (int j = 0; j < interact.count_source;
@@ -1050,7 +1058,8 @@ void cc_stream(const RunConfig &run_information, std::vector<double> &modify,
   dgetrs_(&trans, &dim, &nrhs, &*interp_matrix.begin(), &dim, &*ipiv.begin(),
           &*interptargets.begin(), &dim, &info);
   if (info > 0) {
-    std::cout << info << std::endl;
+    // std::cout << info << std::endl;
+    throw std::runtime_error("Error with linear solve in cc stream computation line 1062");
   }
 
   for (int i = 0; i < interact.count_target;

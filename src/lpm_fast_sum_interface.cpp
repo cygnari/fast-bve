@@ -4,6 +4,7 @@
 #include "structs.hpp"
 #include <mpi.h>
 #include <vector>
+#include <cmath>
 
 void fast_sum_icos_init(IcosTree &icos_tree, const double radius,
                         const bool rotate, const double rotate_alph,

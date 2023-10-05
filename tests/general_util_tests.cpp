@@ -11,7 +11,6 @@
 
 TEST(CountNanTest, BasicAssertions) {
   std::vector<double> test_vec{std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
-  std::cout << count_nans(test_vec) << std::endl;
   EXPECT_EQ(2, count_nans(test_vec));
 }
 

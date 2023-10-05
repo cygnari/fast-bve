@@ -4,6 +4,10 @@
 #include <vector>
 #include "structs.hpp"
 
+void fast_sum_icos_init(IcosTree &icos_tree, const double radius, const bool rotate,
+      const double rotate_alph, const double rotate_beta, const double rotate_gamm,
+      const int tree_levels);
+
 void lpm_interface(std::vector<double> &active_target_velocities,
     std::vector<double> &passive_target_velocities,
     const std::vector<double> &active_target_coords,

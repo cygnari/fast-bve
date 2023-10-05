@@ -32,8 +32,4 @@ void fixer_init(const RunConfig &run_information,
 void fast_sum_icos_init(
     const RunConfig &run_information, IcosTree &icos_tree);
 
-void fast_sum_icos_init(IcosTree &icos_tree, const double radius, const bool rotate,
-      const double rotate_alph, const double rotate_beta, const double rotate_gamm,
-      const int tree_levels);
-
 #endif

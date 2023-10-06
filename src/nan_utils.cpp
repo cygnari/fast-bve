@@ -1,4 +1,5 @@
 #include <vector>
+#include <cmath>
 
 int count_nans(const std::vector<double> &x) {
   int count = 0;

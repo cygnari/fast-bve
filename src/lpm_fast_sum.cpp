@@ -87,9 +87,7 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
   double separation, distance;
   std::vector<std::vector<int>> tri_interactions;
   std::vector<int> curr_interact(4, 0);
-
   std::vector<InteractionPair> own_interactions;
-
   int out_lb, out_ub, in_lb, in_ub;
 
   if (P <= 20) { // less than 20 threads, parallelize only targets
@@ -207,8 +205,8 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
                                         particle_count_source,
                                         0};
         own_interactions.push_back(new_interact);
-      } else if (lev_target ==
-                 tree_levels - 1) { // target is leaf, tree traverse source
+      } else if (lev_target == tree_levels - 1) {
+        // target is leaf, tree traverse source
         tri_interactions.push_back(std::vector<int>{
             curr_target, 4 * curr_source, lev_target, lev_source + 1});
         tri_interactions.push_back(std::vector<int>{
@@ -217,8 +215,8 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
             curr_target, 4 * curr_source + 2, lev_target, lev_source + 1});
         tri_interactions.push_back(std::vector<int>{
             curr_target, 4 * curr_source + 3, lev_target, lev_source + 1});
-      } else if (lev_source ==
-                 tree_levels - 1) { // source is leaf, tree traverse target
+      } else if (lev_source == tree_levels - 1) {
+        // source is leaf, tree traverse target
         tri_interactions.push_back(std::vector<int>{
             4 * curr_target, curr_source, lev_target + 1, lev_source});
         tri_interactions.push_back(std::vector<int>{
@@ -228,8 +226,8 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
         tri_interactions.push_back(std::vector<int>{
             4 * curr_target + 3, curr_source, lev_target + 1, lev_source});
       } else { // neither is leaf
-        if (particle_count_target >=
-            particle_count_source) { // target has more points, refine target
+        if (particle_count_target >= particle_count_source) { 
+          // target has more points, refine target
           tri_interactions.push_back(std::vector<int>{
               4 * curr_target, curr_source, lev_target + 1, lev_source});
           tri_interactions.push_back(std::vector<int>{
@@ -272,7 +270,6 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
   MPI_Barrier(mpi_communicator);
   // cout << "interactions: " << tree_interactions.size() << endl;
   if (not test_is_same(tree_interactions.size(), mpi_communicator)) {
-    // std::cout << "Tree Traverse Error" << std::endl;
     throw std::runtime_error("Tree traversal error, interaction lists not the same");
   }
 }
@@ -536,8 +533,8 @@ void cc_vel(std::vector<double> &modify, const std::vector<double> &targets,
   v1 = icos_tree.icosahedron_vertex_coords[iv1];
   v2 = icos_tree.icosahedron_vertex_coords[iv2];
   v3 = icos_tree.icosahedron_vertex_coords[iv3];
-  for (int i = 0; i < interp_point_count;
-       i++) { // interpolation points in target triangle
+  for (int i = 0; i < interp_point_count; i++) {
+    // interpolation points in target triangle
     u = interp_points[i][0];
     v = interp_points[i][1];
     placeholder1 = v1;
@@ -560,10 +557,10 @@ void cc_vel(std::vector<double> &modify, const std::vector<double> &targets,
   v1s = icos_tree.icosahedron_vertex_coords[iv1s];
   v2s = icos_tree.icosahedron_vertex_coords[iv2s];
   v3s = icos_tree.icosahedron_vertex_coords[iv3s];
-  for (int i = 0; i < interp_point_count;
-       i++) { // loop across target interpolation points
-    for (int j = 0; j < interp_point_count;
-         j++) { // loop across source interpolation points
+  for (int i = 0; i < interp_point_count; i++) {
+    // loop across target interpolation points
+    for (int j = 0; j < interp_point_count; j++) {
+      // loop across source interpolation points
       // for each target interpolation point, interact with the source
       // interpolation points
       us = interp_points[j][0];
@@ -625,8 +622,8 @@ void cc_vel(std::vector<double> &modify, const std::vector<double> &targets,
     alphas_z[i] = interptargets[i + 2 * interp_point_count];
   }
 
-  for (int i = 0; i < interact.count_target;
-       i++) { // interpolate interaction into target triangle
+  for (int i = 0; i < interact.count_target; i++) {
+    // interpolate interaction into target triangle
     point_index = fast_sum_tree_tri_points_target[interact.lev_target]
                                                  [interact.curr_target][i];
     target_particle = slice(targets, 3 * point_index, 1, 3);
@@ -919,10 +916,10 @@ void cc_stream_func(std::vector<double> &modify, const std::vector<double> &targ
   v1s = icos_tree.icosahedron_vertex_coords[iv1s];
   v2s = icos_tree.icosahedron_vertex_coords[iv2s];
   v3s = icos_tree.icosahedron_vertex_coords[iv3s];
-  for (int i = 0; i < interp_point_count;
-       i++) { // loop across target interpolation points
-    for (int j = 0; j < interp_point_count;
-         j++) { // loop across source interpolation points
+  for (int i = 0; i < interp_point_count; i++) {
+    // loop across target interpolation points
+    for (int j = 0; j < interp_point_count; j++) {
+      // loop across source interpolation points
       // for each target interpolation point, interact with the source
       // interpolation points
       us = interp_points[j][0];
@@ -944,8 +941,8 @@ void cc_stream_func(std::vector<double> &modify, const std::vector<double> &targ
       throw std::runtime_error("Problem in cc stream linear solve, line 948");
     }
 
-    for (int j = 0; j < interact.count_source;
-         j++) { // interpolate green's function into interior of source triangle
+    for (int j = 0; j < interact.count_source; j++) {
+      // interpolate green's function into interior of source triangle
       point_index = fast_sum_tree_tri_points_source[interact.lev_source]
                                                    [interact.curr_source][j];
       source_particle = slice(sources, 3 * point_index, 1, 3);
@@ -962,8 +959,8 @@ void cc_stream_func(std::vector<double> &modify, const std::vector<double> &targ
     throw std::runtime_error("Problem in cc stream linear solve, line 980");
   }
 
-  for (int i = 0; i < interact.count_target;
-       i++) { // interpolate interaction into target triangle
+  for (int i = 0; i < interact.count_target; i++) {
+    // interpolate interaction into target triangle
     point_index = fast_sum_tree_tri_points_target[interact.lev_target]
                                                  [interact.curr_target][i];
     target_particle = slice(targets, 3 * point_index, 1, 3);

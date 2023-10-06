@@ -11,13 +11,8 @@ add_library(SrcLib amr.cpp
     lpm_fast_sum.cpp
     lpm_fast_sum_interface.cpp
     mpi_utils.cpp
-    nan_utils.cpp
     rhs_utils.cpp
     vorticity_functions.cpp)
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-  set_source_files_properties(nan_utils.cpp PROPERTIES COMPILE_FLAGS -fp-model=strict)
-endif()
 
 target_link_libraries(SrcLib PUBLIC MPI::MPI_C LAPACK::LAPACK)
 
@@ -34,7 +29,6 @@ install(FILES amr.hpp
     lpm_fast_sum.hpp
     lpm_fast_sum_interface.hpp
     mpi_utils.hpp
-    nan_utils.hpp
     rhs_utils.hpp
     structs.hpp
     vorticity_functions.hpp

@@ -8,12 +8,6 @@
 #include <gtest/gtest.h>
 
 #include "../src/general_utils.hpp"
-#include "../src/nan_utils.hpp"
-
-TEST(CountNanTest, BasicAssertions) {
-  std::vector<double> vec1 {std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
-  EXPECT_EQ(2, count_nans(vec1));
-}
 
 TEST(DotProdTest, BasicAssertions) {
   std::vector<double> vec1 {1, 2, 3};

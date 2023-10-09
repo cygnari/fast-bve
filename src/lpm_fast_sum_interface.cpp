@@ -290,6 +290,8 @@ void lpm_interface_bve_vel(std::vector<double> &active_target_velocities,
                        MPI_DOUBLE, mpi_communicator);
   sync_updates<double>(passive_target_velocities, mpi_P, mpi_ID, &win_passive,
                        MPI_DOUBLE, mpi_communicator);
+  MPI_Win_free(&win_active);
+  MPI_Win_free(&win_passive);
 }
 
 void lpm_interface_bve_stream(std::vector<double> &active_target_stream_func,
@@ -367,4 +369,6 @@ void lpm_interface_bve_stream(std::vector<double> &active_target_stream_func,
                        MPI_DOUBLE, mpi_communicator);
   sync_updates<double>(passive_target_stream_func, mpi_P, mpi_ID, &win_passive,
                        MPI_DOUBLE, mpi_communicator);
+  MPI_Win_free(&win_active);
+  MPI_Win_free(&win_passive);
 }

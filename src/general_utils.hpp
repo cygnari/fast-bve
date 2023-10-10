@@ -1,6 +1,6 @@
 #ifndef H_GENERAL_UTILS_H
 #define H_GENERAL_UTILS_H
-
+#include "fastbve-config.h"
 #include <vector>
 
 int count_nans(const std::vector<double> &x);

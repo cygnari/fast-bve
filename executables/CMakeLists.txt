@@ -13,6 +13,7 @@ target_include_directories(driver PUBLIC
 target_link_libraries(single_rhs PUBLIC fastbve)
 target_include_directories(single_rhs PUBLIC
            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
            $<INSTALL_INTERFACE:include>
            $<INSTALL_INTERFACE:include>
@@ -20,6 +21,7 @@ target_include_directories(single_rhs PUBLIC
 target_link_libraries(lpm_interface_example PUBLIC fastbve)
 target_include_directories(lpm_interface_example PUBLIC
            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
            $<INSTALL_INTERFACE:include>
            $<INSTALL_INTERFACE:include>

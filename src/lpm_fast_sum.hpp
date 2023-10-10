@@ -14,7 +14,7 @@ void point_assign(
 void points_assign(
     const std::vector<double> &point_coords, const IcosTree &icos_tree,
     std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
-    std::vector<std::vector<int>> &fast_sum_tree_point_locs);
+    std::vector<std::vector<int>> &fast_sum_tree_point_locs, const int point_count);
 
 void tree_traverse(const std::vector<std::vector<std::vector<int>>>
                        &fast_sum_tree_tri_points_source,

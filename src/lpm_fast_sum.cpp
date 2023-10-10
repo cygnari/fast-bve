@@ -20,11 +20,11 @@ extern int dgetrs_(char *, int *, int *, double *, int *, int *, double *,
 void point_assign(
     const std::vector<double> &point, const IcosTree &icos_tree,
     std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
-    std::vector<std::vector<int>> &fast_sum_tree_point_locs, const int point_id,
-    const int tree_levels) {
+    std::vector<std::vector<int>> &fast_sum_tree_point_locs, const int point_id) {
   // find which fast sum triangles each point is in
   int iv1, iv2, iv3, lb, ub;
   std::vector<double> v1, v2, v3;
+  int tree_levels = icos_tree.tree_depth;
 
   for (int i = 0; i < tree_levels; i++) {
     if (i > 0) {
@@ -56,9 +56,10 @@ void points_assign(
     const std::vector<double> &point_coords, const IcosTree &icos_tree,
     std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
     std::vector<std::vector<int>> &fast_sum_tree_point_locs,
-    const int point_count, const int tree_levels) {
+    const int point_count) {
   // assigns each point to triangles in the fast sum tree structure
   std::vector<double> particle;
+  int tree_levels = icos_tree.tree_depth;
   for (int i = 0; i < tree_levels; i++) {
     fast_sum_tree_tri_points[i] = std::vector<std::vector<int>>(20 * pow(4, i));
     fast_sum_tree_point_locs[i] = std::vector<int>(point_count, 0);
@@ -66,7 +67,7 @@ void points_assign(
   for (int i = 0; i < point_count; i++) {
     particle = slice(point_coords, 3 * i, 1, 3);
     point_assign(particle, icos_tree, fast_sum_tree_tri_points,
-                 fast_sum_tree_point_locs, i, tree_levels);
+                 fast_sum_tree_point_locs, i);
   }
 }
 
@@ -145,7 +146,7 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
     }
   }
 
-  tree_interactions.clear();
+  own_interactions.clear();
 
   while (tri_interactions.size() > 0) {
     curr_interact = tri_interactions.front(); // get triangle pair to interact
@@ -166,7 +167,6 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
     separation = (icos_tree.icosahedron_tri_radii[lev_target][curr_target] +
                   icos_tree.icosahedron_tri_radii[lev_source][curr_source]) /
                  distance;
-
     if ((distance > 0) and
         (separation < theta)) { // triangles are well separated
       InteractionPair new_interact = {lev_target,
@@ -226,7 +226,7 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
         tri_interactions.push_back(std::vector<int>{
             4 * curr_target + 3, curr_source, lev_target + 1, lev_source});
       } else { // neither is leaf
-        if (particle_count_target >= particle_count_source) { 
+        if (particle_count_target >= particle_count_source) {
           // target has more points, refine target
           tri_interactions.push_back(std::vector<int>{
               4 * curr_target, curr_source, lev_target + 1, lev_source});
@@ -268,7 +268,6 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
                  &tree_interactions[0], &array_sizes_buff[0], &offsets[0],
                  dt_interaction, mpi_communicator);
   MPI_Barrier(mpi_communicator);
-  // cout << "interactions: " << tree_interactions.size() << endl;
   if (not test_is_same(tree_interactions.size(), mpi_communicator)) {
     throw std::runtime_error("Tree traversal error, interaction lists not the same");
   }

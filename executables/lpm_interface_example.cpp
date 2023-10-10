@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
   sync_updates(active_targets, P, ID, &win_at, MPI_DOUBLE, MPI_COMM_WORLD);
   sync_updates(passive_targets, P, ID, &win_pt, MPI_DOUBLE, MPI_COMM_WORLD);
 
-  int tree_levels = (int) log((source_count - 2) / 10) / log(4) - 2;
+  int tree_levels = 2;
   IcosTree icos_tree;
   fast_sum_icos_init(icos_tree, sphere_radius, tree_levels);
 
@@ -81,9 +81,9 @@ int main(int argc, char **argv) {
   std::vector<double> source_vorticities (source_count, 0);
 
   int deg = 4;
-  double w = 2 * omega) / (deg * (3 + deg));
+  double w = 2 * omega / (deg * (3 + deg));
 
-  for (int i = 0; i < source_count, i++) {
+  for (int i = 0; i < source_count; i++) {
     point = slice(sources, 3 * i, 1, 3);
     latlon = lat_lon(point);
     lat = latlon[0];
@@ -93,9 +93,9 @@ int main(int argc, char **argv) {
   }
 
   std::vector<double> active_vels, passive_vels, active_stream, passive_stream;
-  lpm_interface_bve_vel(active_vels, passive_vels, active_targets, passive_targets, sources, source_vorticites, source_areas,
+  lpm_interface_bve_vel(active_vels, passive_vels, active_targets, passive_targets, sources, source_vorticities, source_areas,
                         icos_tree, 0, active_target_count, passive_target_count, source_count, sphere_radius, P, ID, MPI_COMM_WORLD);
-  lpm_interface_bve_stream(active_vels, passive_vels, active_targets, passive_targets, sources, source_vorticites, source_areas,
+  lpm_interface_bve_stream(active_vels, passive_vels, active_targets, passive_targets, sources, source_vorticities, source_areas,
                         icos_tree, 0, active_target_count, passive_target_count, source_count, sphere_radius, P, ID, MPI_COMM_WORLD);
 
   MPI_Win_free(&win_s);

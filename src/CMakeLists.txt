@@ -44,5 +44,5 @@ install(FILES
 
 install(TARGETS fastbve
         EXPORT FastBVETargets
-        DESTINATION lib)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

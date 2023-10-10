@@ -20,10 +20,12 @@ set(CMAKE_CXX_FLAGS_RELEASE -O3)
 # cmake will now use $<Package>_ROOT env variables in its search for Package
 # dependencies
 CMAKE_POLICY(SET CMP0074 NEW)
-# turn off deprecated cmake download timestamp handling
-# cmake will now set the local timestamp of a dependency to match its package
-# creation timestamp, rather than its downloaded timestamp.
-CMAKE_POLICY(SET CMP0135 NEW)
+if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.24)
+  # turn off deprecated cmake download timestamp handling
+  # cmake will now set the local timestamp of a dependency to match its package
+  # creation timestamp, rather than its download timestamp.
+  CMAKE_POLICY(SET CMP0135 NEW)
+endif()
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -44,15 +46,16 @@ configure_file(fastbve-config.h.in fastbve-config.h)
 
 # The following commands prepare FastBVE to be packaged as a library and used
 # by other codes as a dependency.
+include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 install(EXPORT FastBVETargets
   FILE FastBVETargets.cmake
-  DESTINATION lib/cmake/FastBVE
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/FastBVE
 )
 # generate config file for other CMake projects to find this project
 configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/FastBVEConfig.cmake
-  INSTALL_DESTINATION "lib/cmake/FastBVE"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/FastBVE"
   NO_SET_AND_CHECK_MACRO
   NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
@@ -66,7 +69,7 @@ write_basic_package_version_file(
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/FastBVEConfig.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/FastBVEConfigVersion.cmake
-  DESTINATION lib/cmake/FastBVE
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/FastBVE
 )
 # export configured package files to the build directory, too; this allows
 # clients to use FastBVE from a FastBVE build directory (without having to

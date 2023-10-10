@@ -19,6 +19,8 @@ int main(int argc, char **argv) {
   MPI_Status status;
   MPI_Win win_s, win_at, win_pt;
 
+  std::chrono::steady_clock::time_point t1, t2;
+
   MPI_Comm_size(MPI_COMM_WORLD, &P);
   MPI_Comm_rank(MPI_COMM_WORLD, &ID);
 
@@ -75,7 +77,16 @@ int main(int argc, char **argv) {
 
   int tree_levels = 2;
   IcosTree icos_tree;
+  if (ID == 0) {
+      t1 = std::chrono::steady_clock::now();
+  }
   fast_sum_icos_init(icos_tree, sphere_radius, tree_levels);
+  if (ID == 0) {
+      t2 = std::chrono::steady_clock::now();
+      std::cout << "icos setup time: " <<
+      std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() <<
+      " microseconds" << std::endl;
+  }
 
   std::vector<double> source_areas (source_count, 4 * M_PI / source_count);
   std::vector<double> source_vorticities (source_count, 0);
@@ -93,8 +104,17 @@ int main(int argc, char **argv) {
   }
 
   std::vector<double> active_vels, passive_vels, active_stream, passive_stream;
+  if (ID == 0) {
+      t1 = std::chrono::steady_clock::now();
+  }
   lpm_interface_bve_vel(active_vels, passive_vels, active_targets, passive_targets, sources, source_vorticities, source_areas,
                         icos_tree, 0, active_target_count, passive_target_count, source_count, sphere_radius, P, ID, MPI_COMM_WORLD);
+  if (ID == 0) {
+      t2 = std::chrono::steady_clock::now();
+      std::cout << "velocity integration time: " <<
+      std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() <<
+      " microseconds" << std::endl;
+  }
   lpm_interface_bve_stream(active_vels, passive_vels, active_targets, passive_targets, sources, source_vorticities, source_areas,
                         icos_tree, 0, active_target_count, passive_target_count, source_count, sphere_radius, P, ID, MPI_COMM_WORLD);
 

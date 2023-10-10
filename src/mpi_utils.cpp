@@ -2,6 +2,7 @@
 #include <cassert>
 #include <mpi.h>
 #include <vector>
+#include <iostream>
 #define assertm(exp, msg) assert(((void)msg, exp))
 
 void bounds_determine(RunConfig &run_information, const int P, const int ID) {
@@ -89,4 +90,28 @@ void sync_updates(const RunConfig &run_information, std::vector<T> &vals,
   }
   MPI_Win_fence(0, *win);
   MPI_Barrier(MPI_COMM_WORLD);
+}
+
+template <typename T>
+void sync_updates(std::vector<T> &vals, const int P, const int ID,
+                  const MPI_Win *win, MPI_Datatype type,
+                  MPI_Comm mpi_communicator) {
+  MPI_Barrier(mpi_communicator);
+  std::cout << "here 1" << std::endl;
+  MPI_Win_fence(0, *win);
+  std::cout << "here 2" << std::endl;
+  if (ID != 0) {
+    MPI_Accumulate(&vals[0], vals.size(), type, 0, 0, vals.size(), type,
+                   MPI_SUM, *win);
+  }
+  std::cout << "here 3" << std::endl;
+  MPI_Win_fence(0, *win);
+  std::cout << "here 4" << std::endl;
+  if (ID != 0) {
+    MPI_Get(&vals[0], vals.size(), type, 0, 0, vals.size(), type, *win);
+  }
+  std::cout << "here 5" << std::endl;
+  MPI_Win_fence(0, *win);
+  std::cout << "here 6" << std::endl;
+  MPI_Barrier(mpi_communicator);
 }

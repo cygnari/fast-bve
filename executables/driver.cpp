@@ -17,7 +17,6 @@
 #include "mpi_utils.hpp"
 #include "rhs_utils.hpp"
 #include "structs.hpp"
-// #include "nan_utils.hpp"
 
 double omega = 2 * M_PI; // 2pi rotation/day
 

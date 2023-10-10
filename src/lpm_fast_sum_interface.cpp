@@ -6,10 +6,9 @@
 #include <vector>
 #include <cmath>
 
-void fast_sum_icos_init(IcosTree &icos_tree, const double radius,
-                        const bool rotate, const double rotate_alph,
-                        const double rotate_beta, const double rotate_gamm,
-                        const int tree_levels) {
+void fast_sum_icos_init(IcosTree &icos_tree, const double radius, const int tree_levels,
+                        const bool rotate = true, const double rotate_alph = 0.03,
+                        const double rotate_beta = 0.02, const double rotate_gamm = 0.01) {
   double phi = (1 + sqrt(5)) / 2;
   std::vector<double> center, v1, v2, v3, v12, v23, v31;
   int iv1, iv2, iv3, iv12, iv23, iv13;
@@ -226,10 +225,9 @@ void lpm_interface_bve_vel(std::vector<double> &active_target_velocities,
                    const IcosTree &icos_tree, const double time,
                    const int active_target_count,
                    const int passive_target_count, const int source_count,
-                   const double radius, const double theta,
-                   const int cluster_thresh, const int tree_levels,
-                   const int interp_degree, const int mpi_P, const int mpi_ID,
-                   MPI_Comm mpi_communicator) {
+                   const double radius, const int mpi_P, const int mpi_ID,
+                   MPI_Comm mpi_communicator, const double theta = 0.7,
+                   const int cluster_thresh = 10, const int interp_degree = 2) {
   // interace for LPM to call fast summation to compute BVE velocities
   // first assign active targets, passive targets, sources to triangles
   // next perform tree traversal
@@ -241,6 +239,10 @@ void lpm_interface_bve_vel(std::vector<double> &active_target_velocities,
   MPI_Type_contiguous(7, MPI_INT, &dt_interaction);
   MPI_Type_commit(&dt_interaction);
   MPI_Win win_active, win_passive;
+  int tree_levels = icos_tree.tree_depth;
+
+  active_target_velocities.resize(3 * active_target_count, 0);
+  passive_target_velocities.resize(3 * passive_target_count, 0);
 
   MPI_Win_create(&active_target_velocities[0],
                  3 * active_target_count * sizeof(double), sizeof(double),
@@ -248,7 +250,6 @@ void lpm_interface_bve_vel(std::vector<double> &active_target_velocities,
   MPI_Win_create(&passive_target_velocities[0],
                  3 * passive_target_count * sizeof(double), sizeof(double),
                  MPI_INFO_NULL, mpi_communicator, &win_passive);
-
   std::vector<std::vector<std::vector<int>>> tree_tri_active_target(
       icos_tree.tree_depth); // points inside each triangle
   std::vector<std::vector<int>> tree_active_target_locs(
@@ -264,14 +265,11 @@ void lpm_interface_bve_vel(std::vector<double> &active_target_velocities,
   std::vector<InteractionPair> active_interactions; // c/p - c/p interactions
   std::vector<InteractionPair> passive_interactions; // c/p - c/p interactions
 
-  active_target_velocities.resize(3 * active_target_count, 0);
-  passive_target_velocities.resize(3 * passive_target_count, 0);
-
   points_assign(active_target_coords, icos_tree, tree_tri_active_target,
-                tree_active_target_locs);
+                tree_active_target_locs, active_target_count);
   points_assign(passive_target_coords, icos_tree, tree_tri_passive_target,
-                tree_passive_target_locs);
-  points_assign(source_coords, icos_tree, tree_tri_source, tree_source_locs);
+                tree_passive_target_locs, passive_target_count);
+  points_assign(source_coords, icos_tree, tree_tri_source, tree_source_locs, source_count);
   tree_traverse(tree_tri_source, tree_tri_active_target, icos_tree,
                 active_interactions, dt_interaction, mpi_P, mpi_ID, radius,
                 theta, cluster_thresh, tree_levels, mpi_communicator);
@@ -290,6 +288,8 @@ void lpm_interface_bve_vel(std::vector<double> &active_target_velocities,
                        MPI_DOUBLE, mpi_communicator);
   sync_updates<double>(passive_target_velocities, mpi_P, mpi_ID, &win_passive,
                        MPI_DOUBLE, mpi_communicator);
+  MPI_Win_free(&win_active);
+  MPI_Win_free(&win_passive);
 }
 
 void lpm_interface_bve_stream(std::vector<double> &active_target_stream_func,
@@ -302,10 +302,9 @@ void lpm_interface_bve_stream(std::vector<double> &active_target_stream_func,
                    const IcosTree &icos_tree, const double time,
                    const int active_target_count,
                    const int passive_target_count, const int source_count,
-                   const double radius, const double theta,
-                   const int cluster_thresh, const int tree_levels,
-                   const int interp_degree, const int mpi_P, const int mpi_ID,
-                   MPI_Comm mpi_communicator) {
+                   const double radius, const int mpi_P, const int mpi_ID,
+                   MPI_Comm mpi_communicator, const double theta = 0.7,
+                   const int cluster_thresh = 10, const int interp_degree = 2) {
   // interace for LPM to call fast summation to compute BVE velocities
   // first assign active targets, passive targets, sources to triangles
   // next perform tree traversal
@@ -317,6 +316,10 @@ void lpm_interface_bve_stream(std::vector<double> &active_target_stream_func,
   MPI_Type_contiguous(7, MPI_INT, &dt_interaction);
   MPI_Type_commit(&dt_interaction);
   MPI_Win win_active, win_passive;
+
+  int tree_levels = icos_tree.tree_depth;
+  active_target_stream_func.resize(active_target_count, 0);
+  passive_target_stream_func.resize(passive_target_count, 0);
 
   MPI_Win_create(&active_target_stream_func[0],
                  3 * active_target_count * sizeof(double), sizeof(double),
@@ -340,17 +343,16 @@ void lpm_interface_bve_stream(std::vector<double> &active_target_stream_func,
   std::vector<InteractionPair> active_interactions; // c/p - c/p interactions
   std::vector<InteractionPair> passive_interactions; // c/p - c/p interactions
 
-  active_target_stream_func.resize(active_target_count, 0);
-  passive_target_stream_func.resize(passive_target_count, 0);
-
   points_assign(active_target_coords, icos_tree, tree_tri_active_target,
-                tree_active_target_locs);
+                tree_active_target_locs, active_target_count);
   points_assign(passive_target_coords, icos_tree, tree_tri_passive_target,
-                tree_passive_target_locs);
-  points_assign(source_coords, icos_tree, tree_tri_source, tree_source_locs);
+                tree_passive_target_locs, passive_target_count);
+  points_assign(source_coords, icos_tree, tree_tri_source, tree_source_locs, source_count);
+
   tree_traverse(tree_tri_source, tree_tri_active_target, icos_tree,
                 active_interactions, dt_interaction, mpi_P, mpi_ID, radius,
                 theta, cluster_thresh, tree_levels, mpi_communicator);
+
   tree_traverse(tree_tri_source, tree_tri_passive_target, icos_tree,
                 passive_interactions, dt_interaction, mpi_P, mpi_ID, radius,
                 theta, cluster_thresh, tree_levels, mpi_communicator);
@@ -366,4 +368,6 @@ void lpm_interface_bve_stream(std::vector<double> &active_target_stream_func,
                        MPI_DOUBLE, mpi_communicator);
   sync_updates<double>(passive_target_stream_func, mpi_P, mpi_ID, &win_passive,
                        MPI_DOUBLE, mpi_communicator);
+  MPI_Win_free(&win_active);
+  MPI_Win_free(&win_passive);
 }

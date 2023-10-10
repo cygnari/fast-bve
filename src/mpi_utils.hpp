@@ -4,6 +4,7 @@
 #include "structs.hpp"
 #include <mpi.h>
 #include <vector>
+#include <iostream>
 
 void bounds_determine(RunConfig &run_information, const int P, const int ID);
 

@@ -136,7 +136,7 @@ void reconstruct_safely(const RunConfig &run_information,
     clip_assured_sum(run_information, dynamics_state, dynamics_areas, qmin,
                      qmax, target_mass, target_species);
   } else {
-    std::cout << "not feasible" << std::endl;
+    throw std::runtime_error("CAAS not feasible");
   }
 }
 

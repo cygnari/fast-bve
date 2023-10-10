@@ -3,8 +3,6 @@
 #include "fastbve-config.h"
 #include <vector>
 
-int count_nans(const std::vector<double> &x);
-
 double dot_prod(const std::vector<double> &x, const std::vector<double> &y);
 
 double vec_norm(const std::vector<double> &x);
@@ -66,6 +64,11 @@ std::vector<double> barycoords(const std::vector<double> &p1,
                                const std::vector<double> &p3,
                                const std::vector<double> &p);
 
+std::vector<double> barycoords(const std::vector<double> &p1,
+                              const std::vector<double> &p2,
+                              const std::vector<double> &p3,
+                              const double x, const double y, const double z);
+
 std::vector<double> normalized_barycoords(const std::vector<double> &p1,
                                           const std::vector<double> &p2,
                                           const std::vector<double> &p3,
@@ -73,6 +76,11 @@ std::vector<double> normalized_barycoords(const std::vector<double> &p1,
 
 bool check_in_tri(const std::vector<double> &p1, const std::vector<double> &p2,
                   const std::vector<double> &p3, const std::vector<double> &p);
+
+bool check_in_tri(
+    const std::vector<double> &p1, const std::vector<double> &p2,
+    const std::vector<double> &p3,
+    const double x, const double y, const double z);
 
 bool check_in_tri_thresh(const std::vector<double> &p1,
                          const std::vector<double> &p2,

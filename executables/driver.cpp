@@ -17,6 +17,7 @@
 #include "../src/mpi_utils.hpp"
 #include "../src/rhs_utils.hpp"
 #include "../src/structs.hpp"
+#include "../src/nan_utils.hpp"
 
 double omega = 2 * M_PI; // 2pi rotation/day
 
@@ -390,9 +391,9 @@ int main(int argc, char **argv) {
     scalar_mult(c1234, run_information.delta_t / 6.0); // RK4 update
     MPI_Barrier(MPI_COMM_WORLD);
 
-    if (count_nans(c1234) > 0) {
-      std::cout << "process: " << ID << " has nans" << std::endl;
-    }
+    // if (count_nans(c1234) > 0) {
+    //   std::cout << "process: " << ID << " has nans" << std::endl;
+    // }
 
     if (run_information.use_remesh) {
       vec_add(c1234, dynamics_state);
@@ -455,9 +456,9 @@ int main(int argc, char **argv) {
                       dynamics_triangles_is_leaf, *write_outs3[writer_index],
                       write_out4);
     }
-    if ((count_nans(dynamics_state) > 0) and (ID == 0)) {
-      std::cout << "nans present!" << std::endl;
-    }
+    // if ((count_nans(dynamics_state) > 0) and (ID == 0)) {
+    //   std::cout << "nans present!" << std::endl;
+    // }
     if (ID == 0) {
       std::cout << "points: " << run_information.dynamics_curr_point_count
                 << std::endl;

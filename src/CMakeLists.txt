@@ -1,6 +1,4 @@
-add_library(fastbve
-    # add all FastBVE library source/impl files here
-    amr.cpp
+add_library(SrcLib amr.cpp
     conservation_fixer.cpp
     direct_sum_utils.cpp
     fast_sum_utils.cpp
@@ -16,15 +14,9 @@ add_library(fastbve
     rhs_utils.cpp
     vorticity_functions.cpp)
 
-target_link_libraries(fastbve PUBLIC MPI::MPI_C LAPACK::LAPACK)
-target_include_directories(fastbve PUBLIC
-           $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
-           $<INSTALL_INTERFACE:include>)
+target_link_libraries(SrcLib PUBLIC MPI::MPI_C LAPACK::LAPACK)
 
-install(FILES
-    # add all FastBVE header/include files here
-    ${CMAKE_BINARY_DIR}/fastbve-config.h
-    amr.hpp
+install(FILES amr.hpp
     conservation_fixer.hpp
     direct_sum_utils.hpp
     fast_sum_utils.hpp
@@ -40,9 +32,4 @@ install(FILES
     rhs_utils.hpp
     structs.hpp
     vorticity_functions.hpp
-    DESTINATION include)
-
-install(TARGETS fastbve
-        EXPORT FastBVETargets
-        DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
+    DESTINATION ${PROJECT_SOURCE_DIR}/include)

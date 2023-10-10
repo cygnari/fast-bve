@@ -5,18 +5,18 @@
 #include <iostream>
 #include <mpi.h>
 
-#include "amr.hpp"
-#include "conservation_fixer.hpp"
-#include "fast_sum_utils.hpp"
-#include "general_utils.hpp"
-#include "green_funcs.hpp"
-#include "init_utils.hpp"
-#include "input_utils.hpp"
-#include "interp_utils.hpp"
-#include "io_utils.hpp"
-#include "mpi_utils.hpp"
-#include "rhs_utils.hpp"
-#include "structs.hpp"
+#include "../src/amr.hpp"
+#include "../src/conservation_fixer.hpp"
+#include "../src/fast_sum_utils.hpp"
+#include "../src/general_utils.hpp"
+#include "../src/green_funcs.hpp"
+#include "../src/init_utils.hpp"
+#include "../src/input_utils.hpp"
+#include "../src/interp_utils.hpp"
+#include "../src/io_utils.hpp"
+#include "../src/mpi_utils.hpp"
+#include "../src/rhs_utils.hpp"
+#include "../src/structs.hpp"
 
 double omega = 2 * M_PI; // 2pi rotation/day
 

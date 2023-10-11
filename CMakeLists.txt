@@ -68,13 +68,14 @@ install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/FastBVEConfigVersion.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/FastBVE
 )
+install(EXPORT FastBVETargets
+ FILE FastBVETargets.cmake
+ DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/FastBVE
+)
 # export configured package files to the build directory, too; this allows
 # clients to use FastBVE from a FastBVE build directory (without having to
 # install it).
-#export(EXPORT FastBVETargets
-#  FILE "${CMAKE_CURRENT_BINARY_DIR}/FastBVETargets.cmake"
-#)
-#install(EXPORT FastBVETargets
-#  FILE FastBVETargets.cmake
-#  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/FastBVE
-#)
+export(EXPORT FastBVETargets
+ FILE "${CMAKE_CURRENT_BINARY_DIR}/FastBVETargets.cmake"
+)
+

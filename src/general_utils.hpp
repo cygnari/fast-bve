@@ -2,6 +2,7 @@
 #define H_GENERAL_UTILS_H
 
 #include <vector>
+#include "fastbve-config.h"
 
 double dot_prod(const std::vector<double> &x, const std::vector<double> &y);
 

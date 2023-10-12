@@ -63,7 +63,6 @@ int main(int argc, char **argv) {
                                   // triangle
   std::vector<std::vector<bool>>
       dynamics_triangles_exists; // at level i, if triangle j exists
-  // vector<double> target_points;
 
   std::vector<std::vector<double>>
       fast_sum_icos_verts; // vertices for the fast sum icosahedron
@@ -75,10 +74,6 @@ int main(int argc, char **argv) {
       run_information.fast_sum_tree_levels); // points inside each triangle
   std::vector<std::vector<int>> fast_sum_tree_point_locs(
       run_information.fast_sum_tree_levels); // triangle each point is in
-  // vector<vector<vector<int>>> fast_sum_tree_tri_points_target
-  // (run_information.fast_sum_tree_levels); // points inside each triangle
-  // vector<vector<int>> fast_sum_tree_point_locs_target
-  // (run_information.fast_sum_tree_levels); // triangle each point is in
   std::vector<InteractionPair>
       fast_sum_tree_interactions; // c/p - c/p interactions
 
@@ -102,7 +97,6 @@ int main(int argc, char **argv) {
   dynamics_points_initialize(run_information, dynamics_state,
                              dynamics_triangles, dynamics_triangles_is_leaf,
                              dynamics_triangles_exists);
-  // target_points = dynamics_state;
   std::vector<double> dynamics_areas(run_information.dynamics_initial_points,
                                      0);
   area_initialize(run_information, dynamics_state, dynamics_triangles,
@@ -194,7 +188,6 @@ int main(int argc, char **argv) {
                     icos_tree, 0, omega);
     sync_updates<double>(run_information, stream_func, P, ID, &win_stream,
                          MPI_DOUBLE);
-    // sync_updates(run_information, stream_func, P, ID, &win_stream);
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
       dynamics_state[(i + 1) * run_information.info_per_point - 1] =
           stream_func[i];
@@ -348,7 +341,6 @@ int main(int argc, char **argv) {
              fast_sum_tree_tri_points, fast_sum_tree_tri_points,
              icos_tree, curr_time, omega); // RK4 k_1
     sync_updates<double>(run_information, c_1, P, ID, &win_c1, MPI_DOUBLE);
-    // sync_updates(run_information, c_1, P, ID, &win_c1);
     inter_state = c_1;                                       // k_1
     scalar_mult(inter_state, run_information.delta_t / 2.0); // delta_t/2*k1
     vec_add(inter_state, dynamics_state);                    // x+delta_t/2*k1
@@ -359,7 +351,6 @@ int main(int argc, char **argv) {
              fast_sum_tree_interactions, fast_sum_tree_tri_points,
              fast_sum_tree_tri_points, icos_tree, curr_time, omega); // RK4 k_2
     sync_updates<double>(run_information, c_2, P, ID, &win_c2, MPI_DOUBLE);
-    // sync_updates(run_information, c_2, P, ID, &win_c2);
     inter_state = c_2;                                       // k_2
     scalar_mult(inter_state, run_information.delta_t / 2.0); // delta_t/2 * k_2
     vec_add(inter_state, dynamics_state);                    // x+delta_t/2*k2
@@ -370,7 +361,6 @@ int main(int argc, char **argv) {
              fast_sum_tree_interactions, fast_sum_tree_tri_points,
              fast_sum_tree_tri_points, icos_tree, curr_time, omega); // RK4 k_3
     sync_updates<double>(run_information, c_3, P, ID, &win_c3, MPI_DOUBLE);
-    // sync_updates(run_information, c_3, P, ID, &win_c3);
     inter_state = c_3;                                 // k_3
     scalar_mult(inter_state, run_information.delta_t); // delta_t * k_3
     vec_add(inter_state, dynamics_state);              // x + delta_t * k_3
@@ -381,7 +371,6 @@ int main(int argc, char **argv) {
              fast_sum_tree_interactions, fast_sum_tree_tri_points,
              fast_sum_tree_tri_points, icos_tree, curr_time, omega); // RK4 k_4
     sync_updates<double>(run_information, c_4, P, ID, &win_c4, MPI_DOUBLE);
-    // sync_updates(run_information, c_4, P, ID, &win_c4);
 
     c1234 = c_1;
     scalar_mult(c_2, 2);
@@ -392,10 +381,6 @@ int main(int argc, char **argv) {
     scalar_mult(c1234, run_information.delta_t / 6.0); // RK4 update
     MPI_Barrier(MPI_COMM_WORLD);
 
-    // if (count_nans(c1234) > 0) {
-    //   std::cout << "process: " << ID << " has nans" << std::endl;
-    // }
-
     if (run_information.use_remesh) {
       vec_add(c1234, dynamics_state);
       project_points(run_information, c1234, omega);
@@ -404,7 +389,6 @@ int main(int argc, char **argv) {
                     run_information.dynamics_curr_point_count, omega);
       sync_updates<double>(run_information, dynamics_state, P, ID,
                            &win_dynstate, MPI_DOUBLE);
-      // sync_updates(run_information, dynamics_state, P, ID, &win_dynstate);
     } else {
       vec_add(dynamics_state, c1234);
       project_points(run_information, dynamics_state, omega);
@@ -428,7 +412,6 @@ int main(int argc, char **argv) {
                       fast_sum_tree_tri_points, icos_tree, curr_time, omega);
       sync_updates<double>(run_information, stream_func, P, ID, &win_stream,
                            MPI_DOUBLE);
-      // sync_updates(run_information, stream_func, P, ID, &win_stream);
       for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
         dynamics_state[(i + 1) * run_information.info_per_point - 1] =
             stream_func[i];
@@ -457,9 +440,6 @@ int main(int argc, char **argv) {
                       dynamics_triangles_is_leaf, *write_outs3[writer_index],
                       write_out4);
     }
-    // if ((count_nans(dynamics_state) > 0) and (ID == 0)) {
-    //   std::cout << "nans present!" << std::endl;
-    // }
     if (ID == 0) {
       std::cout << "points: " << run_information.dynamics_curr_point_count
                 << std::endl;

@@ -72,8 +72,6 @@ int main(int argc, char **argv) {
       run_information.fast_sum_tree_levels); // points inside each triangle
   std::vector<std::vector<int>> fast_sum_tree_point_locs(
       run_information.fast_sum_tree_levels); // triangle each point is in
-  // vector<int> fast_sum_tree_point_locs(run_information.fast_sum_tree_levels *
-  // run_information.dynamics_max_points, 0);
   std::vector<InteractionPair>
       fast_sum_tree_interactions; // c/p - c/p interactions
 

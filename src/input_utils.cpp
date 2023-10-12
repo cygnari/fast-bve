@@ -8,7 +8,8 @@ void read_run_config(const std::string file_name, RunConfig &run_information) {
   // reads run information of file_name
   std::ifstream config_file(file_name);
   if (config_file.fail()) {
-      throw std::runtime_error("namelist not found, try running from inside /bin"); 
+      std::cout << "namelist file at " << file_name << std::endl;
+      throw std::runtime_error("namelist not found, try running from inside /bin");
   }
   std::string line, word1, word2;
 

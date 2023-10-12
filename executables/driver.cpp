@@ -17,6 +17,7 @@
 #include "../src/mpi_utils.hpp"
 #include "../src/rhs_utils.hpp"
 #include "../src/structs.hpp"
+#include "fastbve-config.h"
 
 double omega = 2 * M_PI; // 2pi rotation/day
 
@@ -35,7 +36,8 @@ int main(int argc, char **argv) {
   MPI_Type_commit(&dt_interaction);
 
   RunConfig run_information;
-  read_run_config("namelist.txt",
+  const std::string namelist_file = std::string(NAMELIST_DIR) + std::string("/namelist.txt");
+  read_run_config(namelist_file,
                   run_information); // reads in run configuration information
   run_information.mpi_P = P;
   run_information.mpi_ID = ID;
@@ -202,9 +204,9 @@ int main(int argc, char **argv) {
   std::string output_filename = create_config(run_information);
 
   if (ID == 0) {
-    std::string filename =
-        " initialize.py " + run_information.out_path + "/" + output_filename;
-    std::string command = "python";
+    std::string filename = NAMELIST_DIR +
+        std::string("initialize.py ") + run_information.out_path + "/" + output_filename;
+    std::string command = "python ";
     command += filename;
     system(command.c_str());
   }

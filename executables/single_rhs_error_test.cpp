@@ -132,7 +132,8 @@ int main(int argc, char **argv) {
           error_num += pow(vec_norm(vel_f), 2) * dynamics_areas[i];
           error_denom += pow(vec_norm(vel_d), 2) * dynamics_areas[i];
       }
-      error = sqrt(error_num / error_denom);
+      // error = sqrt(error_num / error_denom);
+      error = error_num / error_denom;
       std::cout << "Relative error is " << error << " with " << run_information.dynamics_initial_points << " particles and theta of " << run_information.fast_sum_theta << std::endl;
   }
 

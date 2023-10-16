@@ -221,7 +221,7 @@ void tree_traverse(const RunConfig &run_information,
       lb[i] = ub[i - 1];
       // ub[i-1] = lb[i];
     }
-    ub[same_outer] = 20;
+    ub[same_outer-1] = 20;
     in_lb = lb[ID / 20];
     in_ub = ub[ID / 20];
   }

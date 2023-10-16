@@ -342,6 +342,7 @@ void tree_traverse(const RunConfig &run_information,
       }
     }
   }
+  std::cout << "debug here" << std::endl;
   MPI_Barrier(MPI_COMM_WORLD);
   int size = static_cast<int>(own_interactions.size());
   std::vector<int> array_sizes_buff(P, 0);
@@ -363,7 +364,6 @@ void tree_traverse(const RunConfig &run_information,
   MPI_Barrier(MPI_COMM_WORLD);
   std::cout << "interactions: " << tree_interactions.size() << std::endl;
   if (not test_is_same(tree_interactions.size())) {
-    // std::cout << "Tree Traverse Error" << std::endl;
     throw std::runtime_error("Tree Traversal Error, not all interaction lists are the same");
   }
 }

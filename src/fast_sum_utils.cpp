@@ -171,7 +171,7 @@ void tree_traverse(const RunConfig &run_information,
   int P = run_information.mpi_P;
   int ID = run_information.mpi_ID;
 
-  std::cout << "Processor " << ID << std::endl;
+
 
   if (P <= 20) { // less than 20 threads, parallelize only targets
     in_lb = 0;
@@ -200,6 +200,7 @@ void tree_traverse(const RunConfig &run_information,
     out_lb = ID % 20;
     out_ub = out_lb + 1;
     int same_outer = 1 + (P % 20);
+    std::cout << "Processor " << ID << " same outer " << same_outer << std::endl;
     std::vector<int> in_counts(same_outer, int(20 / same_outer));
     std::vector<int> lb(same_outer, 0);
     std::vector<int> ub(same_outer, 0);

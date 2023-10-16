@@ -222,8 +222,8 @@ void tree_traverse(const RunConfig &run_information,
       // ub[i-1] = lb[i];
     }
     ub[same_outer] = 20;
-    in_lb = lb[ID % 20];
-    in_ub = ub[ID % 20];
+    in_lb = lb[ID / 20];
+    in_ub = ub[ID / 20];
   }
 
   std::cout << "Processor: " << run_information.mpi_ID << " out bounds: " << out_lb << " " << out_ub << " in bounds: " << in_lb << " " << in_ub << std::endl;

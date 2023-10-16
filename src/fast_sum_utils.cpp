@@ -171,6 +171,8 @@ void tree_traverse(const RunConfig &run_information,
   int P = run_information.mpi_P;
   int ID = run_information.mpi_ID;
 
+  std::cout << "Processor " << ID << std::endl;
+
   if (P <= 20) { // less than 20 threads, parallelize only targets
     in_lb = 0;
     in_ub = 20;

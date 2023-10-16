@@ -214,11 +214,12 @@ void tree_traverse(const RunConfig &run_information,
       total += in_counts[i];
     }
     std::cout << "Processor " << ID << " inner total " << total << std::endl;
-    // assertm(total == 20, "Inner triangle loop count not correct");
-    lb[0] = in_counts[0];
+    assertm(total == 20, "Inner triangle loop count not correct");
+    lb[0] = 0;
     for (int i = 1; i < same_outer; i++) {
+      ub[i-1] = lb[i-1] + in_counts[i-1];
       lb[i] = ub[i - 1];
-      ub[i-1] = lb[i];
+      // ub[i-1] = lb[i];
     }
     ub[same_outer] = 20;
     in_lb = lb[ID % 20];

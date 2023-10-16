@@ -343,10 +343,13 @@ void tree_traverse(const RunConfig &run_information,
     }
   }
   std::cout << "debug here" << std::endl;
-  std::cout << "Processor " << P << " own interactions " << own_interactions.size() << std::endl;
-  MPI_Barrier(MPI_COMM_WORLD);
+  std::cout << "Processor " << ID << " own interactions " << own_interactions.size() << std::endl;
+  // MPI_Barrier(MPI_COMM_WORLD);
 
   int size = static_cast<int>(own_interactions.size());
+  if (size == 0) {
+      std::cout << "Process " << ID << " 0 interactions" << std::endl;
+  }
 
   std::vector<int> array_sizes_buff(P, 0);
   MPI_Barrier(MPI_COMM_WORLD);

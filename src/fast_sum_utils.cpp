@@ -210,7 +210,7 @@ void tree_traverse(const RunConfig &run_information,
       in_counts[i] += 1;
     }
     total = 0;
-    for (int i = 0; i < P; i++) {
+    for (int i = 0; i < same_outer; i++) {
       total += in_counts[i];
     }
     std::cout << "Processor " << ID << " inner total " << total << std::endl;

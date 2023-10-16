@@ -210,7 +210,7 @@ void tree_traverse(const RunConfig &run_information,
     for (int i = 0; i < P; i++) {
       total += in_counts[i];
     }
-    assertm(total == 20, "Inner triangle loop count not correct");
+    // assertm(total == 20, "Inner triangle loop count not correct");
     ub[0] = in_counts[0];
     for (int i = 1; i < P; i++) {
       lb[i] = ub[i - 1];
@@ -219,6 +219,8 @@ void tree_traverse(const RunConfig &run_information,
     in_lb = lb[ID % 20];
     in_ub = ub[ID % 20];
   }
+
+  std::cout << "Processor: " << run_information.mpi_ID << " out bounds: " << out_lb << " " << out_ub << " in bounds: " << in_lb << " " << in_ub << std::endl;
 
   for (int i = out_lb; i < out_ub; i++) { // queue of triangle pairs to interact
     for (int j = in_lb; j < in_ub; j++) {

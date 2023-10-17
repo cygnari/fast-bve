@@ -171,8 +171,6 @@ void tree_traverse(const RunConfig &run_information,
   int P = run_information.mpi_P;
   int ID = run_information.mpi_ID;
 
-
-
   if (P <= 20) { // less than 20 threads, parallelize only targets
     in_lb = 0;
     in_ub = 20;
@@ -216,21 +214,16 @@ void tree_traverse(const RunConfig &run_information,
     for (int i = 0; i < same_outer; i++) {
       total += in_counts[i];
     }
-    std::cout << "Processor " << ID << " inner total " << total << std::endl;
     assertm(total == 20, "Inner triangle loop count not correct");
     lb[0] = 0;
     for (int i = 1; i < same_outer; i++) {
       ub[i-1] = lb[i-1] + in_counts[i-1];
       lb[i] = ub[i - 1];
-      // ub[i-1] = lb[i];
     }
     ub[same_outer-1] = 20;
     in_lb = lb[ID / 20];
     in_ub = ub[ID / 20];
   }
-  // if (in_ub > 20) {
-  std::cout << "Processor: " << run_information.mpi_ID << " out bounds: " << out_lb << " " << out_ub << " in bounds: " << in_lb << " " << in_ub << std::endl;
-  // }
 
   if (ID < 400) {
     for (int i = out_lb; i < out_ub; i++) { // queue of triangle pairs to interact
@@ -373,7 +366,6 @@ void tree_traverse(const RunConfig &run_information,
                  &tree_interactions[0], &array_sizes_buff[0], &offsets[0],
                  dt_interaction, MPI_COMM_WORLD);
   MPI_Barrier(MPI_COMM_WORLD);
-  std::cout << "interactions: " << tree_interactions.size() << std::endl;
   if (not test_is_same(tree_interactions.size())) {
     throw std::runtime_error("Tree Traversal Error, not all interaction lists are the same");
   }

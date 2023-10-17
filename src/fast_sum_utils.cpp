@@ -162,7 +162,7 @@ void tree_traverse(const RunConfig &run_information,
   int particle_count_target, particle_count_source;
   std::vector<double> center_target, center_source;
   double separation, distance;
-  std::vector<std::vector<int>> tri_interactions;
+  std::vector<std::vector<int>> tri_interactions ;
   std::vector<int> curr_interact(4, 0);
 
   std::vector<InteractionPair> own_interactions;
@@ -232,10 +232,11 @@ void tree_traverse(const RunConfig &run_information,
   std::cout << "Processor: " << run_information.mpi_ID << " out bounds: " << out_lb << " " << out_ub << " in bounds: " << in_lb << " " << in_ub << std::endl;
   // }
 
-
-  for (int i = out_lb; i < out_ub; i++) { // queue of triangle pairs to interact
-    for (int j = in_lb; j < in_ub; j++) {
-      tri_interactions.push_back({i, j, 0, 0});
+  if (ID < 400) {
+    for (int i = out_lb; i < out_ub; i++) { // queue of triangle pairs to interact
+      for (int j = in_lb; j < in_ub; j++) {
+        tri_interactions.push_back({i, j, 0, 0});
+      }
     }
   }
 
@@ -351,9 +352,9 @@ void tree_traverse(const RunConfig &run_information,
   // MPI_Barrier(MPI_COMM_WORLD);
 
   int size = static_cast<int>(own_interactions.size());
-  if (size == 0) {
-      std::cout << "Process " << ID << " 0 interactions" << std::endl;
-  }
+  // if (size == 0) {
+  //     std::cout << "Process " << ID << " 0 interactions" << std::endl;
+  // }
 
   std::vector<int> array_sizes_buff(P, 0);
   MPI_Barrier(MPI_COMM_WORLD);

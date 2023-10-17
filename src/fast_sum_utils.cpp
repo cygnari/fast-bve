@@ -200,6 +200,9 @@ void tree_traverse(const RunConfig &run_information,
     out_lb = ID % 20;
     out_ub = out_lb + 1;
     int same_outer = P / 20;
+    if ((ID % 20) < P - 20*same_outer) {
+      same_outer += 1;
+    }
 
     std::vector<int> in_counts(same_outer, int(20 / same_outer));
     std::vector<int> lb(same_outer, 0);

@@ -117,7 +117,11 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
   } else { // more than 20 threads, parallelize both
     out_lb = ID % 20;
     out_ub = out_lb + 1;
-    int same_outer = 1 + (P % 20);
+    int same_outer = P / 20;
+    if ((ID % 20) < P - 20*same_outer) {
+      same_outer += 1;
+    }
+
     std::vector<int> in_counts(same_outer, int(20 / same_outer));
     std::vector<int> lb(same_outer, 0);
     std::vector<int> ub(same_outer, 0);
@@ -127,22 +131,25 @@ void tree_traverse(const std::vector<std::vector<std::vector<int>>>
       in_counts[i] += 1;
     }
     total = 0;
-    for (int i = 0; i < P; i++) {
+    for (int i = 0; i < same_outer; i++) {
       total += in_counts[i];
     }
     assertm(total == 20, "Inner triangle loop count not correct");
-    ub[0] = in_counts[0];
-    for (int i = 1; i < P; i++) {
+    lb[0] = 0;
+    for (int i = 1; i < same_outer; i++) {
+      ub[i-1] = lb[i-1] + in_counts[i-1];
       lb[i] = ub[i - 1];
-      ub[i] = lb[i] + in_counts[i];
     }
-    in_lb = lb[ID % 20];
-    in_ub = ub[ID % 20];
+    ub[same_outer-1] = 20;
+    in_lb = lb[ID / 20];
+    in_ub = ub[ID / 20];
   }
 
-  for (int i = out_lb; i < out_ub; i++) { // queue of triangle pairs to interact
-    for (int j = in_lb; j < in_ub; j++) {
-      tri_interactions.push_back({i, j, 0, 0});
+  if (ID < 400) {
+    for (int i = out_lb; i < out_ub; i++) { // queue of triangle pairs to interact
+      for (int j = in_lb; j < in_ub; j++) {
+        tri_interactions.push_back({i, j, 0, 0});
+      }
     }
   }
 

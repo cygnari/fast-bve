@@ -162,7 +162,7 @@ void tree_traverse(const RunConfig &run_information,
   int particle_count_target, particle_count_source;
   std::vector<double> center_target, center_source;
   double separation, distance;
-  std::vector<std::vector<int>> tri_interactions;
+  std::vector<std::vector<int>> tri_interactions ;
   std::vector<int> curr_interact(4, 0);
 
   std::vector<InteractionPair> own_interactions;
@@ -197,7 +197,11 @@ void tree_traverse(const RunConfig &run_information,
   } else { // more than 20 threads, parallelize both
     out_lb = ID % 20;
     out_ub = out_lb + 1;
-    int same_outer = 1 + (P % 20);
+    int same_outer = P / 20;
+    if ((ID % 20) < P - 20*same_outer) {
+      same_outer += 1;
+    }
+
     std::vector<int> in_counts(same_outer, int(20 / same_outer));
     std::vector<int> lb(same_outer, 0);
     std::vector<int> ub(same_outer, 0);
@@ -207,22 +211,25 @@ void tree_traverse(const RunConfig &run_information,
       in_counts[i] += 1;
     }
     total = 0;
-    for (int i = 0; i < P; i++) {
+    for (int i = 0; i < same_outer; i++) {
       total += in_counts[i];
     }
     assertm(total == 20, "Inner triangle loop count not correct");
-    ub[0] = in_counts[0];
-    for (int i = 1; i < P; i++) {
+    lb[0] = 0;
+    for (int i = 1; i < same_outer; i++) {
+      ub[i-1] = lb[i-1] + in_counts[i-1];
       lb[i] = ub[i - 1];
-      ub[i] = lb[i] + in_counts[i];
     }
-    in_lb = lb[ID % 20];
-    in_ub = ub[ID % 20];
+    ub[same_outer-1] = 20;
+    in_lb = lb[ID / 20];
+    in_ub = ub[ID / 20];
   }
 
-  for (int i = out_lb; i < out_ub; i++) { // queue of triangle pairs to interact
-    for (int j = in_lb; j < in_ub; j++) {
-      tri_interactions.push_back({i, j, 0, 0});
+  if (ID < 400) {
+    for (int i = out_lb; i < out_ub; i++) { // queue of triangle pairs to interact
+      for (int j = in_lb; j < in_ub; j++) {
+        tri_interactions.push_back({i, j, 0, 0});
+      }
     }
   }
 
@@ -334,8 +341,14 @@ void tree_traverse(const RunConfig &run_information,
       }
     }
   }
-  MPI_Barrier(MPI_COMM_WORLD);
+  // std::cout << "Processor " << ID << " own interactions " << own_interactions.size() << std::endl;
+  // MPI_Barrier(MPI_COMM_WORLD);
+
   int size = static_cast<int>(own_interactions.size());
+  // if (size == 0) {
+  //     std::cout << "Process " << ID << " 0 interactions" << std::endl;
+  // }
+
   std::vector<int> array_sizes_buff(P, 0);
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_Allgather(&size, 1, MPI_INT, &array_sizes_buff[0], 1, MPI_INT,
@@ -353,9 +366,7 @@ void tree_traverse(const RunConfig &run_information,
                  &tree_interactions[0], &array_sizes_buff[0], &offsets[0],
                  dt_interaction, MPI_COMM_WORLD);
   MPI_Barrier(MPI_COMM_WORLD);
-  // cout << "interactions: " << tree_interactions.size() << endl;
   if (not test_is_same(tree_interactions.size())) {
-    // std::cout << "Tree Traverse Error" << std::endl;
     throw std::runtime_error("Tree Traversal Error, not all interaction lists are the same");
   }
 }

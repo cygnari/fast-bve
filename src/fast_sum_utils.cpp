@@ -225,9 +225,9 @@ void tree_traverse(const RunConfig &run_information,
     in_lb = lb[ID / 20];
     in_ub = ub[ID / 20];
   }
-  if (in_ub > 20) {
-    std::cout << "Processor: " << run_information.mpi_ID << " out bounds: " << out_lb << " " << out_ub << " in bounds: " << in_lb << " " << in_ub << std::endl;
-  }
+  // if (in_ub > 20) {
+  std::cout << "Processor: " << run_information.mpi_ID << " out bounds: " << out_lb << " " << out_ub << " in bounds: " << in_lb << " " << in_ub << std::endl;
+  // }
 
 
   for (int i = out_lb; i < out_ub; i++) { // queue of triangle pairs to interact
@@ -344,8 +344,7 @@ void tree_traverse(const RunConfig &run_information,
       }
     }
   }
-  std::cout << "debug here" << std::endl;
-  std::cout << "Processor " << ID << " own interactions " << own_interactions.size() << std::endl;
+  // std::cout << "Processor " << ID << " own interactions " << own_interactions.size() << std::endl;
   // MPI_Barrier(MPI_COMM_WORLD);
 
   int size = static_cast<int>(own_interactions.size());

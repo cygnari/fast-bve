@@ -225,8 +225,10 @@ void tree_traverse(const RunConfig &run_information,
     in_lb = lb[ID / 20];
     in_ub = ub[ID / 20];
   }
+  if (in_ub > 20) {
+    std::cout << "Processor: " << run_information.mpi_ID << " out bounds: " << out_lb << " " << out_ub << " in bounds: " << in_lb << " " << in_ub << std::endl;
+  }
 
-  std::cout << "Processor: " << run_information.mpi_ID << " out bounds: " << out_lb << " " << out_ub << " in bounds: " << in_lb << " " << in_ub << std::endl;
 
   for (int i = out_lb; i < out_ub; i++) { // queue of triangle pairs to interact
     for (int j = in_lb; j < in_ub; j++) {

@@ -7,10 +7,10 @@
 #PBS -k eod
 #PBS -m abe
 #PBS -M cygnari@umich.edu
-#PBS -l select=1:ncpus=4:mpiprocs=4
+#PBS -l select=1:ncpus=8:mpiprocs=8
 #PBS -l place=group=rack
 
 export TMPDIR=/glade/derecho/scratch/$USER/temp
 mkdir -p $TMPDIR
 
-mpiexec ../build/executables/single_rhs > $TMPDIR/run_out14.txt
+mpiexec ../build/executables/single_rhs > $TMPDIR/run_out24.txt

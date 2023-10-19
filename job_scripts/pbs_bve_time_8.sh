@@ -13,4 +13,4 @@
 export TMPDIR=/glade/derecho/scratch/$USER/temp
 mkdir -p $TMPDIR
 
-mpirun -np 1 ../build/executables/single_rhs > $TMPDIR/run_out8.txt
+mpiexec ../build/executables/single_rhs > $TMPDIR/run_out8.txt

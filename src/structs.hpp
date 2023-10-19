@@ -33,13 +33,15 @@ struct RunConfig {
   int init_cond_param1;              // parameter for initial condition
   double init_cond_param2;           // parameter for initial condition
   // for RH, ICP1 is wavenumber, ICP2 is wave speed, default ICP1 = 4, ICP2 = 0
-  // for GV, ICP1 is radius parameter, ICP2 is starting latitude * pi, default
-  // ICP1 = 4, ICP2 = 0.05 for RV, default ICP1 = 10, ICP2 = 0.05 for PV, no
-  // params
+  // for GV, ICP1 is radius parameter, ICP2 is starting latitude * pi,
+  // default ICP1 = 4, ICP2 = 0.05
+  // for RV, default ICP1 = 10, ICP2 = 0.05
+  // for PV, no params
   int forcing_param1;    // parameter for forcing
   double forcing_param2; // parameter for forcing
   // for ssw forcing, FRP1 is forcing wavenumber, FRP2 is forcing duration
-  // [days], default FRP1 = 1, FRP2 = 11 ssw_blend , FRP2 is forcing duration
+  // [days], default FRP1 = 1, FRP2 = 11
+  // for ssw_blend , FRP2 is forcing duration
   // [days], default FRP2 = 11
 
   int interp_degree;      // interpolation degree, can go up to 4

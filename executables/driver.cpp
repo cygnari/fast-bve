@@ -37,8 +37,8 @@ int main(int argc, char **argv) {
 
   RunConfig run_information;
   const std::string namelist_file = std::string(NAMELIST_DIR) + std::string("/namelist.txt");
-  read_run_config(namelist_file,
-                  run_information); // reads in run configuration information
+  read_run_config(namelist_file, run_information);
+  // reads in run configuration information
   run_information.mpi_P = P;
   run_information.mpi_ID = ID;
 

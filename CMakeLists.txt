@@ -5,10 +5,16 @@ endfunction()
 cmake_minimum_required(VERSION 3.10)
 project(FastBVE VERSION 1.0 LANGUAGES CXX C)
 set(default_build_type Release)
+set(default_barytree OFF)
 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
   set(CMAKE_BUILD_TYPE "${default_build_type}")
+endif()
+
+if (NOT BUILD_BARYTREE)
+  message(STATUS "Not building barytree fast BVE")
+  set(BUILD_BARYTREE OFF)
 endif()
 
 set(CMAKE_CXX_STANDARD 14)
@@ -16,8 +22,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 option(BUILD_SHARED_LIBS "Build shared libraries, rather than static" ON)
 
 if (BUILD_SHARED_LIBS)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
+
 set(CMAKE_CXX_FLAGS_RELEASE -O3)
 
 # turn off deprecated env variable handling:

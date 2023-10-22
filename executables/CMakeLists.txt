@@ -26,6 +26,18 @@ target_include_directories(single_rhs_error_test PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<INSTALL_INTERFACE:include>)
 
+if (BUILD_BARYTREE)
+  add_executable(bltc_rhs bltc_rhs.cpp)
+  target_link_libraries(bltc_rhs PUBLIC fastbve)
+  target_include_directories(bltc_rhs PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<INSTALL_INTERFACE:include>)
+  target_include_directories(bltc_rhs PUBLIC "../../BVE-BaryTree/src/interface/")
+  target_link_directories(bltc_rhs PUBLIC "../../BVE-BaryTree/build/lib/")
+  target_link_libraries(bltc_rhs PUBLIC BaryTree_cpu)
+endif()
+
 install(TARGETS driver single_rhs lpm_interface_example single_rhs_error_test
         EXPORT FastBVETargets
         DESTINATION ${CMAKE_INSTALL_BINDIR})

@@ -1,6 +1,7 @@
 #include <chrono>
 #include <mpi.h>
 #include <cstdio>
+#include <cmath>
 
 #include "general_utils.hpp"
 #include "interp_utils.hpp"

@@ -15,13 +15,11 @@ extern int dgetrs_(char *, int *, int *, double *, int *, int *, double *,
                    int *, int *);
 }
 
-double
-dot_prod(const std::vector<double> &x,
-         const std::vector<double> &y) { // dot product of vectors x and y
+double dot_prod(const std::vector<double> &x, const std::vector<double> &y) {
+  // dot product of vectors x and y
   double sum = 0;
   assert(x.size() == y.size());
-  for (int i = 0; i < x.size(); i++)
-    sum += x[i] * y[i];
+  for (int i = 0; i < x.size(); i++) sum += x[i] * y[i];
   return sum;
 }
 
@@ -32,29 +30,25 @@ double vec_norm(const std::vector<double> &x) { // L2 norm of vector x
 void scalar_mult(
     std::vector<double> &x,
     const double scalar) { // multiplies x by scalar in place, modifies x
-  for (int i = 0; i < x.size(); i++)
-    x[i] *= scalar;
+  for (int i = 0; i < x.size(); i++) x[i] *= scalar;
 }
 
 void vec_add(std::vector<double> &x,
              const std::vector<double> &y) { // adds y to x in place, modifies x
   assert(x.size() >= y.size());
-  for (int i = 0; i < x.size(); i++)
-    x[i] += y[i];
+  for (int i = 0; i < x.size(); i++) x[i] += y[i];
 }
 
 void vec_minus(
     std::vector<double> &x,
     const std::vector<double> &y) { // subtracts y from x in place, modifies x
   assert(x.size() >= y.size());
-  for (int i = 0; i < x.size(); i++)
-    x[i] -= y[i];
+  for (int i = 0; i < x.size(); i++) x[i] -= y[i];
 }
 
 void scalar_mult2d(std::vector<std::vector<double>> &x, const double scalar) {
   for (int i = 0; i < x.size(); i++) {
-    for (int j = 0; j < x[i].size(); j++)
-      x[i][j] *= scalar;
+    for (int j = 0; j < x[i].size(); j++) x[i][j] *= scalar;
   }
 }
 
@@ -63,8 +57,7 @@ void vec_add2d(std::vector<std::vector<double>> &x,
   assert(x.size() == y.size());
   for (int i = 0; i < x.size(); i++) {
     assert(x[i].size() == y[i].size());
-    for (int j = 0; j < x[i].size(); j++)
-      x[i][j] += y[i][j];
+    for (int j = 0; j < x[i].size(); j++) x[i][j] += y[i][j];
   }
 }
 
@@ -73,8 +66,7 @@ void vec_minus2d(std::vector<std::vector<double>> &x,
   assert(x.size() == y.size());
   for (int i = 0; i < x.size(); i++) {
     assert(x[i].size() == y[i].size());
-    for (int j = 0; j < x[i].size(); j++)
-      x[i][j] -= y[i][j];
+    for (int j = 0; j < x[i].size(); j++) x[i][j] -= y[i][j];
   }
 }
 
@@ -82,36 +74,30 @@ void matvecmult(const std::vector<std::vector<double>> &Amat,
                 std::vector<double> &xvec) {
   assert(Amat[0].size() == xvec.size());
   std::vector<double> y = xvec;
-  for (int i = 0; i < Amat.size(); i++) {
-    xvec[i] = dot_prod(Amat[i], y);
-  }
+  for (int i = 0; i < Amat.size(); i++) xvec[i] = dot_prod(Amat[i], y);
 }
 
 std::vector<double> slice(const std::vector<double> &x, const int start,
                           const int stride, const int length) {
   // returns a slice of length from x, starting at start, every stride elements
   std::vector<double> out(length);
-  for (int i = 0; i < length; i++)
-    out[i] = x[start + i * stride];
+  for (int i = 0; i < length; i++) out[i] = x[start + i * stride];
   return out;
 }
 
 void vector_copy(std::vector<double> &x, const std::vector<double> &y,
                  const int start, const int length) {
   // copies elements from y into x
-  for (int i = 0; i < length; i++)
-    x[start + i] = y[i];
+  for (int i = 0; i < length; i++) x[start + i] = y[i];
 }
 
 void vector_copy2(std::vector<double> &x, const std::vector<double> y,
                   const int start, const int length) {
   // copies elements from y into x
-  for (int i = 0; i < length; i++)
-    x[start + i] = y[i];
+  for (int i = 0; i < length; i++) x[start + i] = y[i];
 }
 
-std::vector<double>
-cross_product(const std::vector<double> &x,
+std::vector<double> cross_product(const std::vector<double> &x,
               const std::vector<double> &y) { // cross product of x and y
   assert(x.size() >= 3);
   assert(y.size() >= 3);
@@ -122,8 +108,7 @@ cross_product(const std::vector<double> &x,
   return vals;
 }
 
-std::vector<double>
-cart_to_sphere(const std::vector<double> &
+std::vector<double> cart_to_sphere(const std::vector<double> &
                    p1) { // turns cartesian coordinates to spherical coordinates
   assert(p1.size() == 3);
   std::vector<double> sphere(3);
@@ -134,8 +119,7 @@ cart_to_sphere(const std::vector<double> &
   return sphere;
 }
 
-std::vector<double> sphere_to_cart(
-    const double radius, const double colat,
+std::vector<double> sphere_to_cart(const double radius, const double colat,
     const double lon) { // turns spherical coordinates to cartesian coordinates
   std::vector<double> cart(3);
   cart[0] = radius * sin(colat) * cos(lon);
@@ -144,23 +128,19 @@ std::vector<double> sphere_to_cart(
   return cart;
 }
 
-void project_to_sphere(
-    std::vector<double> &p1,
-    const double radius) { // projects a point to the surface of a sphere of
-                           // radius, modifies p1
+void project_to_sphere(std::vector<double> &p1, const double radius) {
+  // projects a point to the surface of a sphere of radius, modifies p1
   double norm = vec_norm(p1);
-  for (int i = 0; i < p1.size(); i++)
-    p1[i] *= radius / norm;
+  for (int i = 0; i < p1.size(); i++) p1[i] *= radius / norm;
 }
 
 std::vector<double> project_to_sphere_2(const std::vector<double> p1,
                                         const double radius) {
-  // projects a point to the surface of a sphere of radius, returns the new
-  // coordinates
+  // projects a point to the surface of a sphere of radius,
+  // returns the new coordinates
   double norm = vec_norm(p1);
   std::vector<double> newcords(p1.size());
-  for (int i = 0; i < p1.size(); i++)
-    newcords[i] = radius * p1[i] / norm;
+  for (int i = 0; i < p1.size(); i++) newcords[i] = radius * p1[i] / norm;
   return newcords;
 }
 
@@ -176,8 +156,7 @@ double great_circ_dist_sph(const double lat1, const double lat2,
                            const double lon1, const double lon2,
                            const double radius) {
   return radius * acos(std::min(1.0, std::max(-1.0, sin(lat1) * sin(lat2) +
-                                                        cos(lat1) * cos(lat2) *
-                                                            cos(lon2 - lon1))));
+                                cos(lat1) * cos(lat2) * cos(lon2 - lon1))));
 }
 
 double sphere_tri_area(const std::vector<double> &p1,
@@ -228,8 +207,7 @@ std::vector<double> barycoords(const std::vector<double> &p1,
   std::vector<double> mat{p1[0], p1[1], p1[2], p2[0], p2[1],
                           p2[2], p3[0], p3[1], p3[2]};
   std::vector<int> ipiv(3);
-  dgesv_(&dim, &nrhs, &*mat.begin(), &dim, &*ipiv.begin(), &*coords.begin(),
-         &dim, &info);
+  dgesv_(&dim, &nrhs, &*mat.begin(), &dim, &*ipiv.begin(), &*coords.begin(), &dim, &info);
   if (info != 0) {
     throw std::runtime_error("Error in barycentric coordinate computation, line 234");
   }
@@ -370,7 +348,6 @@ void replace(std::vector<int> &vals, const int find,
 
 int check_point_exist(const std::vector<std::vector<int>> &parent_points,
                       const int point_count, const int iv1, const int iv2) {
-  // cout << parent_points.size() << " " << point_count << endl;
   for (int i = 0; i < point_count; i++) {
     if ((parent_points[i][0] == iv1) and (parent_points[i][1] == iv2))
       return i;
@@ -439,11 +416,9 @@ std::tuple<int, int> find_leaf_tri(
         if (dynamics_triangles_is_leaf[level][j]) {
           found_leaf_tri = true;
           tri_loc = j;
-          // cout << "found leaf 1" << endl;
           curr_level = level;
           break;
         } else {
-          // curr_level += 1;
           lb = 4 * j;
           ub = 4 * j + 4;
           break;
@@ -462,7 +437,6 @@ std::tuple<int, int> find_leaf_tri(
         v3 = slice(dynamics_state, info_per_point * iv3, 1, 3);
         bary_cords = barycoords(v1, v2, v3, target_point);
         if (check_in_tri_thresh(v1, v2, v3, target_point, epsilon)) {
-
           found_curr_level = true;
           curr_level = level;
           tri_loc = j;

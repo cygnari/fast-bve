@@ -12,10 +12,10 @@ void point_assign(
     std::vector<std::vector<int>> &fast_sum_tree_point_locs,
     const int point_id);
 
-// void new_point_assign(RunConfig& run_information, vector<double>& point,
-// vector<vector<double>>& fast_sum_icos_verts,
-//         vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<int>&
-//         fast_sum_tree_point_locs, int point_id);
+void new_point_assign(RunConfig& run_information, const std::vector<double>& point,
+        const std::vector<std::vector<double>>& fast_sum_icos_verts,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        std:: vector<int>& fast_sum_tree_point_locs, const int point_id);
 
 void points_assign(
     const RunConfig &run_information, const std::vector<double> &dynamics_state,
@@ -23,16 +23,16 @@ void points_assign(
     std::vector<std::vector<std::vector<int>>> &fast_sum_tree_tri_points,
     std::vector<std::vector<int>> &fast_sum_tree_point_locs);
 
-// void points_find_tris(RunConfig& run_information, vector<double>&
-// dynamics_state, vector<vector<double>>& fast_sum_icos_verts,
-//         vector<vector<vector<int>>>& fast_sum_icos_tri_verts, vector<int>&
-//         fast_sum_tree_point_locs);
-//
-// void points_assign_tris(RunConfig& run_information, vector<double>&
-// dynamics_state, vector<vector<double>>& fast_sum_icos_verts,
-//         vector<vector<vector<int>>>& fast_sum_icos_tri_verts,
-//         vector<vector<vector<int>>>& fast_sum_tree_tri_points, vector<int>&
-//         fast_sum_tree_point_locs);
+void points_find_tris(RunConfig& run_information, const std::vector<double>&
+        dynamics_state, const std::vector<std::vector<double>>& fast_sum_icos_verts,
+        const std::vector<std::vector<std::vector<int>>>&
+        fast_sum_icos_tri_verts, std::vector<int>& fast_sum_tree_point_locs);
+
+void points_assign_tris(RunConfig& run_information, const std::vector<double>&
+        dynamics_state, const std::vector<std::vector<double>>& fast_sum_icos_verts,
+        const std::vector<std::vector<std::vector<int>>>& fast_sum_icos_tri_verts,
+        std::vector<std::vector<std::vector<int>>>& fast_sum_tree_tri_points, const std::vector<int>&
+        fast_sum_tree_point_locs);
 
 void tree_traverse(const RunConfig &run_information,
                    const std::vector<std::vector<std::vector<int>>>

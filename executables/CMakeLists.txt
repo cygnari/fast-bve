@@ -19,13 +19,6 @@ target_include_directories(lpm_interface_example PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<INSTALL_INTERFACE:include>)
 
-add_executable(single_rhs_error_test single_rhs_error_test.cpp)
-target_link_libraries(single_rhs_error_test PUBLIC fastbve)
-target_include_directories(single_rhs_error_test PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-  $<INSTALL_INTERFACE:include>)
-
 if (BUILD_BARYTREE)
   add_executable(bltc_rhs bltc_rhs.cpp)
   target_link_libraries(bltc_rhs PUBLIC fastbve)
@@ -38,6 +31,6 @@ if (BUILD_BARYTREE)
   target_link_libraries(bltc_rhs PUBLIC BaryTree_cpu)
 endif()
 
-install(TARGETS driver single_rhs lpm_interface_example single_rhs_error_test
+install(TARGETS driver single_rhs lpm_interface_example
         EXPORT FastBVETargets
         DESTINATION ${CMAKE_INSTALL_BINDIR})

@@ -16,12 +16,10 @@ void rhs_direct_sum_vel(const RunConfig &run_information,
   int nval = 3, point_offset = run_information.info_per_point;
   for (int i = run_information.target_lb; i < run_information.target_ub; i++) {
     pos_change = {0, 0, 0};
-    particle_target =
-        slice(dynamics_state, run_information.info_per_point * i, 1, 3);
+    particle_target = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
     for (int j = 0; j < run_information.dynamics_curr_point_count; j++) {
       if (i != j) {
-        particle_source =
-            slice(dynamics_state, run_information.info_per_point * j, 1, 3);
+        particle_source = slice(dynamics_state, run_information.info_per_point * j, 1, 3);
         contribution = bve_gfunc(particle_target, particle_source);
         vor = dynamics_state[run_information.info_per_point * j + 3];
         vor -= vor_force_func(run_information, particle_source, time, omega);
@@ -43,12 +41,10 @@ void rhs_direct_sum_stream(
   double vor;
   double stream_val = 0, contribution;
   for (int i = run_information.target_lb; i < run_information.target_ub; i++) {
-    particle_i =
-        slice(dynamics_state, run_information.info_per_point * i, 1, 3);
+    particle_i = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
     for (int j = 0; j < run_information.dynamics_curr_point_count; j++) {
       if (i != j) {
-        particle_j =
-            slice(dynamics_state, run_information.info_per_point * j, 1, 3);
+        particle_j = slice(dynamics_state, run_information.info_per_point * j, 1, 3);
         contribution = stream_gfunc(particle_i, particle_j);
         vor = dynamics_state[run_information.info_per_point * j + 3];
         vor -= vor_force_func(run_information, particle_j, time, omega);

@@ -7,18 +7,15 @@ void rossby_haurwitz(const RunConfig &run_information,
   std::vector<double> curr_pos, latlon;
   double lat, lon;
   int deg = run_information.init_cond_param1;
-  double w =
-      (run_information.init_cond_param2 * (1 + deg) * (2 + deg) + 2 * omega) /
-      (deg * (3 + deg));
+  double w = (run_information.init_cond_param2 * (1 + deg) * (2 + deg) + 2 * omega) /
+             (deg * (3 + deg));
   for (int i = 0; i < run_information.dynamics_initial_points; i++) {
-    curr_pos = slice(dynamics_state, run_information.info_per_point * i, 1,
-                     3); // gets the position of a particle
+    curr_pos = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
     latlon = lat_lon(curr_pos);
     lat = latlon[0];
     lon = latlon[1];
     dynamics_state[run_information.info_per_point * i + 3] =
-        2 * w * sin(lat) + (pow(deg, 2) + 3 * deg + 2) * sin(lat) *
-                               pow(cos(lat), deg) * cos(deg * lon);
+        2 * w * sin(lat) + (pow(deg, 2) + 3 * deg + 2) * sin(lat) * pow(cos(lat), deg) * cos(deg * lon);
   }
 }
 
@@ -29,17 +26,14 @@ void gauss_vortex(const RunConfig &run_information,
   double center_lat = run_information.init_cond_param2 * M_PI;
   double center_lon = 0.0;
   for (int i = 0; i < run_information.dynamics_initial_points; i++) {
-    curr_pos = slice(dynamics_state, run_information.info_per_point * i, 1,
-                     3); // gets the position of a particle
+    curr_pos = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
     latlon = lat_lon(curr_pos);
     lat = latlon[0];
-    p1 = sphere_to_cart(run_information.radius, M_PI / 2.0 - center_lat,
-                        center_lon);
+    p1 = sphere_to_cart(run_information.radius, M_PI / 2.0 - center_lat, center_lon);
     vec_minus(p1, curr_pos);
     dist = vec_norm(p1);
     dynamics_state[run_information.info_per_point * i + 3] =
-        4 * M_PI *
-        exp(-pow(run_information.init_cond_param1, 2) * pow(dist, 2));
+        4 * M_PI * exp(-pow(run_information.init_cond_param1, 2) * pow(dist, 2));
   }
 }
 
@@ -56,8 +50,7 @@ void rankine_vortex(const RunConfig &run_information,
     curr_pos = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
     latlon = lat_lon(curr_pos);
     lat = latlon[0];
-    p1 = sphere_to_cart(run_information.radius, M_PI / 2.0 - center_lat,
-                        center_lon);
+    p1 = sphere_to_cart(run_information.radius, M_PI / 2.0 - center_lat, center_lon);
     vec_minus(p1, curr_pos);
     dist = vec_norm(p1);
     if (dist < vor_radius) {

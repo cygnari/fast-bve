@@ -32,8 +32,7 @@ void dynamics_points_initialize(
   run_information.dynamics_curr_tri_count = 20;
   vector_copy2(dynamics_state,
                project_to_sphere_2(std::vector<double>{0, 1, phi},
-                                   run_information.radius),
-               0, 3);
+                                   run_information.radius), 0, 3);
   vector_copy2(dynamics_state,
                project_to_sphere_2(std::vector<double>{0, -1, phi},
                                    run_information.radius),
@@ -79,48 +78,49 @@ void dynamics_points_initialize(
                                    run_information.radius),
                11 * run_information.info_per_point, 3);
 
+   // 0, 1, 2 are indices of the three vertices
+   // 20 starting faces
+   // make sure the points are in CCW order
   dynamics_triangles[0][0].insert(
-      dynamics_triangles[0][0].begin(),
-      {0, 1, 8, 0}); // 0, 1, 2 are indices of the three vertices
-  dynamics_triangles[0][1].insert(dynamics_triangles[0][1].begin(),
-                                  {0, 10, 1, 0}); // 20 starting faces
+                           dynamics_triangles[0][0].begin(), {0, 1, 8, 0});
+  dynamics_triangles[0][1].insert(
+                           dynamics_triangles[0][1].begin(), {0, 10, 1, 0});
   dynamics_triangles[0][2].insert(
-      dynamics_triangles[0][2].begin(),
-      {0, 4, 6, 0}); // make sure the points are in CCW order
-  dynamics_triangles[0][3].insert(dynamics_triangles[0][3].begin(),
-                                  {0, 8, 4, 0});
-  dynamics_triangles[0][4].insert(dynamics_triangles[0][4].begin(),
-                                  {0, 6, 10, 0});
-  dynamics_triangles[0][5].insert(dynamics_triangles[0][5].begin(),
-                                  {1, 7, 5, 0});
-  dynamics_triangles[0][6].insert(dynamics_triangles[0][6].begin(),
-                                  {1, 5, 8, 0});
-  dynamics_triangles[0][7].insert(dynamics_triangles[0][7].begin(),
-                                  {1, 10, 7, 0});
-  dynamics_triangles[0][8].insert(dynamics_triangles[0][8].begin(),
-                                  {2, 9, 3, 0});
-  dynamics_triangles[0][9].insert(dynamics_triangles[0][9].begin(),
-                                  {2, 3, 11, 0});
-  dynamics_triangles[0][10].insert(dynamics_triangles[0][10].begin(),
-                                   {2, 6, 4, 0});
-  dynamics_triangles[0][11].insert(dynamics_triangles[0][11].begin(),
-                                   {2, 4, 9, 0});
-  dynamics_triangles[0][12].insert(dynamics_triangles[0][12].begin(),
-                                   {2, 11, 6, 0});
-  dynamics_triangles[0][13].insert(dynamics_triangles[0][13].begin(),
-                                   {3, 5, 7, 0});
-  dynamics_triangles[0][14].insert(dynamics_triangles[0][14].begin(),
-                                   {3, 9, 5, 0});
-  dynamics_triangles[0][15].insert(dynamics_triangles[0][15].begin(),
-                                   {3, 7, 11, 0});
-  dynamics_triangles[0][16].insert(dynamics_triangles[0][16].begin(),
-                                   {4, 8, 9, 0});
-  dynamics_triangles[0][17].insert(dynamics_triangles[0][17].begin(),
-                                   {5, 9, 8, 0});
-  dynamics_triangles[0][18].insert(dynamics_triangles[0][18].begin(),
-                                   {6, 11, 10, 0});
-  dynamics_triangles[0][19].insert(dynamics_triangles[0][19].begin(),
-                                   {7, 10, 11, 0});
+                           dynamics_triangles[0][2].begin(), {0, 4, 6, 0});
+  dynamics_triangles[0][3].insert(
+                           dynamics_triangles[0][3].begin(), {0, 8, 4, 0});
+  dynamics_triangles[0][4].insert(
+                           dynamics_triangles[0][4].begin(), {0, 6, 10, 0});
+  dynamics_triangles[0][5].insert(
+                           dynamics_triangles[0][5].begin(), {1, 7, 5, 0});
+  dynamics_triangles[0][6].insert(
+                           dynamics_triangles[0][6].begin(), {1, 5, 8, 0});
+  dynamics_triangles[0][7].insert(
+                           dynamics_triangles[0][7].begin(), {1, 10, 7, 0});
+  dynamics_triangles[0][8].insert(
+                           dynamics_triangles[0][8].begin(), {2, 9, 3, 0});
+  dynamics_triangles[0][9].insert(
+                           dynamics_triangles[0][9].begin(), {2, 3, 11, 0});
+  dynamics_triangles[0][10].insert(
+                           dynamics_triangles[0][10].begin(), {2, 6, 4, 0});
+  dynamics_triangles[0][11].insert(
+                           dynamics_triangles[0][11].begin(), {2, 4, 9, 0});
+  dynamics_triangles[0][12].insert(
+                           dynamics_triangles[0][12].begin(), {2, 11, 6, 0});
+  dynamics_triangles[0][13].insert(
+                           dynamics_triangles[0][13].begin(), {3, 5, 7, 0});
+  dynamics_triangles[0][14].insert(
+                           dynamics_triangles[0][14].begin(), {3, 9, 5, 0});
+  dynamics_triangles[0][15].insert(
+                           dynamics_triangles[0][15].begin(), {3, 7, 11, 0});
+  dynamics_triangles[0][16].insert(
+                           dynamics_triangles[0][16].begin(), {4, 8, 9, 0});
+  dynamics_triangles[0][17].insert(
+                           dynamics_triangles[0][17].begin(), {5, 9, 8, 0});
+  dynamics_triangles[0][18].insert(
+                           dynamics_triangles[0][18].begin(), {6, 11, 10, 0});
+  dynamics_triangles[0][19].insert(
+                           dynamics_triangles[0][19].begin(),{7, 10, 11, 0});
 
   for (int i = 0; i < run_information.dynamics_levels_min - 1; i++) {
     dynamics_triangles[i + 1] = std::vector<std::vector<int>>(
@@ -156,38 +156,29 @@ void dynamics_points_initialize(
       if (iv12 == -1) {
         iv12 = run_information.dynamics_curr_point_count;
         run_information.dynamics_curr_point_count += 1;
-        dynamics_points_parents[iv12] = {std::min(iv1, iv2),
-                                         std::max(iv1, iv2)};
-        vector_copy2(dynamics_state, v12, iv12 * run_information.info_per_point,
-                     3);
+        dynamics_points_parents[iv12] = {std::min(iv1, iv2), std::max(iv1, iv2)};
+        vector_copy2(dynamics_state, v12, iv12 * run_information.info_per_point, 3);
       }
       if (iv23 == -1) {
         iv23 = run_information.dynamics_curr_point_count;
         run_information.dynamics_curr_point_count += 1;
-        dynamics_points_parents[iv23] = {std::min(iv2, iv3),
-                                         std::max(iv2, iv3)};
-        vector_copy2(dynamics_state, v23, iv23 * run_information.info_per_point,
-                     3);
+        dynamics_points_parents[iv23] = {std::min(iv2, iv3), std::max(iv2, iv3)};
+        vector_copy2(dynamics_state, v23, iv23 * run_information.info_per_point, 3);
       }
       if (iv31 == -1) {
         iv31 = run_information.dynamics_curr_point_count;
         run_information.dynamics_curr_point_count += 1;
-        dynamics_points_parents[iv31] = {std::min(iv3, iv1),
-                                         std::max(iv3, iv1)};
-        vector_copy2(dynamics_state, v31, iv31 * run_information.info_per_point,
-                     3);
+        dynamics_points_parents[iv31] = {std::min(iv3, iv1), std::max(iv3, iv1)};
+        vector_copy2(dynamics_state, v31, iv31 * run_information.info_per_point, 3);
       }
       dynamics_triangles[i + 1][4 * j].insert(
           dynamics_triangles[i + 1][4 * j].begin(), {iv1, iv12, iv31, i + 1});
       dynamics_triangles[i + 1][4 * j + 1].insert(
-          dynamics_triangles[i + 1][4 * j + 1].begin(),
-          {iv2, iv23, iv12, i + 1});
+          dynamics_triangles[i + 1][4 * j + 1].begin(), {iv2, iv23, iv12, i + 1});
       dynamics_triangles[i + 1][4 * j + 2].insert(
-          dynamics_triangles[i + 1][4 * j + 2].begin(),
-          {iv3, iv31, iv23, i + 1});
+          dynamics_triangles[i + 1][4 * j + 2].begin(), {iv3, iv31, iv23, i + 1});
       dynamics_triangles[i + 1][4 * j + 3].insert(
-          dynamics_triangles[i + 1][4 * j + 3].begin(),
-          {iv12, iv23, iv31, i + 1});
+          dynamics_triangles[i + 1][4 * j + 3].begin(), {iv12, iv23, iv31, i + 1});
       run_information.dynamics_curr_tri_count += 3;
     }
   }
@@ -241,12 +232,10 @@ void vorticity_initialize(const RunConfig &run_information,
   // ensure initial total vorticity is 0
   double total_vor;
   for (int i = 0; i < run_information.dynamics_initial_points; i++) {
-    total_vor += dynamics_state[run_information.info_per_point * i + 3] *
-                 dynamics_areas[i]; //
+    total_vor += dynamics_state[run_information.info_per_point * i + 3] * dynamics_areas[i];
   }
   for (int i = 0; i < run_information.dynamics_initial_points; i++) {
-    dynamics_state[run_information.info_per_point * i + 3] -=
-        total_vor / (4.0 * M_PI);
+    dynamics_state[run_information.info_per_point * i + 3] -= total_vor / (4.0 * M_PI);
   }
 }
 
@@ -259,8 +248,8 @@ void tracer_initialize(const RunConfig &run_information,
   double lonc1 = M_PI / 2, lonc2 = 3 * M_PI / 2, latc1 = 0, latc2 = 0;
   double poly_a = -0.8, poly_b = 0.9, cos_b;
   for (int i = 0; i < run_information.dynamics_initial_points; i++) {
-    curr_pos = slice(dynamics_state, run_information.info_per_point * i, 1,
-                     3); // gets the position of a particle
+    curr_pos = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
+    // gets the position of a particle
     latlon = lat_lon(curr_pos);
     lat = latlon[0];
     lon = latlon[1];
@@ -299,14 +288,11 @@ void fixer_init(const RunConfig &run_information,
   target_mass.resize(run_information.tracer_count + 1, 0);
   for (int i = 0; i < run_information.tracer_count; i++) {
     for (int j = 0; j < run_information.dynamics_initial_points; j++) {
-      qmins[i + 1] =
-          std::min(dynamics_state[run_information.info_per_point * j + i + 4],
+      qmins[i + 1] = std::min(dynamics_state[run_information.info_per_point * j + i + 4],
                    qmins[i + 1]);
-      qmaxs[i + 1] =
-          std::max(dynamics_state[run_information.info_per_point * j + i + 4],
+      qmaxs[i + 1] = std::max(dynamics_state[run_information.info_per_point * j + i + 4],
                    qmaxs[i + 1]);
-      target_mass[i + 1] +=
-          dynamics_areas[j] *
+      target_mass[i + 1] += dynamics_areas[j] *
           dynamics_state[run_information.info_per_point * j + i + 4];
     }
   }
@@ -351,13 +337,11 @@ void fast_sum_icos_init(
       std::vector<double>{-phi, 0, -1}, run_information.radius));
   icos_tree.icosahedron_triangle_vertex_indices.push_back(
       std::vector<std::vector<int>>(20, std::vector<int>(0)));
-  // fast_sum_icos_tri_info.push_back(
-  //     std::vector<std::vector<double>>(20, std::vector<double>(0)));
   icos_tree.icosahedron_tri_centers.push_back(std::vector<std::vector<double>>(20, std::vector<double>(0)));
   icos_tree.icosahedron_tri_radii.push_back(std::vector<double>(20, 0));
   icos_tree.icosahedron_triangle_vertex_indices[0][0].insert(
-      icos_tree.icosahedron_triangle_vertex_indices[0][0].end(),
-      {1, 2, 9}); // 0, 1, 2 are indices of the three vertices
+      icos_tree.icosahedron_triangle_vertex_indices[0][0].end(), {1, 2, 9});
+      // 0, 1, 2 are indices of the three vertices
   icos_tree.icosahedron_triangle_vertex_indices[0][1].insert(icos_tree.icosahedron_triangle_vertex_indices[0][1].end(),
                                        {1, 2, 11}); // 20 starting faces
   icos_tree.icosahedron_triangle_vertex_indices[0][2].insert(icos_tree.icosahedron_triangle_vertex_indices[0][2].end(),

@@ -7,8 +7,7 @@
 
 void bounds_determine(RunConfig &run_information, const int P, const int ID) {
   // find range of particles for each process
-  std::vector<int> particles(
-      P, int(run_information.dynamics_curr_point_count / P));
+  std::vector<int> particles( P, int(run_information.dynamics_curr_point_count / P));
   std::vector<int> lb(P, 0);
   std::vector<int> ub(P, 0);
   int total = P * int(run_information.dynamics_curr_point_count / P);
@@ -21,8 +20,7 @@ void bounds_determine(RunConfig &run_information, const int P, const int ID) {
     total += particles[i];
   }
 
-  assertm(total == run_information.dynamics_curr_point_count,
-          "Particle count not correct");
+  assertm(total == run_information.dynamics_curr_point_count, "Particle count not correct");
 
   ub[0] = particles[0];
   for (int i = 1; i < P; i++) {
@@ -56,17 +54,7 @@ void bounds_determine(RunConfig &run_information, const int P, const int ID) {
   run_information.target_own = targets[ID];
 }
 
-bool test_is_same(
-    const int x) { // test if all processes have the same value for a variable
-  int p[2];
-  p[0] = -x;
-  p[1] = x;
-  MPI_Allreduce(MPI_IN_PLACE, p, 2, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
-  return (p[0] == -p[1]);
-}
-
-bool test_is_same(
-    const int x, MPI_Comm mpi_communicator) { // test if all processes have the same value for a variable
+bool test_is_same(const int x, MPI_Comm mpi_communicator = MPI_COMM_WORLD) { // test if all processes have the same value for a variable
   int p[2];
   p[0] = -x;
   p[1] = x;
@@ -74,28 +62,9 @@ bool test_is_same(
   return (p[0] == -p[1]);
 }
 
-template <typename T>
-void sync_updates(const RunConfig &run_information, std::vector<T> &vals,
-                  const int P, const int ID, const MPI_Win *win,
-                  MPI_Datatype type) {
-  MPI_Barrier(MPI_COMM_WORLD);
-  MPI_Win_fence(0, *win);
-  if (ID != 0) {
-    MPI_Accumulate(&vals[0], vals.size(), type, 0, 0, vals.size(), type,
-                   MPI_SUM, *win);
-  }
-  MPI_Win_fence(0, *win);
-  if (ID != 0) {
-    MPI_Get(&vals[0], vals.size(), type, 0, 0, vals.size(), type, *win);
-  }
-  MPI_Win_fence(0, *win);
-  MPI_Barrier(MPI_COMM_WORLD);
-}
-
-template <typename T>
-void sync_updates(std::vector<T> &vals, const int P, const int ID,
+template <typename T> void sync_updates(std::vector<T> &vals, const int P, const int ID,
                   const MPI_Win *win, MPI_Datatype type,
-                  MPI_Comm mpi_communicator) {
+                  MPI_Comm mpi_communicator = MPI_COMM_WORLD) {
   MPI_Barrier(mpi_communicator);
   std::cout << "here 1" << std::endl;
   MPI_Win_fence(0, *win);

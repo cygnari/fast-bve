@@ -43,11 +43,11 @@ void fast_sum_icos_init(IcosTree &icos_tree, const double radius, const int tree
       std::vector<std::vector<double>>(20, std::vector<double>(0)));
   icos_tree.icosahedron_tri_radii.push_back(std::vector<double>(20, 0));
   icos_tree.icosahedron_triangle_vertex_indices[0][0].insert(
-      icos_tree.icosahedron_triangle_vertex_indices[0][0].end(),
-      {1, 2, 9}); // 0, 1, 2 are indices of the three vertices
+      icos_tree.icosahedron_triangle_vertex_indices[0][0].end(), {1, 2, 9});
+      // 0, 1, 2 are indices of the three vertices
   icos_tree.icosahedron_triangle_vertex_indices[0][1].insert(
-      icos_tree.icosahedron_triangle_vertex_indices[0][1].end(),
-      {1, 2, 11}); // 20 starting faces
+      icos_tree.icosahedron_triangle_vertex_indices[0][1].end(), {1, 2, 11});
+       // 20 starting faces
   icos_tree.icosahedron_triangle_vertex_indices[0][2].insert(
       icos_tree.icosahedron_triangle_vertex_indices[0][2].end(), {1, 5, 7});
   icos_tree.icosahedron_triangle_vertex_indices[0][3].insert(
@@ -155,8 +155,8 @@ void fast_sum_icos_init(IcosTree &icos_tree, const double radius, const int tree
       project_to_sphere(v12, radius);
       project_to_sphere(v23, radius);
       project_to_sphere(v31, radius);
-      iv12 = check_in_vec(icos_tree.icosahedron_vertex_coords,
-                          v12); // check if v12 already exists
+      iv12 = check_in_vec(icos_tree.icosahedron_vertex_coords, v12);
+      // check if v12 already exists
       iv13 = check_in_vec(icos_tree.icosahedron_vertex_coords, v31);
       iv23 = check_in_vec(icos_tree.icosahedron_vertex_coords, v23);
       if (iv12 == -1) {
@@ -188,29 +188,25 @@ void fast_sum_icos_init(IcosTree &icos_tree, const double radius, const int tree
       icos_tree.icosahedron_tri_centers[i + 1][4 * j].insert(
           icos_tree.icosahedron_tri_centers[i + 1][4 * j].end(), center.begin(),
           center.end());
-      icos_tree.icosahedron_tri_radii[i + 1][4 * j] =
-          tri_radius(v1, v12, v31, center);
+      icos_tree.icosahedron_tri_radii[i + 1][4 * j] = tri_radius(v1, v12, v31, center);
 
       center = circum_center(v3, v23, v31, radius);
       icos_tree.icosahedron_tri_centers[i + 1][4 * j + 1].insert(
           icos_tree.icosahedron_tri_centers[i + 1][4 * j + 1].end(),
           center.begin(), center.end());
-      icos_tree.icosahedron_tri_radii[i + 1][4 * j + 1] =
-          tri_radius(v3, v23, v31, center);
+      icos_tree.icosahedron_tri_radii[i + 1][4 * j + 1] = tri_radius(v3, v23, v31, center);
 
       center = circum_center(v2, v12, v23, radius);
       icos_tree.icosahedron_tri_centers[i + 1][4 * j + 2].insert(
           icos_tree.icosahedron_tri_centers[i + 1][4 * j + 2].end(),
           center.begin(), center.end());
-      icos_tree.icosahedron_tri_radii[i + 1][4 * j + 2] =
-          tri_radius(v2, v12, v23, center);
+      icos_tree.icosahedron_tri_radii[i + 1][4 * j + 2] = tri_radius(v2, v12, v23, center);
 
       center = circum_center(v12, v31, v23, radius);
       icos_tree.icosahedron_tri_centers[i + 1][4 * j + 3].insert(
           icos_tree.icosahedron_tri_centers[i + 1][4 * j + 3].end(),
           center.begin(), center.end());
-      icos_tree.icosahedron_tri_radii[i + 1][4 * j + 3] =
-          tri_radius(v12, v31, v23, center);
+      icos_tree.icosahedron_tri_radii[i + 1][4 * j + 3] = tri_radius(v12, v31, v23, center);
     }
   }
 }
@@ -226,7 +222,7 @@ void lpm_interface_bve_vel(std::vector<double> &active_target_velocities,
                    const int active_target_count,
                    const int passive_target_count, const int source_count,
                    const double radius, const int mpi_P, const int mpi_ID,
-                   MPI_Comm mpi_communicator, const double theta = 0.7,
+                   MPI_Comm mpi_communicator, const double theta = 0.5,
                    const int cluster_thresh = 10, const int interp_degree = 2) {
   // interace for LPM to call fast summation to compute BVE velocities
   // first assign active targets, passive targets, sources to triangles
@@ -244,24 +240,16 @@ void lpm_interface_bve_vel(std::vector<double> &active_target_velocities,
   active_target_velocities.resize(3 * active_target_count, 0);
   passive_target_velocities.resize(3 * passive_target_count, 0);
 
-  MPI_Win_create(&active_target_velocities[0],
-                 3 * active_target_count * sizeof(double), sizeof(double),
-                 MPI_INFO_NULL, mpi_communicator, &win_active);
-  MPI_Win_create(&passive_target_velocities[0],
-                 3 * passive_target_count * sizeof(double), sizeof(double),
-                 MPI_INFO_NULL, mpi_communicator, &win_passive);
-  std::vector<std::vector<std::vector<int>>> tree_tri_active_target(
-      icos_tree.tree_depth); // points inside each triangle
-  std::vector<std::vector<int>> tree_active_target_locs(
-      icos_tree.tree_depth); // triangle each point is in
-  std::vector<std::vector<std::vector<int>>> tree_tri_passive_target(
-      icos_tree.tree_depth); // points inside each triangle
-  std::vector<std::vector<int>> tree_passive_target_locs(
-      icos_tree.tree_depth); // triangle each point is in
-  std::vector<std::vector<std::vector<int>>> tree_tri_source(
-      icos_tree.tree_depth); // points inside each triangle
-  std::vector<std::vector<int>> tree_source_locs(
-      icos_tree.tree_depth);                        // triangle each point is in
+  MPI_Win_create(&active_target_velocities[0], 3 * active_target_count * sizeof(double),
+                 sizeof(double), MPI_INFO_NULL, mpi_communicator, &win_active);
+  MPI_Win_create(&passive_target_velocities[0], 3 * passive_target_count * sizeof(double),
+                 sizeof(double), MPI_INFO_NULL, mpi_communicator, &win_passive);
+  std::vector<std::vector<std::vector<int>>> tree_tri_active_target(icos_tree.tree_depth); // points inside each triangle
+  std::vector<std::vector<int>> tree_active_target_locs(icos_tree.tree_depth); // triangle each point is in
+  std::vector<std::vector<std::vector<int>>> tree_tri_passive_target(icos_tree.tree_depth); // points inside each triangle
+  std::vector<std::vector<int>> tree_passive_target_locs(icos_tree.tree_depth); // triangle each point is in
+  std::vector<std::vector<std::vector<int>>> tree_tri_source(icos_tree.tree_depth); // points inside each triangle
+  std::vector<std::vector<int>> tree_source_locs(icos_tree.tree_depth); // triangle each point is in
   std::vector<InteractionPair> active_interactions; // c/p - c/p interactions
   std::vector<InteractionPair> passive_interactions; // c/p - c/p interactions
 
@@ -303,7 +291,7 @@ void lpm_interface_bve_stream(std::vector<double> &active_target_stream_func,
                    const int active_target_count,
                    const int passive_target_count, const int source_count,
                    const double radius, const int mpi_P, const int mpi_ID,
-                   MPI_Comm mpi_communicator, const double theta = 0.7,
+                   MPI_Comm mpi_communicator, const double theta = 0.5,
                    const int cluster_thresh = 10, const int interp_degree = 2) {
   // interace for LPM to call fast summation to compute BVE velocities
   // first assign active targets, passive targets, sources to triangles
@@ -321,25 +309,17 @@ void lpm_interface_bve_stream(std::vector<double> &active_target_stream_func,
   active_target_stream_func.resize(active_target_count, 0);
   passive_target_stream_func.resize(passive_target_count, 0);
 
-  MPI_Win_create(&active_target_stream_func[0],
-                 3 * active_target_count * sizeof(double), sizeof(double),
-                 MPI_INFO_NULL, mpi_communicator, &win_active);
-  MPI_Win_create(&passive_target_stream_func[0],
-                 3 * passive_target_count * sizeof(double), sizeof(double),
-                 MPI_INFO_NULL, mpi_communicator, &win_passive);
+  MPI_Win_create(&active_target_stream_func[0], 3 * active_target_count * sizeof(double),
+                 sizeof(double), MPI_INFO_NULL, mpi_communicator, &win_active);
+  MPI_Win_create(&passive_target_stream_func[0], 3 * passive_target_count * sizeof(double),
+                 sizeof(double), MPI_INFO_NULL, mpi_communicator, &win_passive);
 
-  std::vector<std::vector<std::vector<int>>> tree_tri_active_target(
-      icos_tree.tree_depth); // points inside each triangle
-  std::vector<std::vector<int>> tree_active_target_locs(
-      icos_tree.tree_depth); // triangle each point is in
-  std::vector<std::vector<std::vector<int>>> tree_tri_passive_target(
-      icos_tree.tree_depth); // points inside each triangle
-  std::vector<std::vector<int>> tree_passive_target_locs(
-      icos_tree.tree_depth); // triangle each point is in
-  std::vector<std::vector<std::vector<int>>> tree_tri_source(
-      icos_tree.tree_depth); // points inside each triangle
-  std::vector<std::vector<int>> tree_source_locs(
-      icos_tree.tree_depth);                        // triangle each point is in
+  std::vector<std::vector<std::vector<int>>> tree_tri_active_target(icos_tree.tree_depth); // points inside each triangle
+  std::vector<std::vector<int>> tree_active_target_locs(icos_tree.tree_depth); // triangle each point is in
+  std::vector<std::vector<std::vector<int>>> tree_tri_passive_target(icos_tree.tree_depth); // points inside each triangle
+  std::vector<std::vector<int>> tree_passive_target_locs(icos_tree.tree_depth); // triangle each point is in
+  std::vector<std::vector<std::vector<int>>> tree_tri_source(icos_tree.tree_depth); // points inside each triangle
+  std::vector<std::vector<int>> tree_source_locs(icos_tree.tree_depth); // triangle each point is in
   std::vector<InteractionPair> active_interactions; // c/p - c/p interactions
   std::vector<InteractionPair> passive_interactions; // c/p - c/p interactions
 

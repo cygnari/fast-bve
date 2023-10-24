@@ -153,9 +153,9 @@ int main(int argc, char** argv) {
         all_cz[index] = c_z[i];
     }
 
-    sync_updates<double>(run_information, all_cx, P, ID, &win_cx, MPI_DOUBLE);
-    sync_updates<double>(run_information, all_cy, P, ID, &win_cy, MPI_DOUBLE);
-    sync_updates<double>(run_information, all_cz, P, ID, &win_cz, MPI_DOUBLE);
+    sync_updates<double>(all_cx, P, ID, &win_cx, MPI_DOUBLE);
+    sync_updates<double>(all_cy, P, ID, &win_cy, MPI_DOUBLE);
+    sync_updates<double>(all_cz, P, ID, &win_cz, MPI_DOUBLE);
 
     MPI_Barrier(MPI_COMM_WORLD);
 

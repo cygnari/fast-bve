@@ -124,32 +124,20 @@ biquadratic_interp(const RunConfig &run_information,
   points[4] = normalized_barycoords(v1, v2, v3, v5);
   points[5] = normalized_barycoords(v1, v2, v3, v6);
 
-  vorticity_values[0] =
-      dynamics_state[run_information.info_per_point * iv1 + 3];
-  vorticity_values[1] =
-      dynamics_state[run_information.info_per_point * iv2 + 3];
-  vorticity_values[2] =
-      dynamics_state[run_information.info_per_point * iv3 + 3];
-  vorticity_values[3] =
-      dynamics_state[run_information.info_per_point * iv4 + 3];
-  vorticity_values[4] =
-      dynamics_state[run_information.info_per_point * iv5 + 3];
-  vorticity_values[5] =
-      dynamics_state[run_information.info_per_point * iv6 + 3];
+  vorticity_values[0] = dynamics_state[run_information.info_per_point * iv1 + 3];
+  vorticity_values[1] = dynamics_state[run_information.info_per_point * iv2 + 3];
+  vorticity_values[2] = dynamics_state[run_information.info_per_point * iv3 + 3];
+  vorticity_values[3] = dynamics_state[run_information.info_per_point * iv4 + 3];
+  vorticity_values[4] = dynamics_state[run_information.info_per_point * iv5 + 3];
+  vorticity_values[5] = dynamics_state[run_information.info_per_point * iv6 + 3];
 
   for (int j = 0; j < run_information.tracer_count; j++) {
-    tracer_values[6 * j] =
-        dynamics_state[run_information.info_per_point * iv1 + 4 + j];
-    tracer_values[6 * j + 1] =
-        dynamics_state[run_information.info_per_point * iv2 + 4 + j];
-    tracer_values[6 * j + 2] =
-        dynamics_state[run_information.info_per_point * iv3 + 4 + j];
-    tracer_values[6 * j + 3] =
-        dynamics_state[run_information.info_per_point * iv4 + 4 + j];
-    tracer_values[6 * j + 4] =
-        dynamics_state[run_information.info_per_point * iv5 + 4 + j];
-    tracer_values[6 * j + 5] =
-        dynamics_state[run_information.info_per_point * iv6 + 4 + j];
+    tracer_values[6 * j] = dynamics_state[run_information.info_per_point * iv1 + 4 + j];
+    tracer_values[6 * j + 1] = dynamics_state[run_information.info_per_point * iv2 + 4 + j];
+    tracer_values[6 * j + 2] = dynamics_state[run_information.info_per_point * iv3 + 4 + j];
+    tracer_values[6 * j + 3] = dynamics_state[run_information.info_per_point * iv4 + 4 + j];
+    tracer_values[6 * j + 4] = dynamics_state[run_information.info_per_point * iv5 + 4 + j];
+    tracer_values[6 * j + 5] = dynamics_state[run_information.info_per_point * iv6 + 4 + j];
   }
 
   interp_mat_init(interp_matrix, points, 2, 6);
@@ -165,12 +153,10 @@ biquadratic_interp(const RunConfig &run_information,
   if (info > 0)
     throw std::runtime_error("Biquadratic interpolation linear solve failed at line 168");
   bary_cords = barycoords(v1, v2, v3, target_point);
-  output_values[3] =
-      interp_eval(vorticity_values, bary_cords[0], bary_cords[1], 2);
+  output_values[3] = interp_eval(vorticity_values, bary_cords[0], bary_cords[1], 2);
   for (int j = 0; j < run_information.tracer_count; j++) {
     curr_alphas = slice(tracer_values, 6 * j, 1, 6);
-    output_values[4 + j] =
-        interp_eval(curr_alphas, bary_cords[0], bary_cords[1], 2);
+    output_values[4 + j] = interp_eval(curr_alphas, bary_cords[0], bary_cords[1], 2);
   }
   return output_values;
 }
@@ -183,12 +169,10 @@ void remesh_points(
     const int point_count, const double omega) {
   // remesh points back to regular point distribution
   std::vector<double> curr_target;
-  int iv1, iv2, iv3, iv4, iv5, iv6, curr_level, tri_loc,
-      super_tri_loc; // , lb, ub;
+  int iv1, iv2, iv3, iv4, iv5, iv6, curr_level, tri_loc, super_tri_loc;
   double vor1, vor2, vor3, vor4, vor5, vor6, vormax, vormin, vor;
   for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
-    if ((i < run_information.particle_lb) or
-        (i >= run_information.particle_ub)) {
+    if ((i < run_information.particle_lb) or (i >= run_information.particle_ub)) {
       curr_target.assign(run_information.info_per_point, 0);
     } else {
       curr_target =
@@ -212,31 +196,21 @@ void remesh_points(
       if (run_information.use_fast and (not run_information.fast_sum_rotate)) {
         // fast sum icos not rotated
         vor1 = dynamics_state[run_information.info_per_point * iv1 + 3] +
-               2 * omega *
-                   dynamics_state[run_information.info_per_point * iv1 + 2];
+               2 * omega * dynamics_state[run_information.info_per_point * iv1 + 2];
         vor2 = dynamics_state[run_information.info_per_point * iv2 + 3] +
-               2 * omega *
-                   dynamics_state[run_information.info_per_point * iv2 + 2];
+               2 * omega * dynamics_state[run_information.info_per_point * iv2 + 2];
         vor3 = dynamics_state[run_information.info_per_point * iv3 + 3] +
-               2 * omega *
-                   dynamics_state[run_information.info_per_point * iv3 + 2];
+               2 * omega * dynamics_state[run_information.info_per_point * iv3 + 2];
         vor4 = dynamics_state[run_information.info_per_point * iv4 + 3] +
-               2 * omega *
-                   dynamics_state[run_information.info_per_point * iv4 + 2];
+               2 * omega * dynamics_state[run_information.info_per_point * iv4 + 2];
         vor5 = dynamics_state[run_information.info_per_point * iv5 + 3] +
-               2 * omega *
-                   dynamics_state[run_information.info_per_point * iv5 + 2];
+               2 * omega * dynamics_state[run_information.info_per_point * iv5 + 2];
         vor6 = dynamics_state[run_information.info_per_point * iv6 + 3] +
-               2 * omega *
-                   dynamics_state[run_information.info_per_point * iv6 + 2];
+               2 * omega * dynamics_state[run_information.info_per_point * iv6 + 2];
 
-        vormax = std::max(
-            vor1,
-            std::max(vor2,
+        vormax = std::max(vor1, std::max(vor2,
                      std::max(vor3, std::max(vor4, std::max(vor5, vor6)))));
-        vormin = std::min(
-            vor1,
-            std::min(vor2,
+        vormin = std::min(vor1, std::min(vor2,
                      std::min(vor3, std::min(vor4, std::min(vor5, vor6)))));
 
         if (vormax > 0) { // some leeway
@@ -262,16 +236,6 @@ void remesh_points(
                                         iv3, dynamics_state);
         }
       }
-
-      // if (count_nans(curr_target) > 0) {
-      //   std::cout << "point: " << i << " level: " << curr_level
-      //             << " super tri loc " << super_tri_loc
-      //             << " tri_loc: " << tri_loc << std::endl;
-      //   std::cout << iv1 << "," << iv2 << "," << iv3 << "," << iv4 << "," << iv5
-      //             << "," << iv6 << std::endl;
-      //   std::cout << curr_target[0] << "," << curr_target[1] << ","
-      //             << curr_target[2] << std::endl;
-      // }
     }
 
     vector_copy(target_points, curr_target, run_information.info_per_point * i,

@@ -13,8 +13,7 @@ void write_state(const RunConfig &run_information,
        i++) { // write out initial state
     for (int j = 0; j < run_information.info_per_point; j++) {
       file_writer1 << std::setprecision(run_information.write_precision)
-                   << dynamics_state[run_information.info_per_point * i + j]
-                   << ",";
+                   << dynamics_state[run_information.info_per_point * i + j] << ",";
     }
     file_writer1 << std::setprecision(run_information.write_precision)
                  << dynamics_area[i] << "\n";

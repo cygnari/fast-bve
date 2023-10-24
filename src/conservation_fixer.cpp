@@ -16,9 +16,7 @@ void clip_assured_sum(const RunConfig &run_information,
   for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
     prelim_values[i] =
         std::max(std::min(dynamics_state[run_information.info_per_point * i +
-                                         4 + target_species],
-                          qmax),
-                 qmin);
+                                         4 + target_species], qmax), qmin);
     prelim_mass += prelim_values[i] * dynamics_areas[i];
   }
   if (std::abs(prelim_mass - target_mass) < pow(10, -10)) {
@@ -34,8 +32,8 @@ void clip_assured_sum(const RunConfig &run_information,
       for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
         dynamics_state[run_information.info_per_point * i + 4 +
                        target_species] =
-            prelim_values[i] +
-            (target_mass - prelim_mass) * (qmax - prelim_values[i]) / capacity;
+            prelim_values[i] + (target_mass - prelim_mass) *
+                               (qmax - prelim_values[i]) / capacity;
       }
     } else {
       for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
@@ -44,8 +42,8 @@ void clip_assured_sum(const RunConfig &run_information,
       for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
         dynamics_state[run_information.info_per_point * i + 4 +
                        target_species] =
-            prelim_values[i] -
-            (prelim_mass - target_mass) * (prelim_values[i] - qmin) / capacity;
+            prelim_values[i] - (prelim_mass - target_mass) *
+                               (prelim_values[i] - qmin) / capacity;
       }
     }
   }
@@ -74,23 +72,18 @@ void vorticity_fix_limiter(const RunConfig &run_information,
                            const double qmin, const double qmax,
                            const double omega) {
   double capacity = 0, prelim_total = 0, rel_vor, abs_vor;
-  std::vector<double> prelim_abs_vor(run_information.dynamics_curr_point_count,
-                                     0);
+  std::vector<double> prelim_abs_vor(run_information.dynamics_curr_point_count, 0);
 
   for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
     rel_vor = dynamics_state[run_information.info_per_point * i + 3];
-    abs_vor =
-        rel_vor +
-        2 * omega * dynamics_state[run_information.info_per_point * i + 2];
+    abs_vor = rel_vor + 2 * omega * dynamics_state[run_information.info_per_point * i + 2];
     prelim_abs_vor[i] = std::max(std::min(abs_vor, qmax), qmin);
     prelim_total += prelim_abs_vor[i] * dynamics_areas[i];
   }
   if (std::abs(prelim_total) < pow(10, -10)) {
     for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
       abs_vor = prelim_abs_vor[i];
-      rel_vor =
-          abs_vor -
-          2 * omega * dynamics_state[run_information.info_per_point * i + 2];
+      rel_vor = abs_vor - 2 * omega * dynamics_state[run_information.info_per_point * i + 2];
       dynamics_state[run_information.info_per_point * i + 3] = rel_vor;
     }
   } else {
@@ -99,24 +92,17 @@ void vorticity_fix_limiter(const RunConfig &run_information,
         capacity += dynamics_areas[i] * (qmax - prelim_abs_vor[i]);
       }
       for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
-        abs_vor = prelim_abs_vor[i] -
-                  prelim_total * (qmax - prelim_abs_vor[i]) / capacity;
-        rel_vor =
-            abs_vor -
-            2 * omega * dynamics_state[run_information.info_per_point * i + 2];
+        abs_vor = prelim_abs_vor[i] - prelim_total * (qmax - prelim_abs_vor[i]) / capacity;
+        rel_vor = abs_vor - 2 * omega * dynamics_state[run_information.info_per_point * i + 2];
         dynamics_state[run_information.info_per_point * i + 3] = rel_vor;
       }
     } else {
-      //
       for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
         capacity += dynamics_areas[i] * (prelim_abs_vor[i] - qmin);
       }
       for (int i = 0; i < run_information.dynamics_curr_point_count; i++) {
-        abs_vor = prelim_abs_vor[i] -
-                  prelim_total * (prelim_abs_vor[i] - qmin) / capacity;
-        rel_vor =
-            abs_vor -
-            2 * omega * dynamics_state[run_information.info_per_point * i + 2];
+        abs_vor = prelim_abs_vor[i] - prelim_total * (prelim_abs_vor[i] - qmin) / capacity;
+        rel_vor = abs_vor - 2 * omega * dynamics_state[run_information.info_per_point * i + 2];
         dynamics_state[run_information.info_per_point * i + 3] = rel_vor;
       }
     }

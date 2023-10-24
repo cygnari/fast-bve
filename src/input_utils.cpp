@@ -21,8 +21,8 @@ void read_run_config(const std::string file_name, RunConfig &run_information) {
     if (word1 == "use_amr") {
       if (stoi(word2) == 1) {
         run_information.use_amr = true;
-        run_information.use_remesh =
-            true; // amr cannot happen without remeshing
+        run_information.use_remesh = true;
+        // amr cannot happen without remeshing
       }
     } else if (word1 == "use_remesh") {
       if (stoi(word2) == 1) {
@@ -77,8 +77,7 @@ void read_run_config(const std::string file_name, RunConfig &run_information) {
         run_information.dynamics_levels_max =
             run_information.amr_levels + run_information.dynamics_levels_min;
       } else {
-        run_information.dynamics_levels_max =
-            run_information.dynamics_levels_min;
+        run_information.dynamics_levels_max = run_information.dynamics_levels_min;
       }
     } else if (word1 == "initial_vor_condition") {
       run_information.initial_vor_condition = word2;
@@ -97,8 +96,7 @@ void read_run_config(const std::string file_name, RunConfig &run_information) {
     } else if (word1 == "fast_sum_tree_levels") {
       run_information.fast_sum_tree_levels = stoi(word2);
       if (run_information.fast_sum_tree_levels == -1) {
-        run_information.fast_sum_tree_levels =
-            run_information.dynamics_levels_min - 3;
+        run_information.fast_sum_tree_levels = run_information.dynamics_levels_min - 3;
       }
     } else if (word1 == "fast_sum_theta") {
       run_information.fast_sum_theta = stod(word2);
@@ -122,25 +120,16 @@ void read_run_config(const std::string file_name, RunConfig &run_information) {
     } else if (word1 == "fast_rot_gamm") {
       run_information.fast_sum_rotate_gamm = stod(word2);
     } else {
-      run_information.time_steps =
-          int(run_information.end_time / run_information.delta_t);
-      run_information.dynamics_initial_points =
-          10 * pow(4, run_information.dynamics_levels_min - 1) + 2;
-      run_information.dynamics_initial_triangles =
-          20 * pow(4, run_information.dynamics_levels_min - 1);
-      run_information.dynamics_max_points =
-          10 * pow(4, run_information.dynamics_levels_max - 1) + 2;
-      run_information.dynamics_max_triangles =
-          20 * pow(4, run_information.dynamics_levels_max - 1);
-      run_information.dynamics_curr_point_count =
-          run_information.dynamics_initial_points;
-      run_information.dynamics_curr_tri_count =
-          run_information.dynamics_initial_triangles;
-      run_information.interp_point_count =
-          int((1 + run_information.interp_degree) *
+      run_information.time_steps = int(run_information.end_time / run_information.delta_t);
+      run_information.dynamics_initial_points = 10 * pow(4, run_information.dynamics_levels_min - 1) + 2;
+      run_information.dynamics_initial_triangles = 20 * pow(4, run_information.dynamics_levels_min - 1);
+      run_information.dynamics_max_points = 10 * pow(4, run_information.dynamics_levels_max - 1) + 2;
+      run_information.dynamics_max_triangles = 20 * pow(4, run_information.dynamics_levels_max - 1);
+      run_information.dynamics_curr_point_count = run_information.dynamics_initial_points;
+      run_information.dynamics_curr_tri_count = run_information.dynamics_initial_triangles;
+      run_information.interp_point_count = int((1 + run_information.interp_degree) *
               (2 + run_information.interp_degree) / 2);
-      if (run_information.write_stream)
-        run_information.info_per_point += 1;
+      if (run_information.write_stream) run_information.info_per_point += 1;
       run_information.target_points = run_information.dynamics_curr_point_count;
       return;
     }

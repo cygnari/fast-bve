@@ -10,8 +10,7 @@ void dynamics_points_initialize(
     std::vector<std::vector<bool>> &dynamics_triangles_is_leaf,
     std::vector<std::vector<bool>> &dynamics_triangles_exists);
 
-void area_initialize(
-    const RunConfig &run_information, const std::vector<double> &dynamics_state,
+void area_initialize(const RunConfig &run_information, const std::vector<double> &dynamics_state,
     const std::vector<std::vector<std::vector<int>>> &dynamics_triangles,
     std::vector<double> &dynamics_areas);
 
@@ -29,7 +28,6 @@ void fixer_init(const RunConfig &run_information,
                 std::vector<double> &qmins, std::vector<double> &qmaxs,
                 std::vector<double> &target_mass, const double omega);
 
-void fast_sum_icos_init(
-    const RunConfig &run_information, IcosTree &icos_tree);
+void fast_sum_icos_init(const RunConfig &run_information, IcosTree &icos_tree);
 
 #endif

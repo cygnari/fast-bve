@@ -14,40 +14,35 @@ struct RunConfig {
   bool vor_limiter = false;
   bool bltc = false;
   bool same_source_targets = true;
-  std::string out_path;    // ../run-output/ locally, on Derecho,
-                           // /glade/derecho/scratch/achen/bve/
+  std::string out_path;    // ../run-output/ locally,
+                           // on Derecho, /glade/derecho/scratch/achen/bve/
   int write_precision = 6; // number of decimal places, 6 for data
                            // visualization, 16 for error testing
   bool write_output = false;
   bool write_tris = false;
-  bool write_stream =
-      false; // compute and write stream function at each time step
+  bool write_stream = false; // compute and write stream function at each time step
   double radius = 1.0;
   double end_time;         // in days
   double delta_t;          // time step size
-  int dynamics_levels_min; // initial icosahedron refinement levels, 0 = base
-                           // icosahedron
+  int dynamics_levels_min; // initial icosahedron refinement levels, 0 = base icosahedron
   int dynamics_levels_max; // max icosahedron refinement if using amr
   std::string initial_vor_condition; // initial vorticity distribution
   std::string vor_forcing;           // vorticity forcing, if there is one
   int init_cond_param1;              // parameter for initial condition
   double init_cond_param2;           // parameter for initial condition
   // for RH, ICP1 is wavenumber, ICP2 is wave speed, default ICP1 = 4, ICP2 = 0
-  // for GV, ICP1 is radius parameter, ICP2 is starting latitude * pi,
-  // default ICP1 = 4, ICP2 = 0.05
+  // for GV, ICP1 is radius parameter, ICP2 is starting latitude * pi, default ICP1 = 4, ICP2 = 0.05
   // for RV, default ICP1 = 10, ICP2 = 0.05
   // for PV, no params
   int forcing_param1;    // parameter for forcing
   double forcing_param2; // parameter for forcing
-  // for ssw forcing, FRP1 is forcing wavenumber, FRP2 is forcing duration
-  // [days], default FRP1 = 1, FRP2 = 11
-  // for ssw_blend , FRP2 is forcing duration
-  // [days], default FRP2 = 11
+  // for ssw forcing, FRP1 is forcing wavenumber, FRP2 is forcing duration [days], default FRP1 = 1, FRP2 = 11
+  // for ssw_blend , FRP2 is forcing duration [days], default FRP2 = 11
 
   int interp_degree;      // interpolation degree, can go up to 4
   int interp_point_count; // number of interpolation points
-  int info_per_point; // how many doubles each point is, for example, storing x
-                      // y z vor tracer = 5
+  int info_per_point; // how many doubles each point is, for example,
+                      // storing x y z vor tracer = 5
   double amr_circ_thresh = 0.005; // threshold for circulation in amr
   double amr_vor_thresh = 0.4;    // threshold for vorticity difference in amr
   int amr_levels;                 // how many levels of AMR are permitted

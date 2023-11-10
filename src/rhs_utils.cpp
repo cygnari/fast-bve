@@ -25,18 +25,18 @@ void rhs_fast_sum_vel(
         pp_vel(run_information, modify, targets, curr_state, area,
                interactions[i], fast_sum_tree_tri_points_target,
                fast_sum_tree_tri_points_source, time, omega);
-      else if (interactions[i].type == 2)
+      else if (interactions[i].type == 2) // pp or cp
         cp_vel(run_information, modify, targets, curr_state, area,
                interactions[i], fast_sum_tree_tri_points_target,
                fast_sum_tree_tri_points_source, icos_tree, time, omega);
-      else if (interactions[i].type == 1)
+      else if (interactions[i].type == 1) // pc or pp
         // pc_vel(run_information, modify, targets, curr_state, area,
         //        interactions[i], fast_sum_tree_tri_points_target,
         //        fast_sum_tree_tri_points_source, icos_tree, time, omega);
         pp_vel(run_information, modify, targets, curr_state, area,
                interactions[i], fast_sum_tree_tri_points_target,
                fast_sum_tree_tri_points_source, time, omega);
-      else if (interactions[i].type == 3)
+      else if (interactions[i].type == 3) // pc or cp or pp
         cp_vel(run_information, modify, targets, curr_state, area,
                interactions[i], fast_sum_tree_tri_points_target,
                fast_sum_tree_tri_points_source, icos_tree, time, omega);

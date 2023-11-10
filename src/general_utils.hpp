@@ -4,6 +4,8 @@
 #include <vector>
 #include "fastbve-config.h"
 
+int linear_solve(const std::vector<double> &interp_mat, std::vector<double> &b_vec, int size, int nrhs, const int solver);
+
 double dot_prod(const std::vector<double> &x, const std::vector<double> &y);
 
 double vec_norm(const std::vector<double> &x);

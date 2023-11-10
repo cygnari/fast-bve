@@ -4,11 +4,23 @@
 #include <iostream>
 #include <tuple>
 
-extern "C" { // lapack
-extern int dgesv_(int *, int *, double *, int *, int *, double *, int *, int *);
-extern int dgetrf_(int *, int *, double *, int *, int *, int *);
-extern int dgetrs_(char *, int *, int *, double *, int *, int *, double *,
-                   int *, int *);
+double sbb_coeff(const int deg, const int i, const int j) {
+  std::vector<double> log_vals(deg + 1, 0);
+  double accum = 0;
+  for (int k = 1; k < deg + 1; k++) {
+    log_vals[k] = log(k);
+    accum += log_vals[k];
+  }
+  for (int k = 1; k < i + 1; k++) {
+    accum -= log_vals[k];
+  }
+  for (int k = 1; k < j + 1; k++) {
+    accum -= log_vals[k];
+  }
+  for (int k = 1; k < (deg-i-j) + 1; k++) {
+    accum -= log_vals[k];
+  }
+  return exp(accum);
 }
 
 void fekete_init(std::vector<std::vector<double>> &points, const int degree) {
@@ -35,6 +47,8 @@ void interp_mat_init(
     std::vector<double> &mat, const std::vector<std::vector<double>> &points,
     const int degree,
     const int point_count) { // sets up matrix to interpolate with fekete points
+  // simple polynomial in s and t, barycentric coordinates
+  // for example, for deg 2, evaluates 1, s, t, s^2, st, t^2 at interpolation points
   int index, place;
   double a, b;
   for (int i = 0; i < degree + 1; i++) {
@@ -50,6 +64,29 @@ void interp_mat_init(
   }
 }
 
+void interp_mat_init_sbb(
+    std::vector<double> &mat, const std::vector<std::vector<double>> &points,
+    const int degree,
+    const int point_count) { // sets up matrix to interpolate with fekete points
+  // uses spherical bezier bernstein polynomials
+  // for example, for deg 2, evaluates s^2, t^2, u^2, st, su, tu at interpolation points
+  int index = 0, place;
+  double s, t, u;
+  for (int i = 0; i < degree + 1; i++) { // degree of s
+    for (int j = 0; j < degree + 1 - i; j++) { // degree of t
+      // coeff = sbb_coeff(degree, i, j);
+      for (int k = 0; k < point_count; k++) { // evaluate SBB at each point
+        s = points[k][0];
+        t = points[k][1];
+        u = points[k][2];
+        place = index * point_count + k;
+        mat[place] = pow(s, i) * pow(t, j) * pow(u, degree - i - j);
+      }
+      index += 1;
+    }
+  }
+}
+
 double interp_eval(
     const std::vector<double> &alphas, const double s, const double t,
     const int degree) { // evaluate interpolation polynomial with coefficients
@@ -59,8 +96,47 @@ double interp_eval(
   for (int i = 0; i < degree + 1; i++) {
     for (int j = 0; j < i + 1; j++) {
       index = i * (i + 1) / 2 + j;
-      accum += pow(s, i - j) * pow(t, j) * alphas[index = i * (i + 1) / 2 + j];
+      accum += pow(s, i - j) * pow(t, j) * alphas[index];
     }
+  }
+  return accum;
+}
+
+std::vector<double> interp_vals_sbb(const double s, const double t, const double u, const int degree) {
+  // returns vector of SBB basis values of s, t, u
+  int count = (degree + 1) * (degree + 2) / 2;
+  std::vector<double> out_vals (count, 0);
+  double val, factor, spart = 1;
+  factor = t / u;
+  int index = 0;
+  for (int i = 0; i < degree + 1; i++) { // degree of s
+    val = spart * pow(u, degree - i);
+    for (int j = 0; j < degree + 1 - i; j++) {
+      out_vals[index] = val;
+      index += 1;
+      val *= factor;
+    }
+    spart *= s;
+  }
+  return out_vals;
+}
+
+double interp_eval_sbb(
+    const std::vector<double> &alphas, const double s, const double t, const double u,
+    const int degree) { // evaluate SBB interpolation polynomial with coefficients
+                        // alpha and barycentric point (s, t, u)
+  double accum = 0;
+  int index = 0;
+  double val, factor, spart = 1;
+  factor = t / u;
+  for (int i = 0; i < degree + 1; i++) { // degree of s
+    val = spart * pow(u, degree - i);
+    for (int j = 0; j < degree + 1 - i; j++) {
+      accum += val * alphas[index];
+      index += 1;
+      val *= factor;
+    }
+    spart *= s;
   }
   return accum;
 }
@@ -98,13 +174,10 @@ biquadratic_interp(const RunConfig &run_information,
 
   std::vector<double> v1, v2, v3, v4, v5, v6, curr_alphas, bary_cords;
   std::vector<std::vector<double>> points(6, std::vector<double>(3, 0));
-  std::vector<double> vorticity_values(6, 0);
   std::vector<double> output_values(run_information.info_per_point);
-  std::vector<double> tracer_values(6 * run_information.tracer_count, 0);
   std::vector<double> interp_matrix(36, 0);
   std::vector<int> ipiv(6, 0);
-  char trans = 'N';
-  int Num = 6, nrhs, info;
+  std::vector<double> b_vec(6*run_information.tracer_count+6, 0);
 
   output_values[0] = target_point[0];
   output_values[1] = target_point[1];
@@ -124,38 +197,31 @@ biquadratic_interp(const RunConfig &run_information,
   points[4] = normalized_barycoords(v1, v2, v3, v5);
   points[5] = normalized_barycoords(v1, v2, v3, v6);
 
-  vorticity_values[0] = dynamics_state[run_information.info_per_point * iv1 + 3];
-  vorticity_values[1] = dynamics_state[run_information.info_per_point * iv2 + 3];
-  vorticity_values[2] = dynamics_state[run_information.info_per_point * iv3 + 3];
-  vorticity_values[3] = dynamics_state[run_information.info_per_point * iv4 + 3];
-  vorticity_values[4] = dynamics_state[run_information.info_per_point * iv5 + 3];
-  vorticity_values[5] = dynamics_state[run_information.info_per_point * iv6 + 3];
+  b_vec[0] = dynamics_state[run_information.info_per_point * iv1 + 3];
+  b_vec[1] = dynamics_state[run_information.info_per_point * iv2 + 3];
+  b_vec[2] = dynamics_state[run_information.info_per_point * iv3 + 3];
+  b_vec[3] = dynamics_state[run_information.info_per_point * iv4 + 3];
+  b_vec[4] = dynamics_state[run_information.info_per_point * iv5 + 3];
+  b_vec[5] = dynamics_state[run_information.info_per_point * iv6 + 3];
 
   for (int j = 0; j < run_information.tracer_count; j++) {
-    tracer_values[6 * j] = dynamics_state[run_information.info_per_point * iv1 + 4 + j];
-    tracer_values[6 * j + 1] = dynamics_state[run_information.info_per_point * iv2 + 4 + j];
-    tracer_values[6 * j + 2] = dynamics_state[run_information.info_per_point * iv3 + 4 + j];
-    tracer_values[6 * j + 3] = dynamics_state[run_information.info_per_point * iv4 + 4 + j];
-    tracer_values[6 * j + 4] = dynamics_state[run_information.info_per_point * iv5 + 4 + j];
-    tracer_values[6 * j + 5] = dynamics_state[run_information.info_per_point * iv6 + 4 + j];
+    b_vec[6 * (j+1)] = dynamics_state[run_information.info_per_point * iv1 + 4 + j];
+    b_vec[6 * (j+1) + 1] = dynamics_state[run_information.info_per_point * iv2 + 4 + j];
+    b_vec[6 * (j+1) + 2] = dynamics_state[run_information.info_per_point * iv3 + 4 + j];
+    b_vec[6 * (j+1) + 3] = dynamics_state[run_information.info_per_point * iv4 + 4 + j];
+    b_vec[6 * (j+1) + 4] = dynamics_state[run_information.info_per_point * iv5 + 4 + j];
+    b_vec[6 * (j+1) + 5] = dynamics_state[run_information.info_per_point * iv6 + 4 + j];
   }
 
   interp_mat_init(interp_matrix, points, 2, 6);
-  dgetrf_(&Num, &Num, &*interp_matrix.begin(), &Num, &*ipiv.begin(), &info);
-  nrhs = 1;
-  dgetrs_(&trans, &Num, &nrhs, &*interp_matrix.begin(), &Num, &*ipiv.begin(),
-          &*vorticity_values.begin(), &Num, &info);
+  int info = linear_solve(interp_matrix, b_vec, 6, 1+run_information.tracer_count, 1);
   if (info > 0)
-    throw std::runtime_error("Biquadratic interpolation linear solve failed at line 162");
-  nrhs = run_information.tracer_count;
-  dgetrs_(&trans, &Num, &nrhs, &*interp_matrix.begin(), &Num, &*ipiv.begin(),
-          &*tracer_values.begin(), &Num, &info);
-  if (info > 0)
-    throw std::runtime_error("Biquadratic interpolation linear solve failed at line 168");
+    throw std::runtime_error("Biquadratic interpolation linear solve failed at line 136");
   bary_cords = barycoords(v1, v2, v3, target_point);
-  output_values[3] = interp_eval(vorticity_values, bary_cords[0], bary_cords[1], 2);
+  curr_alphas = slice(b_vec, 0, 1, 6);
+  output_values[3] = interp_eval(curr_alphas, bary_cords[0], bary_cords[1], 2);
   for (int j = 0; j < run_information.tracer_count; j++) {
-    curr_alphas = slice(tracer_values, 6 * j, 1, 6);
+    curr_alphas = slice(b_vec, 6 * j + 6, 1, 6);
     output_values[4 + j] = interp_eval(curr_alphas, bary_cords[0], bary_cords[1], 2);
   }
   return output_values;

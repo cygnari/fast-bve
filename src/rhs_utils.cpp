@@ -5,6 +5,7 @@
 #include "structs.hpp"
 #include "vorticity_functions.hpp"
 #include <vector>
+#include <iostream>
 
 void rhs_fast_sum_vel(
     const RunConfig &run_information, std::vector<double> &modify,
@@ -27,20 +28,12 @@ void rhs_fast_sum_vel(
         cp_vel(run_information, modify, targets, curr_state, area,
                interactions[i], fast_sum_tree_tri_points_target,
                fast_sum_tree_tri_points_source, icos_tree, time, omega);
-      // else if (interactions[i].type == "pc") pc_vel(run_information, modify,
-      // targets, curr_state, area, interactions[i],
-      // fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
-      // icos_tree, time, omega);
       else if (interactions[i].type == 1)
-        pp_vel(run_information, modify, targets, curr_state, area,
+        pc_vel(run_information, modify, targets, curr_state, area,
                interactions[i], fast_sum_tree_tri_points_target,
-               fast_sum_tree_tri_points_source, time, omega);
-      // else if (interactions[i].type == "cc") cc_vel(run_information, modify,
-      // targets, curr_state, area, interactions[i],
-      // fast_sum_tree_tri_points_target, fast_sum_tree_tri_points_source,
-      // icos_tree, time, omega);
+               fast_sum_tree_tri_points_source, icos_tree, time, omega);
       else if (interactions[i].type == 3)
-        cp_vel(run_information, modify, targets, curr_state, area,
+        cc_vel(run_information, modify, targets, curr_state, area,
                interactions[i], fast_sum_tree_tri_points_target,
                fast_sum_tree_tri_points_source, icos_tree, time, omega);
     }

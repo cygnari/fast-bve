@@ -71,7 +71,7 @@ std::string create_config(const RunConfig &run_information) {
   if (run_information.use_fast) {
     output_filename +=
         "fast_" + std::to_string(run_information.fast_sum_tree_levels) + "_" +
-        std::to_string(run_information.fast_sum_theta).substr(0, 3);
+        std::to_string(run_information.fast_sum_theta).substr(0, 3) + "_" + std::to_string(run_information.interp_degree) + "_";
   } else if (run_information.bltc) {
     output_filename +=
         "bltc_" + std::to_string(run_information.fast_sum_theta).substr(0, 3) +

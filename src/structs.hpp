@@ -39,7 +39,7 @@ struct RunConfig {
   // for ssw forcing, FRP1 is forcing wavenumber, FRP2 is forcing duration [days], default FRP1 = 1, FRP2 = 11
   // for ssw_blend , FRP2 is forcing duration [days], default FRP2 = 11
 
-  int interp_degree;      // interpolation degree, can go up to 4
+  int interp_degree;      // interpolation degree
   int interp_point_count; // number of interpolation points
   int info_per_point; // how many doubles each point is, for example,
                       // storing x y z vor tracer = 5

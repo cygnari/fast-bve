@@ -26,19 +26,21 @@ double sbb_coeff(const int deg, const int i, const int j) {
 void fekete_init(std::vector<std::vector<double>> &points, const int degree) {
   double delta_x = 1.0 / degree;
   int index;
-  double a, b, c;
+  double a, b, c, part;
   for (int i = 0; i < degree + 1; i++) {
+    a = 1 - i * delta_x;
+    a = 0.5 * (1 + sin(M_PI / 2 * (2 * a - 1)));
+    part = a;
     for (int j = 0; j < i + 1; j++) {
       index = i * (i + 1) / 2 + j;
-      a = 1 - i * delta_x;
       c = j * delta_x;
-      b = 1 - a - b;
-      a = 0.5 * (1 + sin(M_PI / 2 * (2 * a - 1)));
+      b = i*delta_x - b;
       b = 0.5 * (1 + sin(M_PI / 2 * (2 * b - 1)));
       c = 0.5 * (1 + sin(M_PI / 2 * (2 * c - 1)));
-      points[index][0] = a / (a + b + c);
-      points[index][1] = b / (a + b + c);
-      points[index][2] = c / (a + b + c);
+      part += b + c;
+      points[index][0] = a / part;
+      points[index][1] = b / part;
+      points[index][2] = c / part;
     }
   }
 }
@@ -71,18 +73,25 @@ void interp_mat_init_sbb(
   // uses spherical bezier bernstein polynomials
   // for example, for deg 2, evaluates s^2, t^2, u^2, st, su, tu at interpolation points
   int index = 0, place;
-  double s, t, u;
-  for (int i = 0; i < degree + 1; i++) { // degree of s
-    for (int j = 0; j < degree + 1 - i; j++) { // degree of t
-      // coeff = sbb_coeff(degree, i, j);
-      for (int k = 0; k < point_count; k++) { // evaluate SBB at each point
-        s = points[k][0];
-        t = points[k][1];
-        u = points[k][2];
-        place = index * point_count + k;
-        mat[place] = pow(s, i) * pow(t, j) * pow(u, degree - i - j);
+  double s, t, u, si, tj, uk, comp, val, spart = 1, factor, tpart=1;
+  for (int k = 0; k < point_count; k++) {
+    s = points[k][0];
+    t = points[k][1];
+    u = points[k][2];
+    index = 0;
+    spart = 1;
+    // factor = t/u;
+    for (int i = 0; i < degree + 1; i++) {
+      // val = spart * pow(u, degree-i);
+      for (int j = 0; j < degree+1-i; j++) {
+        val = spart * tpart * pow(u, degree-i-j);
+        place = point_count * index + k;
+        mat[place] = val;
+        index++;
+        val *= factor;
+        tpart *= t;
       }
-      index += 1;
+      spart *= s;
     }
   }
 }

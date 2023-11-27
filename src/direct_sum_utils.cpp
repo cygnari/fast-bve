@@ -10,24 +10,25 @@ void rhs_direct_sum_vel(const RunConfig &run_information,
                         const std::vector<double> &dynamics_areas,
                         const double time,
                         const double omega) { // direct summation for all of RHS
-  std::vector<double> pos_change, particle_source, particle_target,
-      contribution;
-  double vor;
-  int nval = 3, point_offset = run_information.info_per_point;
+  double vor, tx, ty, tz, sx, sy, sz, denom, scalar;
   for (int i = run_information.target_lb; i < run_information.target_ub; i++) {
-    pos_change = {0, 0, 0};
-    particle_target = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
+    tx = dynamics_state[run_information.info_per_point * i];
+    ty = dynamics_state[run_information.info_per_point * i + 1];
+    tz = dynamics_state[run_information.info_per_point * i + 2];
     for (int j = 0; j < run_information.dynamics_curr_point_count; j++) {
       if (i != j) {
-        particle_source = slice(dynamics_state, run_information.info_per_point * j, 1, 3);
-        contribution = bve_gfunc(particle_target, particle_source);
+        sx = dynamics_state[run_information.info_per_point * j];
+        sy = dynamics_state[run_information.info_per_point * j + 1];
+        sz = dynamics_state[run_information.info_per_point * j + 2];
         vor = dynamics_state[run_information.info_per_point * j + 3];
-        vor -= vor_force_func(run_information, particle_source, time, omega);
-        scalar_mult(contribution, vor * dynamics_areas[j]);
-        vec_add(pos_change, contribution);
+        // vor -= vor_force_func(run_information, source_particle, time, omega);
+        denom = 1.0 - tx * sx - ty * sy - tz * sz;
+        scalar = vor * dynamics_areas[j] / denom;
+        modify[run_information.info_per_point * i] += (ty * sz - tz * sy) * scalar;
+        modify[run_information.info_per_point * i + 1] += (tz * sx - tx * sz) * scalar;
+        modify[run_information.info_per_point * i + 2] += (tx * sy - ty * sx) * scalar;
       }
     }
-    vector_copy(modify, pos_change, point_offset * i, nval);
   }
 }
 
@@ -37,20 +38,19 @@ void rhs_direct_sum_stream(
     const std::vector<double> &dynamics_state,
     const std::vector<double> &dynamics_areas, const double time,
     const double omega) { // direct summation for all of RHS
-  std::vector<double> pos_change, particle_i, particle_j;
-  double vor;
-  double stream_val = 0, contribution;
+  double vor, tx, ty, tz, sx, sy, sz, denom, scalar;
   for (int i = run_information.target_lb; i < run_information.target_ub; i++) {
-    particle_i = slice(dynamics_state, run_information.info_per_point * i, 1, 3);
+    tx = dynamics_state[run_information.info_per_point * i];
+    ty = dynamics_state[run_information.info_per_point * i + 1];
+    tz = dynamics_state[run_information.info_per_point * i + 2];
     for (int j = 0; j < run_information.dynamics_curr_point_count; j++) {
       if (i != j) {
-        particle_j = slice(dynamics_state, run_information.info_per_point * j, 1, 3);
-        contribution = stream_gfunc(particle_i, particle_j);
+        sx = dynamics_state[run_information.info_per_point * j];
+        sy = dynamics_state[run_information.info_per_point * j + 1];
+        sz = dynamics_state[run_information.info_per_point * j + 2];
         vor = dynamics_state[run_information.info_per_point * j + 3];
-        vor -= vor_force_func(run_information, particle_j, time, omega);
-        stream_val += contribution * vor * dynamics_areas[j];
+        modify[i] += vor * dynamics_areas[j] * -1.0 / (4.0 * M_PI) * log(1.0 - tx * sx - ty * sy - tz * sz);
       }
     }
-    modify[i] = stream_val;
   }
 }

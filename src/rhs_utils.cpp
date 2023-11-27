@@ -12,10 +12,7 @@ void rhs_fast_sum_vel(
     const std::vector<double> &targets, const std::vector<double> &curr_state,
     const std::vector<double> &area,
     const std::vector<InteractionPair> &interactions,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_target,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_source,
+    const std::vector<std::vector<int>>& start_locs,
     const IcosTree &icos_tree, const double time, const double omega) {
   for (int i = 0; i < interactions.size(); i++) {
     if (i % run_information.mpi_P ==
@@ -23,23 +20,18 @@ void rhs_fast_sum_vel(
       // 0 = pp, 1 = pc, 2 = cp, 3 = cc
       if (interactions[i].type == 0)
         pp_vel(run_information, modify, targets, curr_state, area,
-               interactions[i], fast_sum_tree_tri_points_target,
-               fast_sum_tree_tri_points_source, time, omega);
+               interactions[i], start_locs, time, omega);
       else if (interactions[i].type == 2) // pp or cp
         cp_vel(run_information, modify, targets, curr_state, area,
-               interactions[i], fast_sum_tree_tri_points_target,
-               fast_sum_tree_tri_points_source, icos_tree, time, omega);
+               interactions[i], start_locs, icos_tree, time, omega);
       else if (interactions[i].type == 1) // pc or pp
-        // pc_vel(run_information, modify, targets, curr_state, area,
-        //        interactions[i], fast_sum_tree_tri_points_target,
-        //        fast_sum_tree_tri_points_source, icos_tree, time, omega);
-        pp_vel(run_information, modify, targets, curr_state, area,
-               interactions[i], fast_sum_tree_tri_points_target,
-               fast_sum_tree_tri_points_source, time, omega);
+        pc_vel(run_information, modify, targets, curr_state, area,
+               interactions[i], start_locs, icos_tree, time, omega);
+        // pp_vel(run_information, modify, targets, curr_state, area,
+        //        interactions[i], start_locs, time, omega);
       else if (interactions[i].type == 3) // pc or cp or pp
         cp_vel(run_information, modify, targets, curr_state, area,
-               interactions[i], fast_sum_tree_tri_points_target,
-               fast_sum_tree_tri_points_source, icos_tree, time, omega);
+               interactions[i], start_locs, icos_tree, time, omega);
     }
   }
 }
@@ -97,9 +89,13 @@ void convolve_vel(
     const IcosTree &icos_tree, const double time, const double omega) {
   fill(modify.begin(), modify.end(), 0);
   if (run_information.use_fast) {
-    rhs_fast_sum_vel(run_information, modify, targets, curr_state, area,
-                     interactions, fast_sum_tree_tri_points_target,
-                     fast_sum_tree_tri_points_source, icos_tree, time, omega);
+    std::vector<std::vector<int>> start_locs;
+    std::vector<double> rearrange_state;
+    std::vector<double> rearrange_modify (run_information.dynamics_curr_point_count * run_information.info_per_point);
+    rearrange_particles(run_information, rearrange_state, start_locs, curr_state, fast_sum_tree_tri_points_target);
+    rhs_fast_sum_vel(run_information, rearrange_modify, targets, rearrange_state, area,
+                     interactions, start_locs, icos_tree, time, omega);
+    dearrange_updates(run_information, modify, rearrange_modify, fast_sum_tree_tri_points_target);
   } else {
     rhs_direct_sum_vel(run_information, modify, targets, curr_state, area, time,
                        omega);

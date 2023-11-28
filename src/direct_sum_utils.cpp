@@ -2,6 +2,7 @@
 #include "green_funcs.hpp"
 #include "structs.hpp"
 #include "vorticity_functions.hpp"
+#include <cmath>
 
 void rhs_direct_sum_vel(const RunConfig &run_information,
                         std::vector<double> &modify,

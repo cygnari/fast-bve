@@ -435,10 +435,10 @@ void pc_vel(const RunConfig &run_information, std::vector<double> &modify,
     cx = us * v1s[0] + vs * v2s[0] + ws * v3s[0];
     cy = us * v1s[1] + vs * v2s[1] + ws * v3s[1];
     cz = us * v1s[2] + vs * v2s[2] + ws * v3s[2];
-    scalar = sqrt(cx * cx + cy * cy + cz * cz);
-    cx *= run_information.radius / scalar;
-    cy *= run_information.radius / scalar;
-    cz *= run_information.radius / scalar;
+    scalar = run_information.radius / sqrt(cx * cx + cy * cy + cz * cz);
+    cx *= scalar;
+    cy *= scalar;
+    cz *= scalar;
     bary_cord = barycoords(v1s, v2s, v3s, cx, cy, cz);
     interp_points[i]=bary_cord;
     for (int j = 0; j < interact.count_target; j++) {
@@ -446,11 +446,11 @@ void pc_vel(const RunConfig &run_information, std::vector<double> &modify,
       tx = curr_state[run_information.info_per_point * point_index];
       ty = curr_state[run_information.info_per_point * point_index + 1];
       tz = curr_state[run_information.info_per_point * point_index + 2];
-      denom = 1.0 - tx * cx - ty * cy - tz * cz;
+      denom = 1.0 / (1.0 - tx * cx - ty * cy - tz * cz);
       offset = 3 * j * dim + i;
-      func_vals[offset] = (ty * cz - tz * cy) / denom;
-      func_vals[offset+dim] = (tz * cx - tx * cz) / denom;
-      func_vals[offset+2*dim] = (tx * cy - ty * cx) / denom;
+      func_vals[offset] = (ty * cz - tz * cy) * denom;
+      func_vals[offset+dim] = (tz * cx - tx * cz) * denom;
+      func_vals[offset+2*dim] = (tx * cy - ty * cx) * denom;
     }
   }
 
@@ -509,10 +509,10 @@ void cp_vel(const RunConfig &run_information, std::vector<double> &modify,
     cx = u * v1[0] + v * v2[0] + w * v3[0];
     cy = u * v1[1] + v * v2[1] + w * v3[1];
     cz = u * v1[2] + v * v2[2] + w * v3[2];
-    scalar = sqrt(cx * cx + cy * cy + cz * cz);
-    cx *= run_information.radius / scalar;
-    cy *= run_information.radius / scalar;
-    cz *= run_information.radius / scalar;
+    scalar = run_information.radius / sqrt(cx * cx + cy * cy + cz * cz);
+    cx *= scalar;
+    cy *= scalar;
+    cz *= scalar;
     bary_cord = barycoords(v1, v2, v3, cx, cy, cz);
     interp_points[i] = bary_cord;
     for (int j = 0; j < interact.count_source; j++) {

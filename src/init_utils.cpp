@@ -30,97 +30,54 @@ void dynamics_points_initialize(
 
   run_information.dynamics_curr_point_count = 12;
   run_information.dynamics_curr_tri_count = 20;
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{0, 1, phi},
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{0, 1, phi},
                                    run_information.radius), 0, 3);
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{0, -1, phi},
-                                   run_information.radius),
-               run_information.info_per_point, 3);
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{0, 1, -phi},
-                                   run_information.radius),
-               2 * run_information.info_per_point, 3);
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{0, -1, -phi},
-                                   run_information.radius),
-               3 * run_information.info_per_point, 3);
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{1, phi, 0},
-                                   run_information.radius),
-               4 * run_information.info_per_point, 3);
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{1, -phi, 0},
-                                   run_information.radius),
-               5 * run_information.info_per_point, 3);
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{-1, phi, 0},
-                                   run_information.radius),
-               6 * run_information.info_per_point, 3);
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{-1, -phi, 0},
-                                   run_information.radius),
-               7 * run_information.info_per_point, 3);
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{phi, 0, 1},
-                                   run_information.radius),
-               8 * run_information.info_per_point, 3);
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{phi, 0, -1},
-                                   run_information.radius),
-               9 * run_information.info_per_point, 3);
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{-phi, 0, 1},
-                                   run_information.radius),
-               10 * run_information.info_per_point, 3);
-  vector_copy2(dynamics_state,
-               project_to_sphere_2(std::vector<double>{-phi, 0, -1},
-                                   run_information.radius),
-               11 * run_information.info_per_point, 3);
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{0, -1, phi},
+                                   run_information.radius), run_information.info_per_point, 3);
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{0, 1, -phi},
+                                   run_information.radius), 2 * run_information.info_per_point, 3);
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{0, -1, -phi},
+                                   run_information.radius), 3 * run_information.info_per_point, 3);
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{1, phi, 0},
+                                   run_information.radius), 4 * run_information.info_per_point, 3);
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{1, -phi, 0},
+                                   run_information.radius), 5 * run_information.info_per_point, 3);
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{-1, phi, 0},
+                                   run_information.radius), 6 * run_information.info_per_point, 3);
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{-1, -phi, 0},
+                                   run_information.radius), 7 * run_information.info_per_point, 3);
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{phi, 0, 1},
+                                   run_information.radius), 8 * run_information.info_per_point, 3);
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{phi, 0, -1},
+                                   run_information.radius), 9 * run_information.info_per_point, 3);
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{-phi, 0, 1},
+                                   run_information.radius), 10 * run_information.info_per_point, 3);
+  vector_copy2(dynamics_state, project_to_sphere_2(std::vector<double>{-phi, 0, -1},
+                                   run_information.radius), 11 * run_information.info_per_point, 3);
 
    // 0, 1, 2 are indices of the three vertices
    // 20 starting faces
    // make sure the points are in CCW order
-  dynamics_triangles[0][0].insert(
-                           dynamics_triangles[0][0].begin(), {0, 1, 8, 0});
-  dynamics_triangles[0][1].insert(
-                           dynamics_triangles[0][1].begin(), {0, 10, 1, 0});
-  dynamics_triangles[0][2].insert(
-                           dynamics_triangles[0][2].begin(), {0, 4, 6, 0});
-  dynamics_triangles[0][3].insert(
-                           dynamics_triangles[0][3].begin(), {0, 8, 4, 0});
-  dynamics_triangles[0][4].insert(
-                           dynamics_triangles[0][4].begin(), {0, 6, 10, 0});
-  dynamics_triangles[0][5].insert(
-                           dynamics_triangles[0][5].begin(), {1, 7, 5, 0});
-  dynamics_triangles[0][6].insert(
-                           dynamics_triangles[0][6].begin(), {1, 5, 8, 0});
-  dynamics_triangles[0][7].insert(
-                           dynamics_triangles[0][7].begin(), {1, 10, 7, 0});
-  dynamics_triangles[0][8].insert(
-                           dynamics_triangles[0][8].begin(), {2, 9, 3, 0});
-  dynamics_triangles[0][9].insert(
-                           dynamics_triangles[0][9].begin(), {2, 3, 11, 0});
-  dynamics_triangles[0][10].insert(
-                           dynamics_triangles[0][10].begin(), {2, 6, 4, 0});
-  dynamics_triangles[0][11].insert(
-                           dynamics_triangles[0][11].begin(), {2, 4, 9, 0});
-  dynamics_triangles[0][12].insert(
-                           dynamics_triangles[0][12].begin(), {2, 11, 6, 0});
-  dynamics_triangles[0][13].insert(
-                           dynamics_triangles[0][13].begin(), {3, 5, 7, 0});
-  dynamics_triangles[0][14].insert(
-                           dynamics_triangles[0][14].begin(), {3, 9, 5, 0});
-  dynamics_triangles[0][15].insert(
-                           dynamics_triangles[0][15].begin(), {3, 7, 11, 0});
-  dynamics_triangles[0][16].insert(
-                           dynamics_triangles[0][16].begin(), {4, 8, 9, 0});
-  dynamics_triangles[0][17].insert(
-                           dynamics_triangles[0][17].begin(), {5, 9, 8, 0});
-  dynamics_triangles[0][18].insert(
-                           dynamics_triangles[0][18].begin(), {6, 11, 10, 0});
-  dynamics_triangles[0][19].insert(
-                           dynamics_triangles[0][19].begin(),{7, 10, 11, 0});
+  dynamics_triangles[0][0].insert(dynamics_triangles[0][0].begin(), {0, 1, 8, 0});
+  dynamics_triangles[0][1].insert(dynamics_triangles[0][1].begin(), {0, 10, 1, 0});
+  dynamics_triangles[0][2].insert(dynamics_triangles[0][2].begin(), {0, 4, 6, 0});
+  dynamics_triangles[0][3].insert(dynamics_triangles[0][3].begin(), {0, 8, 4, 0});
+  dynamics_triangles[0][4].insert(dynamics_triangles[0][4].begin(), {0, 6, 10, 0});
+  dynamics_triangles[0][5].insert(dynamics_triangles[0][5].begin(), {1, 7, 5, 0});
+  dynamics_triangles[0][6].insert(dynamics_triangles[0][6].begin(), {1, 5, 8, 0});
+  dynamics_triangles[0][7].insert(dynamics_triangles[0][7].begin(), {1, 10, 7, 0});
+  dynamics_triangles[0][8].insert(dynamics_triangles[0][8].begin(), {2, 9, 3, 0});
+  dynamics_triangles[0][9].insert(dynamics_triangles[0][9].begin(), {2, 3, 11, 0});
+  dynamics_triangles[0][10].insert(dynamics_triangles[0][10].begin(), {2, 6, 4, 0});
+  dynamics_triangles[0][11].insert(dynamics_triangles[0][11].begin(), {2, 4, 9, 0});
+  dynamics_triangles[0][12].insert(dynamics_triangles[0][12].begin(), {2, 11, 6, 0});
+  dynamics_triangles[0][13].insert(dynamics_triangles[0][13].begin(), {3, 5, 7, 0});
+  dynamics_triangles[0][14].insert(dynamics_triangles[0][14].begin(), {3, 9, 5, 0});
+  dynamics_triangles[0][15].insert(dynamics_triangles[0][15].begin(), {3, 7, 11, 0});
+  dynamics_triangles[0][16].insert(dynamics_triangles[0][16].begin(), {4, 8, 9, 0});
+  dynamics_triangles[0][17].insert(dynamics_triangles[0][17].begin(), {5, 9, 8, 0});
+  dynamics_triangles[0][18].insert(dynamics_triangles[0][18].begin(), {6, 11, 10, 0});
+  dynamics_triangles[0][19].insert(dynamics_triangles[0][19].begin(),{7, 10, 11, 0});
 
   for (int i = 0; i < run_information.dynamics_levels_min - 1; i++) {
     dynamics_triangles[i + 1] = std::vector<std::vector<int>>(
@@ -144,14 +101,11 @@ void dynamics_points_initialize(
       project_to_sphere(v12, run_information.radius);
       project_to_sphere(v23, run_information.radius);
       project_to_sphere(v31, run_information.radius);
-      iv12 = check_point_exist(dynamics_points_parents,
-                               run_information.dynamics_curr_point_count,
+      iv12 = check_point_exist(dynamics_points_parents, run_information.dynamics_curr_point_count,
                                std::min(iv1, iv2), std::max(iv1, iv2));
-      iv23 = check_point_exist(dynamics_points_parents,
-                               run_information.dynamics_curr_point_count,
+      iv23 = check_point_exist(dynamics_points_parents, run_information.dynamics_curr_point_count,
                                std::min(iv2, iv3), std::max(iv2, iv3));
-      iv31 = check_point_exist(dynamics_points_parents,
-                               run_information.dynamics_curr_point_count,
+      iv31 = check_point_exist(dynamics_points_parents, run_information.dynamics_curr_point_count,
                                std::min(iv3, iv1), std::max(iv3, iv1));
       if (iv12 == -1) {
         iv12 = run_information.dynamics_curr_point_count;

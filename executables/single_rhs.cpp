@@ -140,30 +140,39 @@ int main(int argc, char **argv) {
 
   MPI_Barrier(MPI_COMM_WORLD);
 
+  std::vector<std::vector<int>> start_locs;
+  std::vector<double> rearrange_state (run_information.dynamics_curr_point_count * run_information.info_per_point);
+  std::vector<double> rearrange_modify (run_information.dynamics_curr_point_count * run_information.info_per_point);
+
+  if (run_information.use_fast) {
+    rearrange_particles(run_information, rearrange_state, start_locs, dynamics_state, fast_sum_tree_tri_points);
+  }
+
+
   if (ID == 0) {
     end = std::chrono::steady_clock::now();
     std::cout << "initialization time: "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end -
-                                                                       begin)
-                     .count()
+              << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()
               << " microseconds" << std::endl;
     begin = std::chrono::steady_clock::now();
   }
 
-  rhs_func(run_information, c_1, dynamics_state, dynamics_state, dynamics_areas,
+  rhs_func(run_information, rearrange_modify, rearrange_state, rearrange_state, dynamics_areas,
            fast_sum_tree_interactions, fast_sum_tree_tri_points,
-           fast_sum_tree_tri_points, icos_tree, curr_time, omega);
+           fast_sum_tree_tri_points, start_locs, icos_tree, curr_time, omega);
   sync_updates<double>(c_1, P, ID, &win_c1, MPI_DOUBLE);
 
   if (ID == 0) {
     end = std::chrono::steady_clock::now();
     std::cout << "dynamics time: "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end -
-                                                                       begin)
-                     .count()
+              << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()
               << " microseconds" << std::endl;
     write_state(run_information, c_1, dynamics_areas, write_out1, write_out2);
   }
+  if (run_information.use_fast) {
+    dearrange_updates(run_information, c_1, rearrange_modify, fast_sum_tree_tri_points);
+  }
+
 
   write_out1.close();
   write_out2.close();

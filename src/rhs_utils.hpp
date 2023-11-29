@@ -28,10 +28,7 @@ void convolve_vel(
     const std::vector<double> &targets, const std::vector<double> &curr_state,
     const std::vector<double> &area,
     const std::vector<InteractionPair> &interactions,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_target,
-    const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_source,
+    const std::vector<std::vector<int>> start_locs,
     const IcosTree &icos_tree, const double time, const double omega);
 
 void convolve_stream(
@@ -53,7 +50,7 @@ void rhs_func(
     const std::vector<std::vector<std::vector<int>>>
         &fast_sum_tree_tri_points_target,
     const std::vector<std::vector<std::vector<int>>>
-        &fast_sum_tree_tri_points_source,
+        &fast_sum_tree_tri_points_source, const std::vector<std::vector<int>> start_locs, 
     const IcosTree &icos_tree, const double time, const double omega);
 
 void project_points(const RunConfig &run_information,

@@ -7,7 +7,7 @@
 #PBS -k eod
 #PBS -m abe
 #PBS -M cygnari@umich.edu
-#PBS -l select=1:ncpus=8:mpiprocs=8
+#PBS -l select=1:ncpus=16:mpiprocs=16
 #PBS -l place=group=rack
 
 export TMPDIR=/glade/derecho/scratch/$USER/temp
